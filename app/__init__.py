@@ -1,5 +1,6 @@
 from flask import Flask
 from app.extensions import db
+from flask_migrate import Migrate
 
 
 def create_app():
@@ -15,12 +16,11 @@ def create_app():
     # Connect SQLAlchemy to Flask
     db.init_app(app)
 
+    # Connect Flask-Migrate to SQLAlchemy
+    Migrate(app, db)
+
     # Import models so SQLAlchemy knows all the tables
     from app import models
-
-    # Create database tables
-    with app.app_context():
-        db.create_all()
 
     @app.route("/")
     def home():
