@@ -1,10 +1,35 @@
 {% extends "base.html" %}
 
 <!--Page Title-->
-{% block title %}Home - CollectiX{% endblock %}
+{% block title %}
+Home - CollectiX
+{% endblock %}
 
-<!--Page Content-->
 {% block content %}
-<h1>Welcome to CollectiX</h1>
-<p>This is the CollectiX homepage.</p>
+
+<!--Main welcome area of the homepage-->
+<div class="text-center py-5">
+
+    <!--Main heading-->
+    <h1 class="display-4 fw-bold">
+        Welcome to CollectiX
+    </h1>
+
+    <!--Short introduction-->
+    <p class="lead">
+        Illustrated collection system, items buy/sell and exchange platform
+    </p>
+
+    <!--Main action button-->
+    <!--href="#" is temporary because the real route is not ready yet-->
+    <a href="#" class="btn btn-primary me-2">
+        Browse Collections
+    </a>
+
+    <!--Secondary action button-->
+    <a href="#" class="btn btn-outline-primary">
+        View Marketplace
+    </a>
+
+</div>
 {% endblock %}
