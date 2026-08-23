@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from app.extensions import db
 from flask_migrate import Migrate
 
@@ -24,6 +24,6 @@ def create_app():
 
     @app.route("/")
     def home():
-        return "CollectiX Database is working!"
+        return render_template("main/index.html")
 
     return app
