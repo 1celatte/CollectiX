@@ -22,6 +22,12 @@ def create_app():
 
     # Import models so SQLAlchemy knows all the tables
     from app import models
+    from app.models import User
+
+    # Tell Flask-Login how to load a user
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     # Register Auth Blueprint
     from app.auth import auth
