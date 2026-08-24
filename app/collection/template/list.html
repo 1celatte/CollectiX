@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/collections.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <div class="nav-container">
+        <a href="{{ url_for('collections.list_collections') }}"
+           class="logo">
+            My Collections
+        </a>
+
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('collections.create_collection') }}">
+                    + New Collection
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+
+<main class="container">
+
+    <h1>Collections</h1>
+
+    <!-- Search -->
+    <form method="GET"
+          action="{{ url_for('collections.list_collections') }}"
+          class="search-form">
+
+        <input
+            type="text"
+            name="q"
+            placeholder="Search collections..."
+            value="{{ query }}"
+        >
+
+        <button type="submit">Search</button>
+    </form>
+
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+    <!-- Collections -->
+    <div class="collection-grid">
+
+        {% if collections %}
+
+            {% for collection in collections %}
+
+                <div class="collection-card">
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/' + collection.image) }}"
+                        alt="{{ collection.name }}"
+                    >
+
+                    <div class="card-content">
+
+                        <h2>{{ collection.name }}</h2>
+
+                        <p class="category">
+                            {{ collection.category }}
+                        </p>
+
+                        <p>
+                            {{ collection.description }}
+                        </p>
+
+                        <a
+                            href="{{ url_for(
+                                'collections.view_collection',
+                                collection_id=collection.id
+                            ) }}"
+                            class="button"
+                        >
+                            View Collection
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No collections found.</p>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+</body>
+</html>

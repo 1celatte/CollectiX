@@ -2,15 +2,16 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Collection, Item, UserCollection
+from ..utils import save_upload
 
 collections_bp = Blueprint("collections", __name__, url_prefix="/collections")
 
 
-=======================================================================================================================
+#=======================================================================================================================
 
 #list & view collections and items in collection
 
-========================================================================================================================
+#========================================================================================================================
 
 @collections_bp.route("/")
 def list_collections():
@@ -33,13 +34,13 @@ def view_collection(collection_id):
     return render_template("collections/view.html", collection=collection, items=items,
                             already_added=already_added)
     
-==============================================================================================
+#==============================================================================================
 
  #Create New Collection (goes to pending review by admin).
  
- ==============================================================================================
+#==============================================================================================
     
-@collections_bp.route("/new", methods=["GET", "POST"])
+@collections_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create_collection():
     if request.method == "POST":
@@ -50,7 +51,7 @@ def create_collection():
 
         if not name:
             flash("Collection name is required.", "danger")
-            return render_template("collections/new.html")
+            return render_template("collections/create.html")
 
         image_filename = save_upload(image_file, default="default_collection.png")
         collection = Collection(name=name, description=description, category=category,
@@ -59,15 +60,15 @@ def create_collection():
         db.session.add(collection)
         db.session.commit()
         flash("Collection submitted sucessfully! It will appear once approved by an admin.", "success")
-        return redirect(url_for(""))
+        return redirect(url_for("collections.list_collections"))
 
-    return render_template("")
+    return render_template("collections/create.html")
 
-================================================================================================================
+#================================================================================================================
 
 #Add items to Public Collection (goes to pending review).
 
-=================================================================================================================
+#=================================================================================================================
 
 @collections_bp.route("/<int:collection_id>/add-item", methods=["GET", "POST"])
 @login_required
@@ -80,7 +81,7 @@ def add_item(collection_id):
 
         if not name:
             flash("Item name is required.", "danger")
-            return render_template("collections/add_item.html", collection=collection)
+            return render_template("collections/add.html", collection=collection)
 
         image_filename = save_upload(image_file, default="default_item.png")
         item = Item(collection_id=collection.id, name=name, description=description,
@@ -90,13 +91,13 @@ def add_item(collection_id):
         flash("Item submitted! It will appear once approved by an admin.", "success")
         return redirect(url_for("collections.view_collection", collection_id=collection.id))
 
-    return render_template("", collection=collection)
+    return render_template("collections/add.html", collection=collection)
 
-=====================================================================================================================
+#=====================================================================================================================
 
 #add collection to user's personal collection
 
-======================================================================================================================
+#======================================================================================================================
 
 @collections_bp.route("/<int:collection_id>/add-to-my-collection", methods=["POST"])
 @login_required
