@@ -6,6 +6,12 @@ from app.models import Collection, Item, UserCollection
 collections_bp = Blueprint("collections", __name__, url_prefix="/collections")
 
 
+=======================================================================================================================
+
+#list & view collections and items in collection
+
+========================================================================================================================
+
 @collections_bp.route("/")
 def list_collections():
     query = request.args.get("q", "").strip()
@@ -26,12 +32,16 @@ def view_collection(collection_id):
             user_id=current_user.id, collection_id=collection.id).first() is not None
     return render_template("collections/view.html", collection=collection, items=items,
                             already_added=already_added)
+    
+==============================================================================================
 
-
+ #Create New Collection (goes to pending review by admin).
+ 
+ ==============================================================================================
+    
 @collections_bp.route("/new", methods=["GET", "POST"])
 @login_required
 def create_collection():
-    """Create New Collection (goes to pending review by admin)."""
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         description = request.form.get("description", "")
@@ -53,11 +63,15 @@ def create_collection():
 
     return render_template("")
 
+================================================================================================================
+
+#Add items to Public Collection (goes to pending review).
+
+=================================================================================================================
 
 @collections_bp.route("/<int:collection_id>/add-item", methods=["GET", "POST"])
 @login_required
 def add_item(collection_id):
-    """Add items to Public Collection (goes to pending review)."""
     collection = Collection.query.get_or_404(collection_id)
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -78,6 +92,11 @@ def add_item(collection_id):
 
     return render_template("", collection=collection)
 
+=====================================================================================================================
+
+#add collection to user's personal collection
+
+======================================================================================================================
 
 @collections_bp.route("/<int:collection_id>/add-to-my-collection", methods=["POST"])
 @login_required
