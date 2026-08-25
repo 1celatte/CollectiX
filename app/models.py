@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default="user", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_picture = db.Column(db.String(255), nullable=True)
 
 
 class Collection(db.Model):

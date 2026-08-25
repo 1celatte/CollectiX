@@ -1,6 +1,8 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.utils import secure_filename
+import os
 
 from . import auth
 from app.extensions import db
@@ -91,6 +93,7 @@ def edit_profile():
     if request.method == "POST":
         username = request.form.get("username")
         email = request.form.get("email")
+        profile_picture = request.files.get("profile_picture")
 
         existing_user = User.query.filter(
             (User.username == username) &
@@ -107,6 +110,23 @@ def edit_profile():
 
         if existing_email:
             return "Email already exists!"
+
+        if profile_picture and profile_picture.filename:
+            filename = f"{current_user.id}_{secure_filename(profile_picture.filename)}"
+            
+            upload_folder = os.path.join(
+                current_app.static_folder,
+                "uploads",
+                "avatars"
+            )
+
+            os.makedirs(upload_folder, exist_ok=True)
+
+            profile_picture.save(
+                os.path.join(upload_folder, filename)
+            )
+
+            current_user.profile_picture = f"uploads/avatars/{filename}"
 
         current_user.username = username
         current_user.email = email
