@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user
 
 from . import auth
 from app.extensions import db
@@ -46,3 +47,33 @@ def register():
         return "Registration successful!"
 
     return render_template("register.html")
+
+
+@auth.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username_or_email = request.form.get("username_or_email")
+        password = request.form.get("password")
+
+        user = User.query.filter(
+            (User.username == username_or_email) |
+            (User.email == username_or_email)
+        ).first()
+
+        if user is None:
+            return "Invalid username/email or password!"
+
+        if not check_password_hash(user.password, password):
+            return "Invalid username/email or password!"
+
+        login_user(user)
+
+        return "Login successful!"
+
+    return render_template("login.html")
+
+
+@auth.route("/logout")
+def logout():
+    logout_user()
+    return "Logout successful!"
