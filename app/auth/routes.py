@@ -83,3 +83,56 @@ def logout():
 @login_required
 def profile():
     return render_template("profile.html")
+
+
+@auth.route("/profile/edit", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+
+        existing_user = User.query.filter(
+            (User.username == username) &
+            (User.id != current_user.id)
+        ).first()
+
+        if existing_user:
+            return "Username already exists!"
+
+        existing_email = User.query.filter(
+            (User.email == email) &
+            (User.id != current_user.id)
+        ).first()
+
+        if existing_email:
+            return "Email already exists!"
+
+        current_user.username = username
+        current_user.email = email
+
+        db.session.commit()
+
+        return redirect(url_for("auth.profile"))
+
+    return render_template("edit_profile.html")
+
+
+@auth.route("/profile/change-password", methods=["POST"])
+@login_required
+def change_password():
+    current_password = request.form.get("current_password")
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_password")
+
+    if not check_password_hash(current_user.password, current_password):
+        return "Current password is incorrect!"
+    
+    if new_password != confirm_password:
+        return "New passwords do not match!"
+
+    current_user.password = generate_password_hash(new_password)
+
+    db.session.commit()
+
+    return redirect(url_for("auth.profile"))

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+
+    <h1>Edit Profile</h1>
+
+    <form method="POST">
+
+        <label>Username:</label>
+        <input type="text"
+               name="username"
+               value="{{ current_user.username }}"
+               required>
+
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email"
+               name="email"
+               value="{{ current_user.email }}"
+               required>
+
+        <br><br>
+
+        <button type="submit">Save Changes</button>
+
+    </form>
+
+    <hr>
+
+    <h2>Change Password</h2>
+
+    <form method="POST" action="{{ url_for('auth.change_password') }}">
+
+        <label>Current Password:</label>
+        <input type="password" name="current_password" required>
+
+        <br><br>
+
+        <label>New Password:</label>
+        <input type="password" name="new_password" required>
+
+        <br><br>
+
+        <label>Confirm New Password:</label>
+        <input type="password" name="confirm_password" required>
+
+        <br><br>
+
+        <button type="submit">Change Password</button>
+
+    </form>
+
+    <a href="{{ url_for('auth.profile') }}">Cancel</a>
+
+</body>
+</html>
