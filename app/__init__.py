@@ -15,6 +15,9 @@ def create_app():
 
     # Connect SQLAlchemy to Flask
     db.init_app(app)
+    # Register the Browse Blueprint
+    from app.browse import browse_bp
+    app.register_blueprint(browse_bp)
 
     # Connect Flask-Migrate to SQLAlchemy
     Migrate(app, db)
