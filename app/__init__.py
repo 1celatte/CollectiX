@@ -21,6 +21,13 @@ def create_app():
 
     # Import models so SQLAlchemy knows all the tables
     from app import models
+    
+     # Import models so SQLAlchemy knows about them
+    from app.models import User, Collection, Item
+
+    # Register collection routes
+    from app.collection.feature import collection_bp
+    app.register_blueprint(collection_bp)
 
     @app.route("/")
     def home():
