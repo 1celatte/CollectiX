@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required, current_user
 
 from . import auth
 from app.extensions import db
@@ -68,7 +68,7 @@ def login():
 
         login_user(user)
 
-        return "Login successful!"
+        return redirect(url_for("auth.profile"))
 
     return render_template("login.html")
 
@@ -77,3 +77,9 @@ def login():
 def logout():
     logout_user()
     return "Logout successful!"
+
+
+@auth.route("/profile")
+@login_required
+def profile():
+    return render_template("profile.html")
