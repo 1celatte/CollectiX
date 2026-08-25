@@ -7,6 +7,15 @@
 
     <h1>My Profile</h1>
 
+    {% if current_user.profile_picture %}
+        <img src="{{ url_for('static', filename=current_user.profile_picture) }}"
+            alt="Profile Picture"
+            width="150"
+            height="150">
+    {% else %}
+        <p>No profile picture.</p>
+    {% endif %}
+    
     <p>Username: {{ current_user.username }}</p>
     <p>Email: {{ current_user.email }}</p>
     <p>Role: {{ current_user.role }}</p>

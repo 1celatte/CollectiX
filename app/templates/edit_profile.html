@@ -7,7 +7,7 @@
 
     <h1>Edit Profile</h1>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
         <label>Username:</label>
         <input type="text"
@@ -22,6 +22,11 @@
                name="email"
                value="{{ current_user.email }}"
                required>
+
+        <br><br>
+
+        <label>Profile Picture:</label>
+        <input type="file" name="profile_picture" accept="image/*">
 
         <br><br>
 
