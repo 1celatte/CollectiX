@@ -113,7 +113,7 @@ def edit_profile():
 
         if profile_picture and profile_picture.filename:
             filename = f"{current_user.id}_{secure_filename(profile_picture.filename)}"
-            
+
             upload_folder = os.path.join(
                 current_app.static_folder,
                 "uploads",
@@ -136,6 +136,24 @@ def edit_profile():
         return redirect(url_for("auth.profile"))
 
     return render_template("edit_profile.html")
+
+
+@auth.route("/profile/remove-picture", methods=["POST"])
+@login_required
+def remove_profile_picture():
+    if current_user.profile_picture:
+        file_path = os.path.join(
+            current_app.static_folder,
+            current_user.profile_picture
+        )
+
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        current_user.profile_picture = None
+        db.session.commit()
+
+    return redirect(url_for("auth.profile"))
 
 
 @auth.route("/profile/change-password", methods=["POST"])
