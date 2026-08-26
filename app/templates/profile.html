@@ -12,22 +12,24 @@
              alt="Profile Picture"
              width="150"
             height="150">
-
-        <form method="POST"
-             action="{{ url_for('auth.remove_profile_picture') }}">
-            <button type="submit">Remove Profile Picture</button>
-        </form>
-
-{% else %}
-    <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}"
-         alt="Default Profile Picture"
-         width="150"
-         height="150">
-{% endif %}
+    {% else %}
+        <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}"
+             alt="Default Profile Picture"
+            width="150"
+            height="150">
+    {% endif %}
 
     <p>Username: {{ current_user.username }}</p>
     <p>Email: {{ current_user.email }}</p>
     <p>Role: {{ current_user.role }}</p>
+
+    <h2>My Collection</h2>
+
+    <button type="button">View My Collection</button>
+
+    <a href="{{ url_for('auth.edit_profile') }}">
+        <button>Edit Profile</button>
+    </a>
 
     <a href="{{ url_for('auth.logout') }}">Logout</a>
 

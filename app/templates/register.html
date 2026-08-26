@@ -2,6 +2,17 @@
 <html>
 <head>
     <title>Register</title>
+
+    <style>
+        .error-input {
+            border: 2px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
 </head>
 
 <body>
@@ -11,22 +22,53 @@
     <form method="POST">
 
         <label>Username:</label>
-        <input type="text" name="username" required>
+        <input type="text"
+               name="username"
+               value="{{ username or '' }}"
+               class="{% if username_error %}error-input{% endif %}"
+               required>
+
+        {% if username_error %}
+            <div class="error-message">
+                ⚠ {{ username_error }}
+            </div>
+        {% endif %}
 
         <br><br>
 
         <label>Email:</label>
-        <input type="email" name="email" required>
+        <input type="email"
+               name="email"
+               value="{{ email or '' }}"
+               class="{% if email_error %}error-input{% endif %}"
+               required>
+
+        {% if email_error %}
+            <div class="error-message">
+                ⚠ {{ email_error }}
+            </div>
+        {% endif %}
 
         <br><br>
 
         <label>Password:</label>
-        <input type="password" name="password" required>
+        <input type="password"
+               name="password"
+               required>
 
         <br><br>
 
         <label>Confirm Password:</label>
-        <input type="password" name="confirm_password" required>
+        <input type="password"
+               name="confirm_password"
+               class="{% if password_error %}error-input{% endif %}"
+               required>
+
+        {% if password_error %}
+            <div class="error-message">
+                ⚠ {{ password_error }}
+            </div>
+        {% endif %}
 
         <br><br>
 

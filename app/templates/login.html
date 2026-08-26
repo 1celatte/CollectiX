@@ -2,7 +2,19 @@
 <html>
 <head>
     <title>Login</title>
+
+    <style>
+        .error-input {
+            border: 2px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
 </head>
+
 <body>
 
     <h1>Login</h1>
@@ -10,12 +22,25 @@
     <form method="POST">
 
         <label>Username or Email:</label>
-        <input type="text" name="username_or_email" required>
+        <input type="text"
+               name="username_or_email"
+               value="{{ username_or_email or '' }}"
+               class="{% if login_error %}error-input{% endif %}"
+               required>
 
         <br><br>
 
         <label>Password:</label>
-        <input type="password" name="password" required>
+        <input type="password"
+               name="password"
+               class="{% if login_error %}error-input{% endif %}"
+               required>
+
+        {% if login_error %}
+            <div class="error-message">
+                ⚠ {{ login_error }}
+            </div>
+        {% endif %}
 
         <br><br>
 
