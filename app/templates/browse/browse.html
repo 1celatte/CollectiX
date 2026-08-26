@@ -8,20 +8,36 @@
     <title>Browse Collections - CollectiX</title>
 
     <!--Bootstrap CSS-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 
     <main class="container py-5">
 
-        <!--page heading-->
+        <!--Page heading-->
         <h1 class="mb-2">Browse Collections</h1>
 
-        <!--page description-->
+        <!--Page description-->
         <p class="text-muted mb-4">
             Explore public collectible collections.
+        </p>
+
+        <!-- Temporary debug information to verify that Flask receives the search and filter parameters -->
+        {% if query %}
+        <p class="text-primary">
+            Current keyword: <strong>{{ query }}</strong>
+        </p>
+        {% endif %}
+
+        {% if category %}
+        <p class="text-primary">
+            Current category: <strong>{{ category }}</strong>
+        </p>
+        {% endif %}
+
+        <p class="text-muted">
+            Current sort: <strong>{{ sort }}</strong>
         </p>
 
         <!--Search and filter form-->
@@ -31,39 +47,95 @@
 
                 <!--search by keyword-->
                 <div class="col-md-6">
-                    <input type="text"
-                           name="q"
-                           class="form-control"
-                           placeholder="Search collections...">
+                    <input type="text" name="q" class="form-control" placeholder="Search collections...">
                 </div>
 
-                <!--filter by category （option only for testing)-->
+                <!--Filter by category （option only for testing)-->
                 <div class="col-md-3">
                     <select name="category" class="form-select">
+
                         <option value="">All categories</option>
                         <option value="anime">Anime</option>
                         <option value="gaming">Gaming</option>
                         <option value="blind-box">Blind Box</option>
+
                     </select>
                 </div>
 
-                <!--sort option-->
+                <!--Sort option-->
                 <div class="col-md-3">
                     <select name="sort" class="form-select">
+
                         <option value="newest">Newest</option>
                         <option value="oldest">Oldest</option>
                         <option value="name">Name A-Z</option>
+
                     </select>
                 </div>
 
             </div>
 
-            <!--Search button-->
+            <!--Search button (submit search)-->
             <button type="submit" class="btn btn-primary mt-3">
                 Search
             </button>
 
         </form>
+
+        <!--Collection results-->
+        <div class="row g-4">
+
+            <!--Check whether collections exist or not-->
+            {% if collections%}
+
+            <!--Display every collection-->
+            {% for collection in collections %}
+
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <!--Collection name-->
+                        <h5 class="card-title">
+                            {{ collection.name }}
+                        </h5>
+
+                        <!--Collection description-->
+                        <p class="card-text">
+                            {{ collection.description }}
+                        </p>
+
+                        <!--Collection category-->
+                        <p class="text-muted">
+                            Category: {{ collection.category }}
+                        </p>
+
+                        <!--Temporary details button-->
+                        <a href="#" class="btn btn-outline-primary">
+                            View Collection
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <!--Message when no collections exist-->
+            <div class="col-12">
+                <p class="text-muted">
+                    No public collections are available yet!
+                </p>
+            </div>
+
+            {% endif %}
+
+        </div>
 
     </main>
 
