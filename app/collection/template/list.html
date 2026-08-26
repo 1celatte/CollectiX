@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Public Collections</title>
 
@@ -16,11 +20,13 @@
     >
 </head>
 
+
 <body>
 
     <div class="container">
 
         <h1>Public Collections</h1>
+
 
         {% if collections %}
 
@@ -28,57 +34,72 @@
 
                 {% for collection in collections %}
 
-                    <div class="collection-card">
+                    <!-- Entire Collection Card is Clickable -->
 
-                        <!-- Collection Image -->
-                        {% if collection.image %}
+                    <a
+                        href="{{ url_for(
+                            'collection.view_collection',
+                            collection_id=collection.id
+                        ) }}"
+                        class="collection-link"
+                    >
 
-                            <img
-                                src="{{ url_for(
-                                    'collection.static',
-                                    filename='uploads/' + collection.image
-                                ) }}"
-                                alt="{{ collection.name }}"
-                                class="collection-image"
-                            >
+                        <div class="collection-card">
 
-                        {% else %}
 
-                            <div class="no-image">
-                                No Image
+                            <!-- Collection Image -->
+
+                            {% if collection.image %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'collection.static',
+                                        filename='uploads/' + collection.image
+                                    ) }}"
+                                    alt="{{ collection.name }}"
+                                    class="collection-image"
+                                >
+
+                            {% else %}
+
+                                <div class="no-image">
+                                    No Image
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Collection Information -->
+
+                            <div class="collection-info">
+
+                                <h2>
+                                    {{ collection.name }}
+                                </h2>
+
+                                <p>
+                                    <strong>Category:</strong>
+                                    {{ collection.category }}
+                                </p>
+
+                                <p>
+                                    {{ collection.description }}
+                                </p>
+
+                                <p class="status">
+                                    Approved
+                                </p>
+
                             </div>
-
-                        {% endif %}
-
-
-                        <!-- Collection Information -->
-
-                        <div class="collection-info">
-
-                            <h2>
-                                {{ collection.name }}
-                            </h2>
-
-                            <p>
-                                <strong>Category:</strong>
-                                {{ collection.category }}
-                            </p>
-
-                            <p>
-                                {{ collection.description }}
-                            </p>
-
-                            <p class="status">
-                                Approved
-                            </p>
 
                         </div>
 
-                    </div>
+                    </a>
 
                 {% endfor %}
 
             </div>
+
 
         {% else %}
 
@@ -87,6 +108,7 @@
             </p>
 
         {% endif %}
+
 
     </div>
 

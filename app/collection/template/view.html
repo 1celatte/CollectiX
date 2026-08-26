@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ collection.name }}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'collection.static',
+            filename='css/collection.css'
+        ) }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- Back Button -->
+
+        <a href="{{ url_for('collection.list_collections') }}">
+            ← Back to Collections
+        </a>
+
+
+        <!-- Collection Information -->
+
+        <div class="collection-detail">
+
+            {% if collection.image %}
+
+                <img
+                    src="{{ url_for(
+                        'collection.static',
+                        filename='uploads/' + collection.image
+                    ) }}"
+                    alt="{{ collection.name }}"
+                    class="detail-image"
+                >
+
+            {% endif %}
+
+
+            <div class="collection-detail-info">
+
+                <h1>
+                    {{ collection.name }}
+                </h1>
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ collection.category }}
+                </p>
+
+                <p>
+                    {{ collection.description }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Items -->
+
+        <h2>Items in this Collection</h2>
+
+
+        {% if items %}
+
+            <div class="item-grid">
+
+                {% for item in items %}
+
+                    <div class="item-card">
+
+                        {% if item.image %}
+
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                class="item-image"
+                            >
+
+                        {% else %}
+
+                            <div class="no-image">
+                                No Image
+                            </div>
+
+                        {% endif %}
+
+
+                        <div class="item-info">
+
+                            <h3>
+                                {{ item.name }}
+                            </h3>
+
+                            <p>
+                                {{ item.description }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p>
+                No approved items in this collection yet.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
