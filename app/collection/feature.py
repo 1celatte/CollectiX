@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-from app.models import Collection
+from app.models import Collection,Item
 from . import collection_bp
 
 
@@ -15,11 +15,10 @@ collection_bp = Blueprint(
 
 #=======================================================================================================================
 
-#list & view collections and items in collection
+#list collectionsin Public collection
 
 #========================================================================================================================
 
-#list
 @collection_bp.route("/")
 def list_collections():
 
@@ -51,25 +50,30 @@ def create_test_collection():
 
     return "Test collection created!"
 
-@collection_bp.route("/fix-images")
-def fix_images():
-
-    collections = Collection.query.all()
-
-    for collection in collections:
-        collection.image = "test.png"
-
-    db.session.commit()
-
-    return "All collection images updated!"
-
 #==============================================================================================
 
- #Create New Collection (goes to pending review by admin).
- 
+#View Collection Details
+
 #=======================================================================================================================
     
+@collection_bp.route("/<int:collection_id>")
+def view_collection(collection_id):
 
+    collection = Collection.query.filter_by(
+        id=collection_id,
+        status="approved"
+    ).first_or_404()
+
+    items = Item.query.filter_by(
+        collection_id=collection.id,
+        status="approved"
+    ).all()
+
+    return render_template(
+        "view.html",
+        collection=collection,
+        items=items
+    )
 
 #================================================================================================================
 
@@ -79,7 +83,7 @@ def fix_images():
 
 #=====================================================================================================================
 
-#add collection to user's personal collection
-
+#Create New Collection (goes to pending review by admin).
+ 
 #======================================================================================================================
 
