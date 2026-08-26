@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create New Collection</title>
+
+</head>
+
+
+<body>
+
+    <h1>Create New Collection</h1>
+
+    <p>
+        Create a new collectible collection.
+        Your collection will be reviewed by an admin before
+        appearing publicly.
+    </p>
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <!-- Collection Name -->
+
+        <div>
+
+            <label for="name">
+                Collection Name:
+            </label>
+
+            <br>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+            >
+
+        </div>
+
+
+        <br>
+
+
+        <!-- Category -->
+
+        <div>
+
+            <label for="category">
+                Category:
+            </label>
+
+            <br>
+
+            <input
+                type="text"
+                id="category"
+                name="category"
+                placeholder="e.g. Trading Cards"
+            >
+
+        </div>
+
+
+        <br>
+
+
+        <!-- Description -->
+
+        <div>
+
+            <label for="description">
+                Description:
+            </label>
+
+            <br>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="5"
+                cols="40"
+            ></textarea>
+
+        </div>
+
+
+        <br>
+
+
+        <!-- Collection Image -->
+
+        <div>
+
+            <label for="image">
+                Collection Image:
+            </label>
+
+            <br>
+
+            <input
+                type="file"
+                id="image"
+                name="image"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <br>
+
+
+        <!-- Submit -->
+
+        <button type="submit">
+            Create Collection
+        </button>
+
+
+    </form>
+
+
+    <br>
+
+
+    <!-- Back to Collections -->
+
+    <a href="{{ url_for('collection.list_collections') }}">
+        ← Back to Collections
+    </a>
+
+
+</body>
+
+</html>

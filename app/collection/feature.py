@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template
-
-from app.models import Collection,Item
+from flask import Blueprint, render_template, url_for, redirect, request, flash
+from app.extensions import db
+from app.models import Collection, Item
 from . import collection_bp
+import os
+from werkzeug.utils import secure_filename
 
 
 collection_bp = Blueprint(
@@ -80,6 +82,76 @@ def view_collection(collection_id):
 #Add items to Public Collection (goes to pending review).
 
 #=================================================================================================================
+
+@collection_bp.route("/create", methods=["GET", "POST"])
+def create_collection():
+
+    if request.method == "POST":
+
+        # Get information from the form
+        name = request.form.get("name")
+        category = request.form.get("category")
+        description = request.form.get("description")
+
+        # Get uploaded image
+        image_file = request.files.get("image")
+
+        # Check collection name
+        if not name:
+            return "Collection name is required."
+
+        # Save image
+        image_filename = None
+
+        if image_file and image_file.filename:
+
+            image_filename = secure_filename(
+                image_file.filename
+            )
+
+            upload_folder = os.path.join(
+                collection_bp.root_path,
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(
+                upload_folder,
+                exist_ok=True
+            )
+
+            image_file.save(
+                os.path.join(
+                    upload_folder,
+                    image_filename
+                )
+            )
+
+        # Create collection
+        collection = Collection(
+            name=name,
+            category=category,
+            description=description,
+            image=image_filename,
+
+            # IMPORTANT:
+            # New collections need admin approval
+            status="pending",
+
+            # Temporary user ID for testing
+            created_by=1
+        )
+
+        # Save to database
+        db.session.add(collection)
+        db.session.commit()
+
+        print("NEW COLLECTION ID:", collection.id)
+        print("NEW COLLECTION NAME:", collection.name)
+        print("NEW COLLECTION STATUS:", collection.status)
+        return "Collection submitted successfully! Waiting for admin approval."
+
+    return render_template("create.html")
 
 #=====================================================================================================================
 
