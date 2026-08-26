@@ -4,10 +4,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Public Collections</title>
 
@@ -20,95 +17,93 @@
     >
 </head>
 
-
 <body>
 
     <div class="container">
 
         <h1>Public Collections</h1>
 
-
+        <!-- Create Collection Link -->
+         <a href="{{ url_for('collection.create_collection') }}">
+             Create New Collection
+        </a>
+        
         {% if collections %}
 
             <div class="collection-grid">
 
                 {% for collection in collections %}
 
-                    <!-- Entire Collection Card is Clickable -->
+                    <div class="collection-card">
 
-                    <a
-                        href="{{ url_for(
-                            'collection.view_collection',
-                            collection_id=collection.id
-                        ) }}"
-                        class="collection-link"
-                    >
+                        <!-- Collection Image -->
+                        {% if collection.image %}
 
-                        <div class="collection-card">
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + collection.image
+                                ) }}"
+                                alt="{{ collection.name }}"
+                                class="collection-image"
+                            >
 
+                        {% else %}
 
-                            <!-- Collection Image -->
-
-                            {% if collection.image %}
-
-                                <img
-                                    src="{{ url_for(
-                                        'collection.static',
-                                        filename='uploads/' + collection.image
-                                    ) }}"
-                                    alt="{{ collection.name }}"
-                                    class="collection-image"
-                                >
-
-                            {% else %}
-
-                                <div class="no-image">
-                                    No Image
-                                </div>
-
-                            {% endif %}
-
-
-                            <!-- Collection Information -->
-
-                            <div class="collection-info">
-
-                                <h2>
-                                    {{ collection.name }}
-                                </h2>
-
-                                <p>
-                                    <strong>Category:</strong>
-                                    {{ collection.category }}
-                                </p>
-
-                                <p>
-                                    {{ collection.description }}
-                                </p>
-
-                                <p class="status">
-                                    Approved
-                                </p>
-
+                            <div class="no-image">
+                                No Image
                             </div>
+
+                        {% endif %}
+
+
+                        <!-- Collection Information -->
+                        <div class="collection-info">
+
+                            <!-- ONLY THIS NAME IS CLICKABLE -->
+                            <h2>
+                                <a
+                                    href="{{ url_for(
+                                        'collection.view_collection',
+                                        collection_id=collection.id
+                                    ) }}"
+                                >
+                                    {{ collection.name }}
+                                </a>
+                            </h2>
+
+
+                            <p>
+                                <strong>Category:</strong>
+                                {{ collection.category }}
+                            </p>
+
+
+                            <p>
+                                {{ collection.description }}
+                            </p>
+
+
+                            <p>
+                                <strong>Status:</strong>
+                                Approved
+                            </p>
 
                         </div>
 
-                    </a>
+                    </div>
 
                 {% endfor %}
 
             </div>
 
-
         {% else %}
 
-            <p class="empty-message">
+            <p>
                 No public collections available.
             </p>
 
         {% endif %}
-
 
     </div>
 
