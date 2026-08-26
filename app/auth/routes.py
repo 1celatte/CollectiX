@@ -22,17 +22,32 @@ def register():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
-        # Check password confirmation
-        if password != confirm_password:
-            return "Passwords do not match!"
+        username_error = None
+        email_error = None
+        password_error = None
 
         # Check whether username already exists
         if User.query.filter_by(username=username).first():
-            return "Username already exists!"
+            username_error = "Username already exists."
 
         # Check whether email already exists
         if User.query.filter_by(email=email).first():
-            return "Email already exists!"
+            email_error = "Email already exists."
+
+        # Check password confirmation
+        if password != confirm_password:
+            password_error = "Passwords do not match."
+
+        # If there are errors, stay on Register page
+        if username_error or email_error or password_error:
+            return render_template(
+                "register.html",
+                username=username,
+                email=email,
+                username_error=username_error,
+                email_error=email_error,
+                password_error=password_error
+            )
 
         # Hash password before storing it
         hashed_password = generate_password_hash(password)
@@ -46,7 +61,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        return "Registration successful!"
+        return redirect(url_for("auth.login"))
 
     return render_template("register.html")
 
@@ -62,11 +77,21 @@ def login():
             (User.email == username_or_email)
         ).first()
 
+        # Invalid username/email
         if user is None:
-            return "Invalid username/email or password!"
+            return render_template(
+                "login.html",
+                login_error="Invalid username/email or password.",
+                username_or_email=username_or_email
+            )
 
+        # Incorrect password
         if not check_password_hash(user.password, password):
-            return "Invalid username/email or password!"
+            return render_template(
+                "login.html",
+                login_error="Invalid username/email or password.",
+                username_or_email=username_or_email
+            )
 
         login_user(user)
 
@@ -95,13 +120,16 @@ def edit_profile():
         email = request.form.get("email")
         profile_picture = request.files.get("profile_picture")
 
+        username_error = None
+        email_error = None
+
         existing_user = User.query.filter(
             (User.username == username) &
             (User.id != current_user.id)
         ).first()
 
         if existing_user:
-            return "Username already exists!"
+            username_error = "Username already exists."
 
         existing_email = User.query.filter(
             (User.email == email) &
@@ -109,7 +137,16 @@ def edit_profile():
         ).first()
 
         if existing_email:
-            return "Email already exists!"
+            email_error = "Email already exists."
+
+        if username_error or email_error:
+            return render_template(
+                "edit_profile.html",
+                username=username,
+                email=email,
+                username_error=username_error,
+                email_error=email_error
+            )
 
         if profile_picture and profile_picture.filename:
             filename = f"{current_user.id}_{secure_filename(profile_picture.filename)}"
