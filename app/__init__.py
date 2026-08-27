@@ -1,17 +1,14 @@
 from flask import Flask
 from app.extensions import db
 from flask_migrate import Migrate
+from config import Config
 
 
 def create_app():
     app = Flask(__name__)
 
-    # Basic configuration
-    app.config["SECRET_KEY"] = "dev-secret-key"
-
-    # SQLite database
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///collectix.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # Load configuration
+    app.config.from_object(Config)
 
     # Connect SQLAlchemy to Flask
     db.init_app(app)
