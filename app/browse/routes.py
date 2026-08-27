@@ -1,6 +1,6 @@
 from flask import render_template, request
 from app.browse import browse_bp
-from app.models import Collection
+from app.models import Collection, Item
 
 #Browse all public collections
 @browse_bp.route("/")
@@ -55,4 +55,18 @@ def browse_page():
         query=query,
         category=category,
         sort=sort
+    )
+    
+#Display all the approved collectible items
+@browse_bp.route("/items")
+def browse_items():
+    items = Item.query.filter_by(
+        status="approved"
+    ).order_by(
+        Item.created_at.desc()
+    ).all()
+
+    return render_template(
+        "browse/items.html",
+        items=items
     )
