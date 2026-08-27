@@ -57,16 +57,30 @@ def browse_page():
         sort=sort
     )
     
-#Display all the approved collectible items
+#Display and search approved collectible items
 @browse_bp.route("/items")
 def browse_items():
-    items = Item.query.filter_by(
+    #Get the keyword from the search box
+    query = request.args.get("q", "").strip()
+
+    #Start with approved items
+    items_query = Item.query.filter_by(
         status="approved"
-    ).order_by(
+    )
+
+    #Search by item name
+    if query:
+        items_query = items_query.filter(
+            Item.name.ilike(f"%{query}%")
+        )
+
+    #Sort newest items first
+    items = items_query.order_by(
         Item.created_at.desc()
     ).all()
 
     return render_template(
         "browse/items.html",
-        items=items
+        items=items,
+        query=query
     )
