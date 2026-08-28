@@ -96,7 +96,7 @@ with app.app_context():
         name="Naruto Shippuden",
         category="Anime Figure",
         description="Naruto Shippuden collectible figures.",
-        image=None,
+        image="kakashi_test.png",
         status="approved",
         created_by=admin.id
     )
@@ -163,7 +163,7 @@ with app.app_context():
         collection_id=naruto.id,
         name="Sasuke Uchiha",
         description="Sasuke Uchiha collectible figure.",
-        image=None,
+        image="kakashi_test.png",
         status="approved",
         created_by=admin.id
     )
