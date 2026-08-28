@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+
+    <style>
+        .error-input {
+            border: 2px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Edit Profile</h1>
+
+    <!-- Edit Profile Form -->
+    <form method="POST" enctype="multipart/form-data">
+
+        <label>Username:</label>
+        <input type="text"
+               name="username"
+               value="{{ username or current_user.username }}"
+               class="{% if username_error %}error-input{% endif %}"
+               required>
+
+        {% if username_error %}
+            <div class="error-message">
+                ⚠ {{ username_error }}
+            </div>
+        {% endif %}
+
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email"
+               name="email"
+               value="{{ email or current_user.email }}"
+               class="{% if email_error %}error-input{% endif %}"
+               required>
+
+        {% if email_error %}
+            <div class="error-message">
+                ⚠ {{ email_error }}
+            </div>
+        {% endif %}
+
+        <br><br>
+
+        <label>Profile Picture:</label>
+        <input type="file"
+               name="profile_picture"
+               accept="image/*">
+
+        <br><br>
+
+        <button type="submit">Save Changes</button>
+
+    </form>
+
+    <br>
+
+    <!-- Remove Profile Picture -->
+    <form method="POST"
+          action="{{ url_for('auth.remove_profile_picture') }}">
+
+        <button type="submit">Remove Profile Picture</button>
+
+    </form>
+
+    <hr>
+
+    <!-- Change Password -->
+    <h2>Change Password</h2>
+
+    <form method="POST"
+          action="{{ url_for('auth.change_password') }}">
+
+        <label>Current Password:</label>
+        <input type="password"
+               name="current_password"
+               required>
+
+        <br><br>
+
+        <label>New Password:</label>
+        <input type="password"
+               name="new_password"
+               required>
+
+        <br><br>
+
+        <label>Confirm New Password:</label>
+        <input type="password"
+               name="confirm_password"
+               required>
+
+        <br><br>
+
+        <button type="submit">Change Password</button>
+
+    </form>
+
+    <br>
+
+    <a href="{{ url_for('auth.profile') }}">
+        <button type="button">Cancel</button>
+    </a>
+
+</body>
+</html>
