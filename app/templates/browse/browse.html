@@ -1,151 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Browse Collections - CollectiX
+{% endblock %}
 
-    <title>Browse Collections - CollectiX</title>
+{% block content %}
 
-    <!--Bootstrap CSS-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<!--Page heading-->
+<h1 class="mb-2">Browse Collections</h1>
 
-<a
-    href="{{ url_for('browse.browse_items') }}"
-    class="btn btn-primary"
->
+<!--Page description-->
+<p class="text-muted mb-4">
+    Explore public collectible collections.
+</p>
+
+<!--Link with View All Items page-->
+<a href="{{ url_for('browse.browse_items') }}" class="btn btn-primary-4">
     View All Items
 </a>
 
-<body>
+<!--Search and filter form-->
+<form method="GET" action="{{ url_for('browse.browse_page') }}" class="card p-3 mb-4">
 
-    <main class="container py-5">
+    <div class="row g-2">
 
-        <!--Page heading-->
-        <h1 class="mb-2">Browse Collections</h1>
+        <!--search by keyword-->
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="Search collections..." value="{{ query }}">
+        </div>
 
-        <!--Page description-->
-        <p class="text-muted mb-4">
-            Explore public collectible collections.
-        </p>
+        <!--Filter by category-->
+        <div class="col-md-3">
+            <select name="category" class="form-select">
 
-        <!-- Temporary debug information to verify that Flask receives the search and filter parameters -->
-        {% if query %}
-        <p class="text-primary">
-            Current keyword: <strong>{{ query }}</strong>
-        </p>
-        {% endif %}
+                <option value="">All categories</option>
 
-        {% if category %}
-        <p class="text-primary">
-            Current category: <strong>{{ category }}</strong>
-        </p>
-        {% endif %}
+                {% for category_option in categories %}
+                <option value="{{ category_option }}" {% if category==category_option %}selected{% endif %}>
+                    {{ category_option }}
+                </option>
+                {% endfor %}
 
-        <p class="text-muted">
-            Current sort: <strong>{{ sort }}</strong>
-        </p>
+            </select>
+        </div>
 
-        <!--Search and filter form-->
-        <form method="GET" action="/browse/" class="card p-3 mb-4">
+        <!--Sort results-->
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
 
-            <div class="row g-2">
+                <option value="newest" {% if sort=="newest" %}selected{% endif %}>
+                    Newest
+                </option>
 
-                <!--search by keyword-->
-                <div class="col-md-6">
-                    <input type="text" name="q" class="form-control" placeholder="Search collections...">
-                </div>
+                <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>
+                    Oldest
+                </option>
 
-                <!--Filter by category （option only for testing)-->
-                <div class="col-md-3">
-                    <select name="category" class="form-select">
+                <option value="name" {% if sort=="name" %}selected{% endif %}>
+                    Name A-Z
+                </option>
 
-                        <option value="">All categories</option>
-                        <option value="anime">Anime</option>
-                        <option value="gaming">Gaming</option>
-                        <option value="blind-box">Blind Box</option>
+            </select>
+        </div>
 
-                    </select>
-                </div>
+    </div>
 
-                <!--Sort option-->
-                <div class="col-md-3">
-                    <select name="sort" class="form-select">
+    <!--Search button (submit search)-->
+    <button type="submit" class="btn btn-primary mt-3">
+        Search
+    </button>
 
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                        <option value="name">Name A-Z</option>
+</form>
 
-                    </select>
-                </div>
+<!--Collection results-->
+<div class="row g-4">
 
-            </div>
+    <!--Check whether collections exist or not-->
+    {% if collections%}
 
-            <!--Search button (submit search)-->
-            <button type="submit" class="btn btn-primary mt-3">
-                Search
-            </button>
+    <!--Display every collection-->
+    {% for collection in collections %}
 
-        </form>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
 
-        <!--Collection results-->
-        <div class="row g-4">
+            <div class="card-body">
 
-            <!--Check whether collections exist or not-->
-            {% if collections%}
+                <!--Collection name-->
+                <h5 class="card-title">
+                    {{ collection.name }}
+                </h5>
 
-            <!--Display every collection-->
-            {% for collection in collections %}
-
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <!--Collection name-->
-                        <h5 class="card-title">
-                            {{ collection.name }}
-                        </h5>
-
-                        <!--Collection description-->
-                        <p class="card-text">
-                            {{ collection.description }}
-                        </p>
-
-                        <!--Collection category-->
-                        <p class="text-muted">
-                            Category: {{ collection.category }}
-                        </p>
-
-                        <!--Temporary details button-->
-                        <a href="#" class="btn btn-outline-primary">
-                            View Collection
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            {% endfor %}
-
-            {% else %}
-
-            <!--Message when no collections exist-->
-            <div class="col-12">
-                <p class="text-muted">
-                    No public collections are available yet!
+                <!--Collection description-->
+                <p class="card-text">
+                    {{ collection.description }}
                 </p>
-            </div>
 
-            {% endif %}
+                <!--Collection category-->
+                <p class="text-muted">
+                    Category: {{ collection.category }}
+                </p>
+
+                <!--Temporary details button-->
+                <a href="#" class="btn btn-outline-primary">
+                    View Collection
+                </a>
+
+            </div>
 
         </div>
 
-    </main>
+    </div>
 
-</body>
+    {% endfor %}
 
-</html>
+    {% else %}
+
+    <!--Message when no collections exist-->
+    <div class="col-12">
+        <p class="text-muted">
+            No public collections are available yet!
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

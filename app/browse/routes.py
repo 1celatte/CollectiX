@@ -17,7 +17,7 @@ def browse_page():
     #Start with approved public collections
     collections_query = Collection.query.filter_by(
         status="approved"
-        )
+    )
     
     #Search by collection name
     if query:
@@ -45,18 +45,32 @@ def browse_page():
             Collection.created_at.desc()
         )
 
-    #Run the database query
+    #Run the collection query
     collections = collections_query.all()
 
-    #Send all the collections(results) to HTML page
+    #Get categories from approved collections
+    categories = [
+        row[0]
+        for row in Collection.query.with_entities(
+            Collection.category
+        ).filter(
+            Collection.status == "approved",
+            Collection.category.isnot(None)
+        ).distinct().order_by(
+            Collection.category
+        ).all()
+    ]
+            
     return render_template(
         "browse/browse.html",
         collections=collections,
         query=query,
         category=category,
-        sort=sort
+        sort=sort,
+        categories=categories
     )
     
+       
 #Display and search approved collectible items
 @browse_bp.route("/items")
 def browse_items():
