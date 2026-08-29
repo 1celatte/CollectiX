@@ -154,7 +154,7 @@ with app.app_context():
         collection_id=naruto.id,
         name="Naruto Uzumaki",
         description="Naruto Uzumaki collectible figure.",
-        image=None,
+        image="test.png",
         status="approved",
         created_by=admin.id
     )

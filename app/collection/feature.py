@@ -34,25 +34,6 @@ def list_collections():
         collections=collections
     )
 
-@collection_bp.route("/test")
-def create_test_collection():
-
-    collection = Collection(
-        name="Pokemon TCG",
-        category="Trading Cards",
-        description="A test collection for Pokemon trading cards.",
-        image="test.png",
-        status="approved",
-        created_by=1
-    )
-
-    from app.extensions import db
-
-    db.session.add(collection)
-    db.session.commit()
-
-    return "Test collection created!"
-
 #==============================================================================================
 
 #View Collection Details
@@ -83,6 +64,7 @@ def view_collection(collection_id):
 #=================================================================================================================
 
 @collection_bp.route("/create", methods=["GET", "POST"])
+@login_required
 def create_collection():
 
     if request.method == "POST":
@@ -98,11 +80,18 @@ def create_collection():
         ).first()
 
         if existing_collection:
-            return "This collection already exists. Please use the existing collection."
+
+            flash(
+                "This collection already exists. Please use the existing collection.",
+                "error"
+            )
+
+            return redirect(
+                url_for("collection.list_collections")
+            )
 
         # Get uploaded image
         image_file = request.files.get("image")
-
         image_filename = None
 
         # Save image
@@ -137,20 +126,23 @@ def create_collection():
             description=description,
             image=image_filename,
             status="pending",
-
-            # Temporary testing value(will replace with current user id later)
-            created_by=1
+            created_by=current_user.id
         )
 
         # Save to database
         db.session.add(collection)
         db.session.commit()
 
-        print("NEW COLLECTION ID:", collection.id)
-        print("NEW COLLECTION NAME:", collection.name)
-        print("NEW COLLECTION STATUS:", collection.status)
+        # Success message
+        flash(
+            "Collection submitted successfully! Waiting for admin approval.",
+            "success"
+        )
 
-        return "Collection submitted successfully! Waiting for admin approval."
+        # Go back to collection list
+        return redirect(
+            url_for("collection.list_collections")
+        )
 
     return render_template("create.html")
 
@@ -246,3 +238,4 @@ def add_item(collection_id):
 #Add Public Collection to My collection
 
 #=================================================================================================================
+
