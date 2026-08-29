@@ -84,13 +84,21 @@
         <label>Current Password:</label>
         <input type="password"
                name="current_password"
+               class="{% if password_error %}error-input{% endif %}" 
                required>
+
+        {% if password_error %} 
+            <div class="error-message"> 
+                ⚠ {{ password_error }} 
+            </div> 
+        {% endif %}       
 
         <br><br>
 
         <label>New Password:</label>
         <input type="password"
                name="new_password"
+               class="{% if confirm_password_error %}error-input{% endif %}" 
                required>
 
         <br><br>
@@ -98,7 +106,14 @@
         <label>Confirm New Password:</label>
         <input type="password"
                name="confirm_password"
+               class="{% if confirm_password_error %}error-input{% endif %}"
                required>
+
+        {% if confirm_password_error %} 
+            <div class="error-message"> 
+                ⚠ {{ confirm_password_error }} 
+            </div> 
+        {% endif %}
 
         <br><br>
 

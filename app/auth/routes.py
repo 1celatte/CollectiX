@@ -201,10 +201,16 @@ def change_password():
     confirm_password = request.form.get("confirm_password")
 
     if not check_password_hash(current_user.password, current_password):
-        return "Current password is incorrect!"
+        return render_template(
+            "edit_profile.html",
+            password_error="Current password is incorrect."
+        )
     
     if new_password != confirm_password:
-        return "New passwords do not match!"
+        return render_template(
+        "edit_profile.html",
+        confirm_password_error="New password and confirm password do not match."
+        )
 
     current_user.password = generate_password_hash(new_password)
 
