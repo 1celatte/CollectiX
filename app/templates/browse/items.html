@@ -24,12 +24,30 @@ Browse Items - CollectiX
     <div class="row g-2">
 
         <!--Search box-->
-        <div class="col-md-9">
+        <div class="col-md-6">
             <input type="text" name="q" class="form-control" placeholder="Search items..." value="{{ query }}">
         </div>
 
+        <!--Filter by collection-->
+        <div class="col-md-4">
+            <label for="collection" class="form-label">
+                Filter by collection
+            </label>
+
+            <select id="collection" name="collection_id" class="form-select">
+                <option value="">All Collections</option>
+
+                {% for collection in collections %}
+                <option value="{{ collection.id }}" {% if selected_collection==collection.id|string %} selected {% endif
+                    %}>
+                    {{ collection.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
         <!--Search button-->
-        <div class="col-md-3">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">
                 Search
             </button>
