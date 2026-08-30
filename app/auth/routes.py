@@ -103,7 +103,7 @@ def login():
 @auth.route("/logout")
 def logout():
     logout_user()
-    return "Logout successful!"
+    return redirect(url_for("home"))
 
 
 @auth.route("/profile")
