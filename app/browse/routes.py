@@ -76,25 +76,42 @@ def browse_page():
 def browse_items():
     #Get the keyword from the search box
     query = request.args.get("q", "").strip()
-
-    #Start with approved items
+    collection_id = request.args.get(
+        "collection_id",
+        ""
+    ).strip()
+    
     items_query = Item.query.filter_by(
         status="approved"
     )
-
+    
     #Search by item name
     if query:
         items_query = items_query.filter(
             Item.name.ilike(f"%{query}%")
         )
 
-    #Sort newest items first
+    #Filter items by collection
+    if collection_id:
+        items_query = items_query.filter(
+            Item.collection_id == collection_id
+        )
+
     items = items_query.order_by(
         Item.created_at.desc()
+    ).all()
+
+    #Get collections for the dropdown menu
+    collections = Collection.query.filter_by(
+        status="approved"
+    ).order_by(
+        Collection.name.asc()
     ).all()
 
     return render_template(
         "browse/items.html",
         items=items,
-        query=query
+        query=query,
+        collections=collections,
+        selected_collection=collection_id
     )
