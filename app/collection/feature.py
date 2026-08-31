@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import login_required, current_user
 from app.extensions import db
-from app.models import Collection, Item, Submission
+from app.models import Collection, Item, Submission,UserCollection
 from . import collection_bp
 import os
 from werkzeug.utils import secure_filename
@@ -18,7 +18,7 @@ collection_bp = Blueprint(
 
 #=======================================================================================================================
 
-#list collectionsin Public collection
+#list collections in Public collection
 
 #========================================================================================================================
 
@@ -239,3 +239,52 @@ def add_item(collection_id):
 
 #=================================================================================================================
 
+@collection_bp.route(
+    "/<int:collection_id>/add-to-my-collection",
+    methods=["POST"]
+)
+@login_required
+def add_to_my_collection(collection_id):
+
+    collection = Collection.query.get_or_404(collection_id)
+
+    # Check whether user already added this collection
+    existing = UserCollection.query.filter_by(
+        user_id=current_user.id,
+        collection_id=collection.id
+    ).first()
+
+    if existing:
+
+        flash(
+            "This collection is already in My Collection.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "collection.view_collection",
+                collection_id=collection.id
+            )
+        )
+
+    # Add collection to My Collection
+    user_collection = UserCollection(
+        user_id=current_user.id,
+        collection_id=collection.id
+    )
+
+    db.session.add(user_collection)
+    db.session.commit()
+
+    flash(
+        "Collection added to My Collection successfully!",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            "collection.view_collection",
+            collection_id=collection.id
+        )
+    )
