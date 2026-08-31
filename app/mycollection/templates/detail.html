@@ -70,6 +70,36 @@
                 {{ item.description }}
             </p>
 
+            <!-- Check whether current user owns this item -->
+
+            {% set owned = owned_items
+                |selectattr("item_id", "equalto", item.id)
+                |list
+                |first
+            %}
+
+            {% if owned %}
+
+                <p>
+                    <strong>Status:</strong> Owned
+                </p>
+
+                <p>
+                    <strong>Quantity:</strong> {{ owned.quantity }}
+                </p>
+
+            {% else %}
+
+                <p>
+                    <strong>Status:</strong> Unowned
+                </p>
+
+                <p>
+                    <strong>Quantity:</strong> 0
+                </p>
+
+            {% endif %}
+
         {% endfor %}
 
     {% else %}
@@ -83,7 +113,7 @@
     <br>
 
     <a href="{{ url_for('my_collection.list_my_collections') }}">
-        ← Back to My Collections
+        <button>← Back to My Collections</button>
     </a>
 
 </body>
