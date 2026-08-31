@@ -119,19 +119,48 @@ def browse_items():
 #Display available marketplace listings
 @browse_bp.route("/marketplace")
 def browse_marketplace():
-    #Get available listings and their related items
-    listings = Listing.query.join(
+    #Get selected sorting option
+    sort = request.args.get(
+        "sort",
+        "newest"
+    )
+        
+    #Start with available listings
+    listings_query = Listing.query.join(
         Item,
         Listing.item_id == Item.id
     ).add_entity(
         Item
     ).filter(
         Listing.status == "available"
-    ).order_by(
-        Listing.created_at.desc()
-    ).all()
+    )
 
+    #Sort marketplace listings
+    if sort == "oldest":
+        listings_query = listings_query.order_by(
+            Listing.created_at.asc()
+        )
+    elif sort == "name":
+        listings_query = listings_query.order_by(
+            Item.name.asc()
+        )
+    elif sort == "lowest":
+        listings_query = listings_query.order_by(
+            Listing.price.asc().nulls_last()
+        )
+    elif sort == "highest":
+        listings_query = listings_query.order_by(
+            Listing.price.desc().nulls_last()
+        )
+    else:
+        listings_query = listings_query.order_by(
+            Listing.created_at.desc()
+        )
+
+    listings = listings_query.all()
+        
     return render_template(
         "browse/marketplace.html",
-        listings=listings
+        listings=listings,
+        sort=sort
     )
