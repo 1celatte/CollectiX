@@ -1,6 +1,6 @@
 from flask import render_template, request
 from app.browse import browse_bp
-from app.models import Collection, Item
+from app.models import Collection, Item, Listing
 
 #Browse all public collections
 @browse_bp.route("/")
@@ -114,4 +114,24 @@ def browse_items():
         query=query,
         collections=collections,
         selected_collection=collection_id
+    )
+    
+#Display available marketplace listings
+@browse_bp.route("/marketplace")
+def browse_marketplace():
+    #Get available listings and their related items
+    listings = Listing.query.join(
+        Item,
+        Listing.item_id == Item.id
+    ).add_entity(
+        Item
+    ).filter(
+        Listing.status == "available"
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    return render_template(
+        "browse/marketplace.html",
+        listings=listings
     )
