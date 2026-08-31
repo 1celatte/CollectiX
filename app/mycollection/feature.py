@@ -1,7 +1,7 @@
 from flask import render_template, abort
 from flask_login import login_required, current_user
 
-from app.models import Collection, UserCollection
+from app.models import Collection, UserCollection,OwnedItem, Item
 from . import my_collection_bp
 
 #=======================================================================================================================
@@ -38,7 +38,7 @@ def list_my_collections():
     
 #=======================================================================================================================
 
-# View one collection's details
+# View collection's details
 
 #=======================================================================================================================
 
@@ -56,15 +56,27 @@ def view_my_collection(collection_id):
     if not user_collection:
         abort(404)
 
+    # Get the collection
     collection = Collection.query.get_or_404(
         collection_id
     )
 
+    # Get all approved items inside this collection
+    items = Item.query.filter_by(
+        collection_id=collection_id,
+    ).all()
+
+    # Get items owned by the current user
+    owned_items = OwnedItem.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
     return render_template(
         "detail.html",
-        collection=collection
+        collection=collection,
+        items=items,
+        owned_items=owned_items
     )
-
 
 
 
