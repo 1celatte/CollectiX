@@ -14,118 +14,126 @@ Browse & Search - CollectiX
     Find public collections, collectible items and marketplace listings.
 </p>
 
-<!--Search and filter form-->
+<!--Search form-->
 <form method="GET" action="{{ url_for('browse.browse_page') }}" class="card p-3 mb-4">
 
-    <div class="row g-3">
+    <!--Search by keyword-->
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ query }}">
 
-        <!--Choose what to display-->
-        <div class="col-md-3">
-            <label for="show" class="form-label">
-                Show
-            </label>
-
-            <select id="show" name="show" class="form-select">
-                <option value="all" {% if show=="all" %}selected{% endif %}>
-                    Everything
-                </option>
-                <option value="collections" {% if show=="collections" %}selected{% endif %}>
-                    Collections
-                </option>
-
-                <option value="items" {% if show=="items" %}selected{% endif %}>
-                    Items
-                </option>
-
-                <option value="marketplace" {% if show=="marketplace" %}selected{% endif %}>
-                    Marketplace Listings
-                </option>
-            </select>
-        </div>
-
-        <!--search by keyword-->
-        <div class="col-md-5">
-            <label for="keyword" class="form-label">
-                Search by keyword
-            </label>
-
-            <input id="keyword" type="text" name="q" class="form-control" placeholder="Search collections or items..."
-                value="{{ query }}">
-        </div>
-
-        <!--Filter by category-->
-        <div class="col-md-4">
-            <label for="category" class="form-label">
-                Category
-            </label>
-
-            <select id="category" name="category" class="form-select">
-                <option value="">All categories</option>
-
-                {% for category_option in categories %}
-                <option value="{{ category_option }}" {% if category==category_option %}selected{% endif %}>
-                    {{ category_option }}
-                </option>
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <!--Filter by collection-->
-        <div class="col-md-6">
-            <label for="collection_id" class="form-label">
-                Collection
-            </label>
-
-            <select id="collection_id" name="collection_id" class="form-select">
-                <option value="" {% if not collection_id %}selected{% endif %}>
-                    All collections
-                </option>
-
-                {% for collection in collections %}
-                <option value="{{ collection.id }}" {% if collection_id|string == collection.id|string %}selected{% endif %}>
-                    {{ collection.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!--Sort results-->
-        <div class="col-md-6">
-            <label for="sort" class="form-label">
-                Sort results
-            </label>
-
-            <select id="sort" name="sort" class="form-select">
-                <option value="newest" {% if sort=="newest" %}selected{% endif %}>
-                    Newest
-                </option>
-
-                <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>
-                    Oldest
-                </option>
-
-                <option value="name" {% if sort=="name" %}selected{% endif %}>
-                    Name A-Z
-                </option>
-
-                <option value="lowest" {% if sort=="lowest" %}selected{% endif %}>
-                    Lowest Price
-                </option>
-
-                <option value="highest" {% if sort=="highest" %}selected{% endif %}>
-                    Highest Price
-                </option>
-            </select>
-        </div>
-
+        <button type="submit" class="btn btn-primary">
+            Search
+        </button>
     </div>
 
-    <!--Search button (submit search)-->
-    <button type="submit" class="btn btn-primary mt-3">
-        Search
-    </button>
+    <!--Button to show or hide filters-->
+    <details class="mt-3">
+        <summary class="btn btn-outline-secondary">
+            <i class="bi bi-sliders"></i>
+            Filters
+        </summary>
 
+        <div class="card card-body mt-3">
+
+            <div class="row g-3">
+
+                <!--Show type-->
+                <div class="col-md-3">
+                    <label for="show" class="form-label">
+                        Show
+                    </label>
+
+                    <select id="show" name="show" class="form-select">
+                        <option value="all" {% if show=="all" %}selected{% endif %}>
+                            Everything
+                        </option>
+
+                        <option value="collections" {% if show=="collections" %}selected{% endif %}>
+                            Collections
+                        </option>
+
+                        <option value="items" {% if show=="items" %}selected{% endif %}>
+                            Items
+                        </option>
+
+                        <option value="marketplace" {% if show=="marketplace" %}selected{% endif %}>
+                            Marketplace Listings
+                        </option>
+                    </select>
+                </div>
+
+                <!--Category-->
+                <div class="col-md-3">
+                    <label for="category" class="form-label">
+                        Category
+                    </label>
+
+                    <select id="category" name="category" class="form-select">
+                        <option value="" {% if not category %}selected{% endif %}>
+                            All categories
+                        </option>
+
+                        {% for category_option in categories %}
+                        <option value="{{ category_option }}" {% if category==category_option %}selected{% endif %}>
+                            {{ category_option }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!--Collection-->
+                <div class="col-md-3">
+                    <label for="collection_id" class="form-label">
+                        Collection
+                    </label>
+
+                    <select id="collection_id" name="collection_id" class="form-select">
+
+                        <option value="" {% if not collection_id %}selected{% endif %}>
+                            All collections
+                        </option>
+
+                        {% for collection in collections %}
+                        <option value="{{ collection.id }}" {% if collection_id|string==collection.id|string %} selected
+                            {% endif %}>
+                            {{ collection.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!--Sort-->
+                <div class="col-md-3">
+                    <label for="sort" class="form-label">
+                        Sort results
+                    </label>
+
+                    <select id="sort" name="sort" class="form-select">
+                        <option value="newest" {% if sort=="newest" %}selected{% endif %}>
+                            Newest
+                        </option>
+
+                        <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>
+                            Oldest
+                        </option>
+
+                        <option value="name" {% if sort=="name" %}selected{% endif %}>
+                            Name A-Z
+                        </option>
+
+                        <option value="lowest" {% if sort=="lowest" %}selected{% endif %}>
+                            Lowest Price
+                        </option>
+
+                        <option value="highest" {% if sort=="highest" %}selected{% endif %}>
+                            Highest Price
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </details>
 </form>
 
 <!--Search results-->
