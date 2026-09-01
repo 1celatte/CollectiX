@@ -1,38 +1,65 @@
 {% extends "base.html" %}
 
 {% block title %}
-Browse Collections - CollectiX
+Browse & Search - CollectiX
 {% endblock %}
 
 {% block content %}
 
 <!--Page heading-->
-<h1 class="mb-2">Browse Collections</h1>
+<h1 class="mb-2">Browse & Search</h1>
 
 <!--Page description-->
 <p class="text-muted mb-4">
-    Explore public collectible collections.
+    Find public collections, collectible items and marketplace listings.
 </p>
-
-<!--Link with View All Items page-->
-<a href="{{ url_for('browse.browse_items') }}" class="btn btn-primary-4">
-    View All Items
-</a>
 
 <!--Search and filter form-->
 <form method="GET" action="{{ url_for('browse.browse_page') }}" class="card p-3 mb-4">
 
-    <div class="row g-2">
+    <div class="row g-3">
+
+        <!--Choose what to display-->
+        <div class="col-md-3">
+            <label for="show" class="form-label">
+                Show
+            </label>
+
+            <select id="show" name="show" class="form-select">
+                <option value="all" {% if show=="all" %}selected{% endif %}>
+                    Everything
+                </option>
+                <option value="collections" {% if show=="collections" %}selected{% endif %}>
+                    Collections
+                </option>
+
+                <option value="items" {% if show=="items" %}selected{% endif %}>
+                    Items
+                </option>
+
+                <option value="marketplace" {% if show=="marketplace" %}selected{% endif %}>
+                    Marketplace Listings
+                </option>
+            </select>
+        </div>
 
         <!--search by keyword-->
-        <div class="col-md-6">
-            <input type="text" name="q" class="form-control" placeholder="Search collections..." value="{{ query }}">
+        <div class="col-md-5">
+            <label for="keyword" class="form-label">
+                Search by keyword
+            </label>
+
+            <input id="keyword" type="text" name="q" class="form-control" placeholder="Search collections or items..."
+                value="{{ query }}">
         </div>
 
         <!--Filter by category-->
-        <div class="col-md-3">
-            <select name="category" class="form-select">
+        <div class="col-md-4">
+            <label for="category" class="form-label">
+                Category
+            </label>
 
+            <select id="category" name="category" class="form-select">
                 <option value="">All categories</option>
 
                 {% for category_option in categories %}
@@ -44,10 +71,32 @@ Browse Collections - CollectiX
             </select>
         </div>
 
-        <!--Sort results-->
-        <div class="col-md-3">
-            <select name="sort" class="form-select">
+        <!--Filter by collection-->
+        <div class="col-md-6">
+            <label for="collection_id" class="form-label">
+                Collection
+            </label>
 
+            <select id="collection_id" name="collection_id" class="form-select">
+                <option value="" {% if not collection_id %}selected{% endif %}>
+                    All collections
+                </option>
+
+                {% for collection in collections %}
+                <option value="{{ collection.id }}" {% if collection_id|string == collection.id|string %}selected{% endif %}>
+                    {{ collection.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!--Sort results-->
+        <div class="col-md-6">
+            <label for="sort" class="form-label">
+                Sort results
+            </label>
+
+            <select id="sort" name="sort" class="form-select">
                 <option value="newest" {% if sort=="newest" %}selected{% endif %}>
                     Newest
                 </option>
@@ -60,6 +109,13 @@ Browse Collections - CollectiX
                     Name A-Z
                 </option>
 
+                <option value="lowest" {% if sort=="lowest" %}selected{% endif %}>
+                    Lowest Price
+                </option>
+
+                <option value="highest" {% if sort=="highest" %}selected{% endif %}>
+                    Highest Price
+                </option>
             </select>
         </div>
 
@@ -72,38 +128,69 @@ Browse Collections - CollectiX
 
 </form>
 
-<!--Collection results-->
+<!--Search results-->
 <div class="row g-4">
 
     <!--Check whether collections exist or not-->
-    {% if collections%}
+    {% if results %}
 
     <!--Display every collection-->
-    {% for collection in collections %}
+    {% for result in results %}
 
-    <div class="col-md-4">
+    <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
 
             <div class="card-body">
 
-                <!--Collection name-->
-                <h5 class="card-title">
-                    {{ collection.name }}
+                <!--Result type-->
+                {% if result.type == "collection" %}
+                <span class="badge bg-primary">
+                    Collection
+                </span>
+                {% elif result.type == "item" %}
+                <span class="badge bg-success">
+                    Item
+                </span>
+                {% else %}
+                <span class="badge bg-warning text-dark">
+                    Marketplace Listing
+                </span>
+                {% endif %}
+
+                <!--Result name-->
+                <h5 class="card-title mt-2">
+                    {{ result.name }}
                 </h5>
 
-                <!--Collection description-->
-                <p class="card-text">
-                    {{ collection.description }}
+                <!--Category-->
+                <p class="text-muted">
+                    Category: {{ result.category }}
                 </p>
 
-                <!--Collection category-->
+                <!--Collection name for items and listings-->
+                {% if result.type != "collection" %}
                 <p class="text-muted">
-                    Category: {{ collection.category }}
+                    Collection: {{ result.collection_name }}
                 </p>
+                {% endif %}
+
+                <!--Description-->
+                <p class="card-text">
+                    {{ result.description or
+                    "No description available." }}
+                </p>
+
+                <!--Price for marketplace listing-->
+                {% if result.price is not none %}
+                <p class="fw-bold text-success">
+                    Price: RM
+                    {{ "%.2f"|format(result.price) }}
+                </p>
+                {% endif %}
 
                 <!--Temporary details button-->
                 <a href="#" class="btn btn-outline-primary">
-                    View Collection
+                    View Details
                 </a>
 
             </div>
@@ -118,9 +205,9 @@ Browse Collections - CollectiX
 
     <!--Message when no collections exist-->
     <div class="col-12">
-        <p class="text-muted">
-            No public collections are available yet!
-        </p>
+        <div class="alert alert-info">
+            No results match your search or filters.
+        </div>
     </div>
 
     {% endif %}
