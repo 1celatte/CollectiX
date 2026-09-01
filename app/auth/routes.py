@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, current_app
+from flask import render_template, request, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
@@ -95,7 +95,12 @@ def login():
 
         login_user(user)
 
-        return redirect(url_for("auth.profile"))
+        next_page = request.args.get("next")
+
+        if next_page:
+            return redirect(next_page)
+
+        return redirect(url_for("home"))
 
     return render_template("login.html")
 
@@ -103,7 +108,7 @@ def login():
 @auth.route("/logout")
 def logout():
     logout_user()
-    return "Logout successful!"
+    return redirect(url_for("home"))
 
 
 @auth.route("/profile")
@@ -119,6 +124,7 @@ def edit_profile():
         username = request.form.get("username")
         email = request.form.get("email")
         profile_picture = request.files.get("profile_picture")
+        remove_profile_picture = request.form.get("remove_profile_picture") == "1"
 
         username_error = None
         email_error = None
@@ -148,11 +154,25 @@ def edit_profile():
                 email_error=email_error
             )
 
-        if profile_picture and profile_picture.filename:
+        # Remove profile picture
+        if remove_profile_picture:
+            if current_user.profile_picture:
+                file_path = os.path.join(
+                    auth.static_folder,
+                    current_user.profile_picture
+                )
+
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+            current_user.profile_picture = None
+
+        # Upload new profile picture   
+        elif profile_picture and profile_picture.filename:
             filename = f"{current_user.id}_{secure_filename(profile_picture.filename)}"
 
             upload_folder = os.path.join(
-                current_app.static_folder,
+                auth.static_folder,
                 "uploads",
                 "avatars"
             )
@@ -175,24 +195,6 @@ def edit_profile():
     return render_template("edit_profile.html")
 
 
-@auth.route("/profile/remove-picture", methods=["POST"])
-@login_required
-def remove_profile_picture():
-    if current_user.profile_picture:
-        file_path = os.path.join(
-            current_app.static_folder,
-            current_user.profile_picture
-        )
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        current_user.profile_picture = None
-        db.session.commit()
-
-    return redirect(url_for("auth.profile"))
-
-
 @auth.route("/profile/change-password", methods=["POST"])
 @login_required
 def change_password():
@@ -201,13 +203,66 @@ def change_password():
     confirm_password = request.form.get("confirm_password")
 
     if not check_password_hash(current_user.password, current_password):
-        return "Current password is incorrect!"
+        return render_template(
+            "edit_profile.html",
+            password_error="Current password is incorrect."
+        )
     
     if new_password != confirm_password:
-        return "New passwords do not match!"
+        return render_template(
+        "edit_profile.html",
+        confirm_password_error="New password and confirm password do not match."
+        )
 
     current_user.password = generate_password_hash(new_password)
 
     db.session.commit()
 
     return redirect(url_for("auth.profile"))
+
+
+@auth.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+
+        user = User.query.filter_by(email=email).first()
+
+        if user is None:
+            return render_template(
+                "forgot_password.html",
+                email=email,
+                email_error="Email does not exist."
+            )
+
+        return redirect(url_for("auth.reset_password", email=email))
+
+    return render_template("forgot_password.html")
+
+
+@auth.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    email = request.args.get("email")
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if new_password != confirm_password:
+            return render_template(
+                "reset_password.html",
+                password_error="New password and confirm password do not match."
+            )
+
+        user.password = generate_password_hash(new_password)
+
+        db.session.commit()
+
+        return redirect(url_for("auth.login"))
+
+    return render_template("reset_password.html")
