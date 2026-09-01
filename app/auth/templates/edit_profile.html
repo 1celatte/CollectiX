@@ -52,6 +52,21 @@
 
         <br><br>
 
+        <!-- Upload New Profile Picture -->
+        {% if current_user.profile_picture %}
+            <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+                 alt="Profile Picture"
+                 width="150"
+                 height="150">
+        {% else %}
+            <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                 alt="Default Profile Picture"
+                 width="150"
+                 height="150">
+        {% endif %}
+
+        <br><br>
+
         <label>Profile Picture:</label>
         <input type="file"
                name="profile_picture"
@@ -59,17 +74,17 @@
 
         <br><br>
 
+        <!-- Remove Profile Picture -->
+        <label>
+            <input type="checkbox"
+                   name="remove_profile_picture"
+                   value="1">
+            Remove Profile Picture
+        </label>
+
+        <br><br>
+
         <button type="submit">Save Changes</button>
-
-    </form>
-
-    <br>
-
-    <!-- Remove Profile Picture -->
-    <form method="POST"
-          action="{{ url_for('auth.remove_profile_picture') }}">
-
-        <button type="submit">Remove Profile Picture</button>
 
     </form>
 
@@ -84,13 +99,21 @@
         <label>Current Password:</label>
         <input type="password"
                name="current_password"
+               class="{% if password_error %}error-input{% endif %}" 
                required>
+
+        {% if password_error %} 
+            <div class="error-message"> 
+                ⚠ {{ password_error }} 
+            </div> 
+        {% endif %}       
 
         <br><br>
 
         <label>New Password:</label>
         <input type="password"
                name="new_password"
+               class="{% if confirm_password_error %}error-input{% endif %}" 
                required>
 
         <br><br>
@@ -98,7 +121,14 @@
         <label>Confirm New Password:</label>
         <input type="password"
                name="confirm_password"
+               class="{% if confirm_password_error %}error-input{% endif %}"
                required>
+
+        {% if confirm_password_error %} 
+            <div class="error-message"> 
+                ⚠ {{ confirm_password_error }} 
+            </div> 
+        {% endif %}
 
         <br><br>
 
@@ -108,6 +138,7 @@
 
     <br>
 
+    <!-- Cancel -->
     <a href="{{ url_for('auth.profile') }}">
         <button type="button">Cancel</button>
     </a>
