@@ -1,122 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Public Collections</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for(
-            'collection.static',
-            filename='css/collection.css'
-        ) }}"
-    >
-</head>
-
-<body>
-
-    <div class="container">
-
-        <h1>Public Collections</h1>
-
-        <!-- Create Collection Link -->
-         <a href="{{ url_for('collection.create_collection') }}">
-             <button type="button">Create New Collection</button>
-        </a>
-
-    
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class="flashes">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        {% if collections %}
-
-            <div class="collection-grid">
-
-                {% for collection in collections %}
-
-                    <div class="collection-card">
-
-                        <!-- Collection Image -->
-                        {% if collection.image %}
-
-                            <img
-                                src="{{ url_for(
-                                    'collection.static',
-                                    filename='uploads/' + collection.image
-                                ) }}"
-                                alt="{{ collection.name }}"
-                                class="collection-image"
-                            >
-
-                        {% else %}
-
-                            <div class="no-image">
-                                No Image
-                            </div>
-
-                        {% endif %}
+{% block title %}
+Public Collections
+{% endblock %}
 
 
-                        <!-- Collection Information -->
-                        <div class="collection-info">
+{% block content %}
 
-                            <!-- ONLY THIS NAME IS CLICKABLE -->
-                            <h2>
-                                <a
-                                    href="{{ url_for(
-                                        'collection.view_collection',
-                                        collection_id=collection.id
-                                    ) }}"
-                                >
-                                    {{ collection.name }}
-                                </a>
-                            </h2>
+<h1>Public Collections</h1>
 
 
-                            <p>
-                                <strong>Category:</strong>
-                                {{ collection.category }}
-                            </p>
+<!-- Create Collection Link -->
+
+<a href="{{ url_for('collection.create_collection') }}">
+    <button type="button">
+        Create New Collection
+    </button>
+</a>
 
 
-                            <p>
-                                {{ collection.description }}
-                            </p>
+<!-- Flash Messages -->
+
+{% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+        <ul>
+
+            {% for message in messages %}
+
+                <li>
+                    {{ message }}
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+{% endwith %}
 
 
-                            <p>
-                                <strong>Status:</strong>
-                                Approved
-                            </p>
 
-                        </div>
+<!-- Collections -->
 
+{% if collections %}
+
+    <div class="collection-grid">
+
+        {% for collection in collections %}
+
+            <div class="collection-card">
+
+
+                <!-- Collection Image -->
+
+                {% if collection.image %}
+
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' + collection.image
+                        ) }}"
+                        alt="{{ collection.name }}"
+                        class="collection-image"
+                        width="200"
+                    >
+
+                {% else %}
+
+                    <div class="no-image">
+                        No Image
                     </div>
 
-                {% endfor %}
+                {% endif %}
+
+
+
+                <!-- Collection Information -->
+
+                <div class="collection-info">
+
+                    <h2>
+
+                        <a
+                            href="{{ url_for(
+                                'collection.view_collection',
+                                collection_id=collection.id
+                            ) }}"
+                        >
+                            {{ collection.name }}
+                        </a>
+
+                    </h2>
+
+
+                    <p>
+
+                        <strong>Category:</strong>
+
+                        {{ collection.category }}
+
+                    </p>
+
+
+                    <p>
+                        {{ collection.description }}
+                    </p>
+
+
+                    <p>
+
+                        <strong>Status:</strong>
+
+                        Approved
+
+                    </p>
+
+                </div>
+
 
             </div>
 
-        {% else %}
-
-            <p>
-                No public collections available.
-            </p>
-
-        {% endif %}
+        {% endfor %}
 
     </div>
 
-</body>
 
-</html>
+{% else %}
+
+    <p>
+        No public collections available.
+    </p>
+
+{% endif %}
+
+{% endblock %}
