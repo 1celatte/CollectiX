@@ -181,7 +181,7 @@ def browse_page():
         )
 
     return render_template(
-        "browse/browse.html",
+        "browse.html",
         results=results,
         show=show,
         query=query,
@@ -230,7 +230,7 @@ def browse_items():
     ).all()
 
     return render_template(
-        "browse/items.html",
+        "items.html",
         items=items,
         query=query,
         collections=collections,
@@ -281,7 +281,7 @@ def browse_marketplace():
     listings = listings_query.all()
         
     return render_template(
-        "browse/marketplace.html",
+        "marketplace.html",
         listings=listings,
         sort=sort
     )
