@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}
+Browse Items - CollectiX
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1 class="mb-2">Browse Collectible Items</h1>
+
+<!--Page description-->
+<p class="text-muted mb-4">
+    Explore approved collectible items available on the platform.
+</p>
+
+<!--Link back to collections-->
+<a href="{{ url_for('browse.browse_page') }}" class="btn btn-outline-secondary mb-4">
+    View All Collections
+</a>
+
+<!--Search items by keyword-->
+<form method="GET" action="{{ url_for('browse.browse_items') }}" class="card p-3 mb-4">
+    <div class="row g-2">
+
+        <!--Search box-->
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="Search items..." value="{{ query }}">
+        </div>
+
+        <!--Filter by collection-->
+        <div class="col-md-4">
+            <label for="collection" class="form-label">
+                Filter by collection
+            </label>
+
+            <select id="collection" name="collection_id" class="form-select">
+                <option value="">All Collections</option>
+
+                {% for collection in collections %}
+                <option value="{{ collection.id }}" {% if selected_collection==collection.id|string %} selected {% endif
+                    %}>
+                    {{ collection.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!--Search button-->
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+                Search
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<!--Item results-->
+<div class="row g-4">
+
+    {% if items %}
+
+    {% for item in items %}
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+
+            <div class="card-body">
+
+                <!--Item name-->
+                <h5 class="card-title">
+                    {{ item.name }}
+                </h5>
+
+                <!--Item description-->
+                <p class="card-text">
+                    {{ item.description or "No description available." }}
+                </p>
+
+                <!--Related collection-->
+                <p class="text-muted">
+                    Collection ID: {{ item.collection_id }}
+                </p>
+
+                <!--Temporary details button-->
+                <a href="#" class="btn btn-outline-primary">
+                    View Item
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <!--Message when no items exist-->
+    <div class="col-12">
+        <p class="text-muted">
+            No approved collectible items are available yet!
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
