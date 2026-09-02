@@ -33,6 +33,10 @@ def create_app():
     from app.auth import auth
     app.register_blueprint(auth)
 
+    # Register the Browse Blueprint
+    from app.browse import browse_bp
+    app.register_blueprint(browse_bp)
+
     @app.route("/")
     def home():
         return render_template("main/index.html")
