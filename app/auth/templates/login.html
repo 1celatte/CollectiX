@@ -1,63 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
+{% extends "base.html" %}
 
-    <style>
-        .error-input {
-            border: 2px solid red;
-        }
+{% block title %}
+Login - CollectiX
+{% endblock %}
 
-        .error-message {
-            color: red;
-            font-size: 14px;
-        }
-    </style>
-</head>
+{% block content %}
 
-<body>
+<style>
+    .error-input {
+        border: 2px solid red;
+    }
 
-    <h1>Login</h1>
+    .error-message {
+        color: red;
+        font-size: 14px;
+    }
+</style>
 
-    <form method="POST">
+<h1>Login</h1>
 
-        <label>Username or Email:</label>
-        <input type="text"
-               name="username_or_email"
-               value="{{ username_or_email or '' }}"
-               class="{% if login_error %}error-input{% endif %}"
-               required>
+<form method="POST">
 
-        <br><br>
+    <label>Username or Email:</label>
+    <input type="text"
+           name="username_or_email"
+           value="{{ username_or_email or '' }}"
+           class="{% if login_error %}error-input{% endif %}"
+           required>
 
-        <label>Password:</label>
-        <input type="password"
-               name="password"
-               class="{% if login_error %}error-input{% endif %}"
-               required>
+    <br><br>
 
-        {% if login_error %}
-            <div class="error-message">
-                ⚠ {{ login_error }}
-            </div>
-        {% endif %}
+    <label>Password:</label>
+    <input type="password"
+           name="password"
+           class="{% if login_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if login_error %}
+        <div class="error-message">
+            ⚠ {{ login_error }}
+        </div>
+    {% endif %}
 
-        <button type="submit">Login</button>
+    <br><br>
 
-    </form>
+    <button type="submit">Login</button>
 
-    <p>
-        Don't have an account?
-        <a href="{{ url_for('auth.register') }}">Register here</a>
-    </p>
+</form>
 
-    <p>
-        <a href="{{ url_for('auth.forgot_password') }}">
-            Forgot Password?
-        </a>
-    </p>
+<p>
+    Don't have an account?
+    <a href="{{ url_for('auth.register') }}">Register here</a>
+</p>
 
-</body>
-</html>
+<p>
+    <a href="{{ url_for('auth.forgot_password') }}">
+        Forgot Password?
+    </a>
+</p>
+
+{% endblock %}
