@@ -1,41 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Profile</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h1>My Profile</h1>
+{% block title %}
+My Profile - CollectiX
+{% endblock %}
 
-    {% if current_user.profile_picture %}
-        <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
-             alt="Profile Picture"
-             width="150"
-            height="150">
-    {% else %}
-        <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
-             alt="Default Profile Picture"
-            width="150"
-            height="150">
-    {% endif %}
+{% block content %}
 
-    <p>Username: {{ current_user.username }}</p>
-    <p>Email: {{ current_user.email }}</p>
-    <p>Role: {{ current_user.role }}</p>
+<h1>My Profile</h1>
 
-    <h2>My Collection</h2>
+{% if current_user.profile_picture %}
+    <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+         alt="Profile Picture"
+         width="150"
+        height="150">
+{% else %}
+    <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+         alt="Default Profile Picture"
+        width="150"
+        height="150">
+{% endif %}
 
-    <button type="button">View My Collection</button>
+<p>Username: {{ current_user.username }}</p>
+<p>Email: {{ current_user.email }}</p>
+<p>Role: {{ current_user.role }}</p>
 
-    <a href="{{ url_for('auth.edit_profile') }}">
-        <button>Edit Profile</button>
-    </a>
+<h2>My Collection</h2>
 
-    <a href="{{ url_for('home') }}">
-        <button type="button">Back to Home</button>
-    </a>
+<button type="button">View My Collection</button>
 
-    <a href="{{ url_for('auth.logout') }}">Logout</a>
+<a href="{{ url_for('auth.edit_profile') }}">
+    <button>Edit Profile</button>
+</a>
 
-</body>
-</html>
+<a href="{{ url_for('home') }}">
+    <button type="button">Back to Home</button>
+</a>
+
+<a href="{{ url_for('auth.logout') }}">Logout</a>
+
+{% endblock %}

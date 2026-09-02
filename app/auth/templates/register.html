@@ -1,85 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
+{% extends "base.html" %}
 
-    <style>
-        .error-input {
-            border: 2px solid red;
-        }
+{% block title %}
+Register - CollectiX
+{% endblock %}
 
-        .error-message {
-            color: red;
-            font-size: 14px;
-        }
-    </style>
-</head>
+{% block content %}
 
-<body>
+<style>
+    .error-input {
+        border: 2px solid red;
+    }
 
-    <h1>Create Account</h1>
+    .error-message {
+        color: red;
+        font-size: 14px;
+    }
+</style>
 
-    <form method="POST">
+<h1>Create Account</h1>
 
-        <label>Username:</label>
-        <input type="text"
-               name="username"
-               value="{{ username or '' }}"
-               class="{% if username_error %}error-input{% endif %}"
-               required>
+<form method="POST">
 
-        {% if username_error %}
-            <div class="error-message">
-                ⚠ {{ username_error }}
-            </div>
-        {% endif %}
+    <label>Username:</label>
+    <input type="text"
+           name="username"
+           value="{{ username or '' }}"
+           class="{% if username_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if username_error %}
+        <div class="error-message">
+            ⚠ {{ username_error }}
+        </div>
+    {% endif %}
 
-        <label>Email:</label>
-        <input type="email"
-               name="email"
-               value="{{ email or '' }}"
-               class="{% if email_error %}error-input{% endif %}"
-               required>
+    <br><br>
 
-        {% if email_error %}
-            <div class="error-message">
-                ⚠ {{ email_error }}
-            </div>
-        {% endif %}
+    <label>Email:</label>
+    <input type="email"
+           name="email"
+           value="{{ email or '' }}"
+           class="{% if email_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if email_error %}
+        <div class="error-message">
+            ⚠ {{ email_error }}
+        </div>
+    {% endif %}
 
-        <label>Password:</label>
-        <input type="password"
-               name="password"
-               required>
+    <br><br>
 
-        <br><br>
+    <label>Password:</label>
+    <input type="password"
+           name="password"
+           required>
 
-        <label>Confirm Password:</label>
-        <input type="password"
-               name="confirm_password"
-               class="{% if password_error %}error-input{% endif %}"
-               required>
+    <br><br>
 
-        {% if password_error %}
-            <div class="error-message">
-                ⚠ {{ password_error }}
-            </div>
-        {% endif %}
+    <label>Confirm Password:</label>
+    <input type="password"
+           name="confirm_password"
+           class="{% if password_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if password_error %}
+        <div class="error-message">
+            ⚠ {{ password_error }}
+        </div>
+    {% endif %}
 
-        <button type="submit">Register</button>
+    <br><br>
 
-    </form>
+    <button type="submit">Register</button>
 
-    <p>
-        Already have an account?
-        <a href="{{ url_for('auth.login') }}">Login here</a>
-    </p>
+</form>
 
-</body>
-</html>
+<p>
+    Already have an account?
+    <a href="{{ url_for('auth.login') }}">Login here</a>
+</p>
+
+{% endblock %}

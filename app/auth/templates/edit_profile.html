@@ -1,147 +1,146 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Profile</title>
+{% extends "base.html" %}
 
-    <style>
-        .error-input {
-            border: 2px solid red;
-        }
+{% block title %}
+Edit Profile - CollectiX
+{% endblock %}
 
-        .error-message {
-            color: red;
-            font-size: 14px;
-        }
-    </style>
-</head>
+{% block content %}
 
-<body>
+<style>
+    .error-input {
+        border: 2px solid red;
+    }
 
-    <h1>Edit Profile</h1>
+    .error-message {
+        color: red;
+        font-size: 14px;
+    }
+</style>
 
-    <!-- Edit Profile Form -->
-    <form method="POST" enctype="multipart/form-data">
+<h1>Edit Profile</h1>
 
-        <label>Username:</label>
-        <input type="text"
-               name="username"
-               value="{{ username or current_user.username }}"
-               class="{% if username_error %}error-input{% endif %}"
-               required>
+<!-- Edit Profile Form -->
+<form method="POST" enctype="multipart/form-data">
 
-        {% if username_error %}
-            <div class="error-message">
-                ⚠ {{ username_error }}
-            </div>
-        {% endif %}
+    <label>Username:</label>
+    <input type="text"
+           name="username"
+           value="{{ username or current_user.username }}"
+           class="{% if username_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if username_error %}
+        <div class="error-message">
+            ⚠ {{ username_error }}
+        </div>
+    {% endif %}
 
-        <label>Email:</label>
-        <input type="email"
-               name="email"
-               value="{{ email or current_user.email }}"
-               class="{% if email_error %}error-input{% endif %}"
-               required>
+    <br><br>
 
-        {% if email_error %}
-            <div class="error-message">
-                ⚠ {{ email_error }}
-            </div>
-        {% endif %}
+    <label>Email:</label>
+    <input type="email"
+           name="email"
+           value="{{ email or current_user.email }}"
+           class="{% if email_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if email_error %}
+        <div class="error-message">
+            ⚠ {{ email_error }}
+        </div>
+    {% endif %}
 
-        <!-- Upload New Profile Picture -->
-        {% if current_user.profile_picture %}
-            <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
-                 alt="Profile Picture"
-                 width="150"
-                 height="150">
-        {% else %}
-            <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
-                 alt="Default Profile Picture"
-                 width="150"
-                 height="150">
-        {% endif %}
+    <br><br>
 
-        <br><br>
+    <!-- Upload New Profile Picture -->
+    {% if current_user.profile_picture %}
+        <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+             alt="Profile Picture"
+             width="150"
+             height="150">
+    {% else %}
+        <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+             alt="Default Profile Picture"
+             width="150"
+             height="150">
+    {% endif %}
 
-        <label>Profile Picture:</label>
-        <input type="file"
-               name="profile_picture"
-               accept="image/*">
+    <br><br>
 
-        <br><br>
+    <label>Profile Picture:</label>
+    <input type="file"
+           name="profile_picture"
+           accept="image/*">
 
-        <!-- Remove Profile Picture -->
-        <label>
-            <input type="checkbox"
-                   name="remove_profile_picture"
-                   value="1">
-            Remove Profile Picture
-        </label>
+    <br><br>
 
-        <br><br>
+    <!-- Remove Profile Picture -->
+    <label>
+        <input type="checkbox"
+               name="remove_profile_picture"
+               value="1">
+        Remove Profile Picture
+    </label>
 
-        <button type="submit">Save Changes</button>
+    <br><br>
 
-    </form>
+    <button type="submit">Save Changes</button>
 
-    <hr>
+</form>
 
-    <!-- Change Password -->
-    <h2>Change Password</h2>
+<hr>
 
-    <form method="POST"
-          action="{{ url_for('auth.change_password') }}">
+<!-- Change Password -->
+<h2>Change Password</h2>
 
-        <label>Current Password:</label>
-        <input type="password"
-               name="current_password"
-               class="{% if password_error %}error-input{% endif %}" 
-               required>
+<form method="POST"
+      action="{{ url_for('auth.change_password') }}">
 
-        {% if password_error %} 
-            <div class="error-message"> 
-                ⚠ {{ password_error }} 
-            </div> 
-        {% endif %}       
+    <label>Current Password:</label>
+    <input type="password"
+           name="current_password"
+           class="{% if password_error %}error-input{% endif %}" 
+           required>
 
-        <br><br>
+    {% if password_error %} 
+        <div class="error-message"> 
+            ⚠ {{ password_error }} 
+        </div> 
+    {% endif %}       
 
-        <label>New Password:</label>
-        <input type="password"
-               name="new_password"
-               class="{% if confirm_password_error %}error-input{% endif %}" 
-               required>
+    <br><br>
 
-        <br><br>
+    <label>New Password:</label>
+    <input type="password"
+           name="new_password"
+           class="{% if confirm_password_error %}error-input{% endif %}" 
+           required>
 
-        <label>Confirm New Password:</label>
-        <input type="password"
-               name="confirm_password"
-               class="{% if confirm_password_error %}error-input{% endif %}"
-               required>
+    <br><br>
 
-        {% if confirm_password_error %} 
-            <div class="error-message"> 
-                ⚠ {{ confirm_password_error }} 
-            </div> 
-        {% endif %}
+    <label>Confirm New Password:</label>
+    <input type="password"
+           name="confirm_password"
+           class="{% if confirm_password_error %}error-input{% endif %}"
+           required>
 
-        <br><br>
+    {% if confirm_password_error %} 
+        <div class="error-message"> 
+            ⚠ {{ confirm_password_error }} 
+        </div> 
+    {% endif %}
 
-        <button type="submit">Change Password</button>
+    <br><br>
 
-    </form>
+    <button type="submit">Change Password</button>
 
-    <br>
+</form>
 
-    <!-- Cancel -->
-    <a href="{{ url_for('auth.profile') }}">
-        <button type="button">Cancel</button>
-    </a>
+<br>
 
-</body>
-</html>
+<!-- Cancel -->
+<a href="{{ url_for('auth.profile') }}">
+    <button type="button">Cancel</button>
+</a>
+
+{% endblock %}
