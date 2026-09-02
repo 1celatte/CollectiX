@@ -1,0 +1,365 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+
+/* =========================
+   Navigation
+   ========================= */
+
+nav {
+    background: #222;
+    color: white;
+    padding: 15px 0;
+}
+
+.nav-container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   Main Container
+   ========================= */
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+.container h1 {
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   Search
+   ========================= */
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+/* =========================
+   Buttons
+   ========================= */
+
+button,
+.button {
+    display: inline-block;
+
+    padding: 10px 16px;
+
+    background: #333;
+    color: white;
+
+    border: none;
+    border-radius: 5px;
+
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button:hover,
+.button:hover {
+    background: #555;
+}
+
+button:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+
+/* =========================
+   Collection Grid
+   ========================= */
+
+.collection-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(250px, 1fr));
+
+    gap: 20px;
+}
+
+.collection-card {
+    background: white;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.collection-card img {
+    width: 100%;
+    height: 180px;
+
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-content h2 {
+    margin-bottom: 8px;
+}
+
+.card-content p {
+    margin-bottom: 15px;
+}
+
+
+/* =========================
+   Category
+   ========================= */
+
+.category {
+    display: inline-block;
+
+    font-size: 13px;
+
+    background: #eee;
+
+    padding: 5px 9px;
+
+    border-radius: 4px;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================
+   Collection Header
+   ========================= */
+
+.collection-header {
+    display: flex;
+    gap: 30px;
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 8px;
+}
+
+.collection-header img {
+    width: 280px;
+    height: 220px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+}
+
+.collection-header h1 {
+    margin-bottom: 15px;
+}
+
+.collection-header p {
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   Items
+   ========================= */
+
+.items-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 25px 0 20px;
+}
+
+.item-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(200px, 1fr));
+
+    gap: 20px;
+}
+
+.item-card {
+    background: white;
+
+    padding-bottom: 15px;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-card img {
+    width: 100%;
+    height: 180px;
+
+    object-fit: cover;
+}
+
+.item-card h3,
+.item-card p {
+    margin: 12px 15px;
+}
+
+
+/* =========================
+   Forms
+   ========================= */
+
+.form-container {
+    width: 90%;
+    max-width: 600px;
+
+    margin: 40px auto;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.form-card {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-card label {
+    display: block;
+
+    font-weight: bold;
+
+    margin-bottom: 7px;
+    margin-top: 18px;
+}
+
+.form-card label:first-child {
+    margin-top: 0;
+}
+
+.form-card input,
+.form-card select,
+.form-card textarea {
+    width: 100%;
+
+    padding: 11px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 5px;
+
+    font-family: inherit;
+}
+
+.form-card textarea {
+    resize: vertical;
+}
+
+.form-card button {
+    margin-top: 25px;
+
+    width: 100%;
+}
+
+
+/* =========================
+   Flash Messages
+   ========================= */
+
+.flash {
+    padding: 12px 15px;
+
+    margin-bottom: 20px;
+
+    border-radius: 5px;
+}
+
+.flash.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.flash.danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.flash.info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 700px) {
+
+    .collection-header {
+        flex-direction: column;
+    }
+
+    .collection-header img {
+        width: 100%;
+        height: 250px;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .nav-container {
+        width: 95%;
+    }
+}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}
+Public Collections
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Public Collections</h1>
+
+
+<!-- Create Collection Link -->
+
+<a href="{{ url_for('collection.create_collection') }}">
+    <button type="button">
+        Create New Collection
+    </button>
+</a>
+
+
+<!-- Flash Messages -->
+
+{% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+        <ul>
+
+            {% for message in messages %}
+
+                <li>
+                    {{ message }}
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+{% endwith %}
+
+
+
+<!-- Collections -->
+
+{% if collections %}
+
+    <div class="collection-grid">
+
+        {% for collection in collections %}
+
+            <div class="collection-card">
+
+
+                <!-- Collection Image -->
+
+                {% if collection.image %}
+
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' + collection.image
+                        ) }}"
+                        alt="{{ collection.name }}"
+                        class="collection-image"
+                        width="200"
+                    >
+
+                {% else %}
+
+                    <div class="no-image">
+                        No Image
+                    </div>
+
+                {% endif %}
+
+
+
+                <!-- Collection Information -->
+
+                <div class="collection-info">
+
+                    <h2>
+
+                        <a
+                            href="{{ url_for(
+                                'collection.view_collection',
+                                collection_id=collection.id
+                            ) }}"
+                        >
+                            {{ collection.name }}
+                        </a>
+
+                    </h2>
+
+
+                    <p>
+
+                        <strong>Category:</strong>
+
+                        {{ collection.category }}
+
+                    </p>
+
+
+                    <p>
+                        {{ collection.description }}
+                    </p>
+
+
+                    <p>
+
+                        <strong>Status:</strong>
+
+                        Approved
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+{% else %}
+
+    <p>
+        No public collections available.
+    </p>
+
+{% endif %}
+
+{% endblock %}

@@ -22,8 +22,19 @@ def create_app():
 
     # Import models so SQLAlchemy knows all the tables
     from app import models
-    from app.models import User
+    
+     # Import models so SQLAlchemy knows about them
+    from app.models import User, Collection, Item
 
+    # Register collection routes
+    from app.collection.feature import collection_bp
+    app.register_blueprint(collection_bp)
+    from app.models import User
+    
+    # Register my-collections routes
+    from app.mycollection.feature import my_collection_bp
+    app.register_blueprint(my_collection_bp)
+    
     # Tell Flask-Login how to load a user
     @login_manager.user_loader
     def load_user(user_id):

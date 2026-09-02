@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ collection.name }}</title>
+</head>
+
+<body>
+
+    <h1>{{ collection.name }}</h1>
+
+    {% if collection.image %}
+
+        <img
+            src="{{ url_for(
+                'collection.static',
+                filename='uploads/' + collection.image
+            ) }}"
+            alt="{{ collection.name }}"
+            width="200"
+        >
+
+    {% endif %}
+
+    <p>
+        <strong>Category:</strong>
+        {{ collection.category }}
+    </p>
+
+    <p>
+        <strong>Description:</strong>
+        {{ collection.description }}
+    </p>
+
+    <hr>
+
+    <h2>Items in This Collection</h2>
+
+    {% if items %}
+
+        {% for item in items %}
+
+            <hr>
+
+            <h3>
+                {{ item.name }}
+            </h3>
+
+            {% if item.image %}
+
+                <img
+                    src="{{ url_for(
+                        'collection.static',
+                        filename='uploads/' + item.image
+                    ) }}"
+                    alt="{{ item.name }}"
+                    width="150"
+                >
+
+            {% endif %}
+
+            <p>
+                {{ item.description }}
+            </p>
+
+            <!-- Check whether current user owns this item -->
+
+            {% set owned = owned_items
+                |selectattr("item_id", "equalto", item.id)
+                |list
+                |first
+            %}
+
+            {% if owned %}
+
+                <p>
+                    <strong>Status:</strong> Owned
+                </p>
+
+                <p>
+                    <strong>Quantity:</strong> {{ owned.quantity }}
+                </p>
+
+            {% else %}
+
+                <p>
+                    <strong>Status:</strong> Unowned
+                </p>
+
+                <p>
+                    <strong>Quantity:</strong> 0
+                </p>
+
+            {% endif %}
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No approved items are available in this collection yet.
+        </p>
+
+    {% endif %}
+
+    <br>
+
+    <a href="{{ url_for('my_collection.list_my_collections') }}">
+        <button>← Back to My Collections</button>
+    </a>
+
+</body>
+
+</html>
