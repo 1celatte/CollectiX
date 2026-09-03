@@ -1,7 +1,22 @@
+import unicodedata
 from flask import render_template, request
 from app.browse import browse_bp
 from app.models import Collection, Item, Listing
 from datetime import datetime
+
+#Remove diacritical marks (when search)
+def normalize_text(text):
+    text = text or ""
+    normalized = unicodedata.normalize(
+        "NFKD",
+        text
+    )
+
+    return "".join(
+        character
+        for character in normalized
+        if not unicodedata.combining(character)
+    ).casefold()
 
 #Browse all public collections
 @browse_bp.route("/")
@@ -41,17 +56,16 @@ def browse_page():
             status="approved"
         )
 
-        if query:
-            collection_query = collection_query.filter(
-                Collection.name.ilike(f"%{query}%")
-            )
-
         if category:
             collection_query = collection_query.filter(
                 Collection.category.ilike(category)
             )
 
         for collection in collection_query.all():
+            #Compare search text without case or diacritics differences
+            if query and normalize_text(query) not in normalize_text(collection.name):
+                continue
+            
             results.append({
                 "type": "collection",
                 "id": collection.id,
@@ -76,11 +90,6 @@ def browse_page():
             Collection.status == "approved"
         )
 
-        if query:
-            item_query = item_query.filter(
-                Item.name.ilike(f"%{query}%")
-            )
-
         if category:
             item_query = item_query.filter(
                 Collection.category.ilike(category)
@@ -92,6 +101,9 @@ def browse_page():
             )
 
         for item, collection in item_query.all():
+            #Compare search text without case or diacritics differences
+            if query and normalize_text(query) not in normalize_text(item.name):
+                 continue
             results.append({
                 "type": "item",
                 "id": item.id,
@@ -122,11 +134,6 @@ def browse_page():
             Collection.status == "approved"
         )
 
-        if query:
-            listing_query = listing_query.filter(
-                Item.name.ilike(f"%{query}%")
-            )
-
         if category:
             listing_query = listing_query.filter(
                 Collection.category.ilike(category)
@@ -138,6 +145,10 @@ def browse_page():
             )
 
         for listing, item, collection in listing_query.all():
+            #Compare search text without case or diacritics differences
+            if query and normalize_text(query) not in normalize_text(item.name):
+                 continue
+             
             results.append({
                 "type": "marketplace",
                 "id": listing.id,
