@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login - CollectiX
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .error-input {
+        border: 2px solid red;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 14px;
+    }
+</style>
+
+<h1>Login</h1>
+
+<form method="POST">
+
+    <label>Username or Email:</label>
+    <input type="text"
+           name="username_or_email"
+           value="{{ username_or_email or '' }}"
+           class="{% if login_error %}error-input{% endif %}"
+           required>
+
+    <br><br>
+
+    <label>Password:</label>
+    <input type="password"
+           name="password"
+           class="{% if login_error %}error-input{% endif %}"
+           required>
+
+    {% if login_error %}
+        <div class="error-message">
+            ⚠ {{ login_error }}
+        </div>
+    {% endif %}
+
+    <br><br>
+
+    <button type="submit">Login</button>
+
+</form>
+
+<p>
+    Don't have an account?
+    <a href="{{ url_for('auth.register') }}">Register here</a>
+</p>
+
+<p>
+    <a href="{{ url_for('auth.forgot_password') }}">
+        Forgot Password?
+    </a>
+</p>
+
+{% endblock %}

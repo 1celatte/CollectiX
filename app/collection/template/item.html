@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Add Item
+{% endblock %}
+
+
+{% block content %}
+
+<h1>
+    Add Item to {{ collection.name }}
+</h1>
+
+
+<p>
+    You are adding a new item to:
+    <strong>{{ collection.name }}</strong>
+</p>
+
+
+<!-- ===================================================== -->
+<!-- ADD ITEM FORM -->
+<!-- ===================================================== -->
+
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+
+    <!-- Item Name -->
+
+    <div>
+
+        <label for="name">
+            Item Name:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            required
+        >
+
+    </div>
+
+
+    <br>
+
+
+    <!-- Description -->
+
+    <div>
+
+        <label for="description">
+            Description:
+        </label>
+
+        <br>
+
+        <textarea
+            id="description"
+            name="description"
+            rows="5"
+            cols="40"
+        ></textarea>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- Item Image -->
+
+    <div>
+
+        <label for="image">
+            Item Image:
+        </label>
+
+        <br>
+
+        <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+        >
+
+    </div>
+
+
+    <br>
+
+
+    <!-- Submit -->
+
+    <button type="submit">
+        Submit Item
+    </button>
+
+
+</form>
+
+
+<br>
+
+
+<!-- ===================================================== -->
+<!-- BACK TO COLLECTION -->
+<!-- ===================================================== -->
+
+<a
+    href="{{ url_for(
+        'collection.view_collection',
+        collection_id=collection.id
+    ) }}"
+>
+
+    <button type="button">
+        ← Back to Collection
+    </button>
+
+</a>
+
+
+{% endblock %}
