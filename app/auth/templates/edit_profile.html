@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Profile - CollectiX
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .error-input {
+        border: 2px solid red;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 14px;
+    }
+</style>
+
+<h1>Edit Profile</h1>
+
+<!-- Edit Profile Form -->
+<form method="POST" enctype="multipart/form-data">
+
+    <label>Username:</label>
+    <input type="text"
+           name="username"
+           value="{{ username or current_user.username }}"
+           class="{% if username_error %}error-input{% endif %}"
+           required>
+
+    {% if username_error %}
+        <div class="error-message">
+            ⚠ {{ username_error }}
+        </div>
+    {% endif %}
+
+    <br><br>
+
+    <label>Email:</label>
+    <input type="email"
+           name="email"
+           value="{{ email or current_user.email }}"
+           class="{% if email_error %}error-input{% endif %}"
+           required>
+
+    {% if email_error %}
+        <div class="error-message">
+            ⚠ {{ email_error }}
+        </div>
+    {% endif %}
+
+    <br><br>
+
+    <!-- Upload New Profile Picture -->
+    {% if current_user.profile_picture %}
+        <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+             alt="Profile Picture"
+             width="150"
+             height="150">
+    {% else %}
+        <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+             alt="Default Profile Picture"
+             width="150"
+             height="150">
+    {% endif %}
+
+    <br><br>
+
+    <label>Profile Picture:</label>
+    <input type="file"
+           name="profile_picture"
+           accept="image/*">
+
+    <br><br>
+
+    <!-- Remove Profile Picture -->
+    <label>
+        <input type="checkbox"
+               name="remove_profile_picture"
+               value="1">
+        Remove Profile Picture
+    </label>
+
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+
+</form>
+
+<hr>
+
+<!-- Change Password -->
+<h2>Change Password</h2>
+
+<form method="POST"
+      action="{{ url_for('auth.change_password') }}">
+
+    <label>Current Password:</label>
+    <input type="password"
+           name="current_password"
+           class="{% if password_error %}error-input{% endif %}" 
+           required>
+
+    {% if password_error %} 
+        <div class="error-message"> 
+            ⚠ {{ password_error }} 
+        </div> 
+    {% endif %}       
+
+    <br><br>
+
+    <label>New Password:</label>
+    <input type="password"
+           name="new_password"
+           class="{% if confirm_password_error %}error-input{% endif %}" 
+           required>
+
+    <br><br>
+
+    <label>Confirm New Password:</label>
+    <input type="password"
+           name="confirm_password"
+           class="{% if confirm_password_error %}error-input{% endif %}"
+           required>
+
+    {% if confirm_password_error %} 
+        <div class="error-message"> 
+            ⚠ {{ confirm_password_error }} 
+        </div> 
+    {% endif %}
+
+    <br><br>
+
+    <button type="submit">Change Password</button>
+
+</form>
+
+<br>
+
+<!-- Cancel -->
+<a href="{{ url_for('auth.profile') }}">
+    <button type="button">Cancel</button>
+</a>
+
+{% endblock %}

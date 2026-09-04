@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ collection.name }}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+
+    <!-- ===================================================== -->
+    <!-- FLASH MESSAGES -->
+    <!-- ===================================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <ul class="flashes">
+
+                {% for category, message in messages %}
+
+                    <li>
+                        {{ message }}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+
+    <!-- ===================================================== -->
+    <!-- COLLECTION INFORMATION -->
+    <!-- ===================================================== -->
+
+    <div class="collection">
+
+        {% if collection.image %}
+
+            <img
+                class="collection-image"
+                src="{{ url_for(
+                    'collection.static',
+                    filename='uploads/' + collection.image
+                ) }}"
+                alt="{{ collection.name }}"
+                width="200"
+            >
+
+        {% else %}
+
+            <p>
+                No Collection Image
+            </p>
+
+        {% endif %}
+
+
+        <h1>
+            {{ collection.name }}
+        </h1>
+
+
+        {% if collection.category %}
+
+            <p class="category">
+
+                <strong>Category:</strong>
+
+                {{ collection.category }}
+
+            </p>
+
+        {% endif %}
+
+
+        {% if collection.description %}
+
+            <p class="description">
+
+                <strong>Description:</strong>
+
+                {{ collection.description }}
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <hr>
+
+
+
+    <!-- ===================================================== -->
+    <!-- ADD COLLECTION TO MY COLLECTION -->
+    <!-- ===================================================== -->
+
+    <div class="my-collection-section">
+
+        <h2>
+            My Collection
+        </h2>
+
+
+        <form
+            action="{{ url_for(
+                'collection.add_to_my_collection',
+                collection_id=collection.id
+            ) }}"
+            method="POST"
+        >
+
+            <button type="submit">
+                + Add to My Collection
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <hr>
+
+
+
+    <!-- ===================================================== -->
+    <!-- ITEMS -->
+    <!-- ===================================================== -->
+
+    <div class="items-section">
+
+        <h2>
+            Items in this Collection
+        </h2>
+
+
+        {% if items %}
+
+            <div class="item-list">
+
+
+                {% for item in items %}
+
+                    <div class="item-card">
+
+
+                        <!-- Item Image -->
+
+                        {% if item.image %}
+
+                            <img
+                                class="item-image"
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                width="150"
+                            >
+
+                        {% else %}
+
+                            <div
+                                style="
+                                    width: 150px;
+                                    height: 150px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    background: #eee;
+                                "
+                            >
+
+                                No Image
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Item Name -->
+
+                        <h3>
+                            {{ item.name }}
+                        </h3>
+
+
+
+                        <!-- Item Description -->
+
+                        {% if item.description %}
+
+                            <p>
+                                {{ item.description }}
+                            </p>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                    <hr>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+            <p>
+                No approved items in this collection yet.
+            </p>
+
+        {% endif %}
+
+
+
+        <!-- ================================================= -->
+        <!-- ADD ITEM -->
+        <!-- ================================================= -->
+
+        <br>
+
+        <a
+            href="{{ url_for(
+                'collection.add_item',
+                collection_id=collection.id
+            ) }}"
+        >
+
+            <button type="button">
+                + Add Item
+            </button>
+
+        </a>
+
+    </div>
+
+
+
+    <hr>
+
+
+
+    <!-- ===================================================== -->
+    <!-- BACK BUTTON -->
+    <!-- ===================================================== -->
+
+    <a
+        href="{{ url_for(
+            'collection.list_collections'
+        ) }}"
+    >
+
+        <button type="button">
+            ← Back to Public Collections
+        </button>
+
+    </a>
+
+
+</div>
+
+{% endblock %}

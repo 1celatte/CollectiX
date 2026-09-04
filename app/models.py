@@ -1,8 +1,8 @@
 from datetime import datetime
 from app.extensions import db
+from flask_login import UserMixin
 
-
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +11,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default="user", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_picture = db.Column(db.String(255), nullable=True)
 
 
 class Collection(db.Model):

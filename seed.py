@@ -96,7 +96,7 @@ with app.app_context():
         name="Naruto Shippuden",
         category="Anime Figure",
         description="Naruto Shippuden collectible figures.",
-        image=None,
+        image="collection.jpg",
         status="approved",
         created_by=admin.id
     )
@@ -105,7 +105,7 @@ with app.app_context():
         name="POP MART Crybaby Series",
         category="Blind Box",
         description="POP MART Crybaby collectible series.",
-        image=None,
+        image="crybaby.jpg",
         status="approved",
         created_by=admin.id
     )
@@ -127,7 +127,7 @@ with app.app_context():
         collection_id=pokemon.id,
         name="Pikachu",
         description="Pikachu collectible card.",
-        image=None,
+        image="pikachu.png",
         status="approved",
         created_by=admin.id
     )
@@ -136,7 +136,7 @@ with app.app_context():
         collection_id=pokemon.id,
         name="Charizard",
         description="Charizard collectible card.",
-        image=None,
+        image="charizard.jpg",
         status="approved",
         created_by=admin.id
     )
@@ -154,7 +154,7 @@ with app.app_context():
         collection_id=naruto.id,
         name="Naruto Uzumaki",
         description="Naruto Uzumaki collectible figure.",
-        image=None,
+        image="naruto.png",
         status="approved",
         created_by=admin.id
     )
@@ -172,7 +172,7 @@ with app.app_context():
         collection_id=naruto.id,
         name="Sakura Haruno",
         description="Sakura Haruno collectible figure.",
-        image=None,
+        image="sakura.jpg",
         status="approved",
         created_by=admin.id
     )
@@ -181,7 +181,7 @@ with app.app_context():
         collection_id=naruto.id,
         name="Kakashi Hatake",
         description="Kakashi Hatake collectible figure.",
-        image=None,
+        image="kakashi_test.png",
         status="approved",
         created_by=admin.id
     )

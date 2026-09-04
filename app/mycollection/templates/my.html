@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Collections</title>
+</head>
+
+<body>
+
+    <h1>My Collections</h1>
+
+    {% if collections %}
+
+        {% for collection in collections %}
+
+            <hr>
+
+            <h2>
+                {{ collection.name }}
+            </h2>
+
+            {% if collection.image %}
+
+                <img
+                    src="{{ url_for(
+                        'collection.static',
+                        filename='uploads/' + collection.image
+                    ) }}"
+                    alt="{{ collection.name }}"
+                    width="150"
+                >
+
+            {% endif %}
+
+            <p>
+                <strong>Category:</strong>
+                {{ collection.category }}
+            </p>
+
+            <p>
+                {{ collection.description }}
+            </p>
+
+            <a
+                href="{{ url_for(
+                    'my_collection.view_my_collection',
+                    collection_id=collection.id
+                ) }}"
+            >
+                <button>View Collection Details</button>
+            </a>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            You have not added any collections yet.
+        </p>
+
+    {% endif %}
+
+</body>
+
+</html>
