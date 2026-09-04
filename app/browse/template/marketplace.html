@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}
+Marketplace Listings - CollectiX
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1 class="mb-2">Marketplace Listings</h1>
+
+<!--Page description-->
+<p class="text-muted mb-4">
+    Browse collectible items available for sale or trade.
+</p>
+
+<!--Back to Browse page-->
+<a href="{{ url_for('browse.browse_page') }}" class="btn btn-outline-secondary mb-4">
+    Back to Browse
+</a>
+
+<!--Sort marketplace listings-->
+<form method="GET" action="{{ url_for('browse.browse_marketplace') }}" class="card p-3 mb-4">
+    <div class="row g-2">
+
+        <div class="col-md-10">
+            <label for="sort" class="form-label">
+                Sort results
+            </label>
+
+            <select id="sort" name="sort" class="form-select">
+
+                <option value="newest" {% if sort=="newest" %}selected{% endif %}>
+                    Newest
+                </option>
+
+                <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>
+                    Oldest
+                </option>
+
+                <option value="name" {% if sort=="name" %}selected{% endif %}>
+                    Name A-Z
+                </option>
+
+                <option value="lowest" {% if sort=="lowest" %}selected{% endif %}>
+                    Lowest Price
+                </option>
+
+                <option value="highest" {% if sort=="highest" %}selected{% endif %}>
+                    Highest Price
+                </option>
+
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                Sort
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<!--Marketplace results-->
+<div class="row g-4">
+
+    {% if listings %}
+
+    {% for listing, item in listings %}
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+
+            <div class="card-body">
+
+                <!--Item name-->
+                <h5 class="card-title">
+                    {{ item.name }}
+                </h5>
+
+                <!--Listing type-->
+                <p class="text-muted">
+                    Type: {{ listing.listing_type|capitalize }}
+                </p>
+
+                <!--Item description-->
+                <p class="card-text">
+                    {{ listing.description or
+                    item.description or
+                    "No description available." }}
+                </p>
+
+                <!--Item condition-->
+                <p class="text-muted">
+                    Condition: {{ listing.condition }}
+                </p>
+
+                <!--Price-->
+                {% if listing.price is not none %}
+                <p class="fw-bold text-success">
+                    Price: RM {{ "%.2f"|format(listing.price) }}
+                </p>
+                {% else %}
+                <p class="fw-bold text-primary">
+                    Available for trade
+                </p>
+                {% endif %}
+
+                <!--Temporary details button-->
+                <a href="#" class="btn btn-outline-primary">
+                    View Listing
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <!--Message when no listings exist-->
+    <div class="col-12">
+        <p class="text-muted">
+            No marketplace listings are available yet!
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
