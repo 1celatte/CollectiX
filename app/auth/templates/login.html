@@ -21,10 +21,10 @@ Login - CollectiX
 
 <form method="POST">
 
-    <label>Username or Email:</label>
+    <label>Email:</label>
     <input type="text"
-           name="username_or_email"
-           value="{{ username_or_email or '' }}"
+           name="email"
+           value="{{ email or '' }}"
            class="{% if login_error %}error-input{% endif %}"
            required>
 
