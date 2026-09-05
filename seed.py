@@ -42,29 +42,29 @@ with app.app_context():
     # =========================
 
     admin = User(
-        username="admin",
+        name="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="admin"
     )
 
     alice = User(
-        username="alice",
+        name="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
     )
 
     bob = User(
-        username="bob",
+        name="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
     )
 
     charlie = User(
-        username="charlie",
-        email="charlie@collectix.com",
+        name="charlie",
+        emailn="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
     )
@@ -412,7 +412,7 @@ with app.app_context():
     print("================================")
     print()
     print("Test accounts:")
-    print("admin   / Test1234!")
-    print("alice   / Test1234!")
-    print("bob     / Test1234!")
-    print("charlie / Test1234!")
+    print("admin@collectix.com / Test1234!")
+    print("alice@collectix.com / Test1234!")
+    print("bob@collectix.com / Test1234!")
+    print("charlie@collectix.com / Test1234!")
