@@ -45,28 +45,32 @@ with app.app_context():
         name="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="admin"
+        role="admin",
+        email_verified=True
     )
 
     alice = User(
         name="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     bob = User(
         name="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     charlie = User(
         name="charlie",
-        emailn="charlie@collectix.com",
+        email="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     db.session.add_all([
