@@ -33,15 +33,8 @@ Edit Profile - CollectiX
     <label>Email:</label>
     <input type="email"
            name="email"
-           value="{{ email or current_user.email }}"
-           class="{% if email_error %}error-input{% endif %}"
-           required>
-
-    {% if email_error %}
-        <div class="error-message">
-            ⚠ {{ email_error }}
-        </div>
-    {% endif %}
+           value="{{ current_user.email }}"
+           disabled>
 
     <br><br>
 
