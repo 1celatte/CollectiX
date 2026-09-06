@@ -2,27 +2,110 @@ from datetime import datetime
 from app.extensions import db
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), default="user", nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    profile_picture = db.Column(db.String(255), nullable=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
+    username = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
+
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False
+    )
+
+    password = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    role = db.Column(
+        db.String(20),
+        default="user",
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    profile_picture = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+
+# ==========================================
+# Tag
+# ==========================================
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+# ==========================================
+# Collection
+# ==========================================
 
 class Collection(db.Model):
     __tablename__ = "collections"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    category = db.Column(db.String(80))
-    description = db.Column(db.Text)
-    image = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="pending", nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    # Replaced category with tag_id
+    tag_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tags.id"),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    image = db.Column(
+        db.String(255)
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="pending",
+        nullable=False
+    )
 
     created_by = db.Column(
         db.Integer,
@@ -30,13 +113,23 @@ class Collection(db.Model):
         nullable=False
     )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
+
+# ==========================================
+# Item
+# ==========================================
 
 class Item(db.Model):
     __tablename__ = "items"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     collection_id = db.Column(
         db.Integer,
@@ -44,10 +137,24 @@ class Item(db.Model):
         nullable=False
     )
 
-    name = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text)
-    image = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="pending", nullable=False)
+    name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    image = db.Column(
+        db.String(255)
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="pending",
+        nullable=False
+    )
 
     created_by = db.Column(
         db.Integer,
@@ -55,13 +162,23 @@ class Item(db.Model):
         nullable=False
     )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
+
+# ==========================================
+# User Collection
+# ==========================================
 
 class UserCollection(db.Model):
     __tablename__ = "user_collections"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -89,10 +206,17 @@ class UserCollection(db.Model):
     )
 
 
+# ==========================================
+# Owned Item
+# ==========================================
+
 class OwnedItem(db.Model):
     __tablename__ = "owned_items"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -126,10 +250,17 @@ class OwnedItem(db.Model):
     )
 
 
+# ==========================================
+# Submission
+# ==========================================
+
 class Submission(db.Model):
     __tablename__ = "submissions"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -148,9 +279,31 @@ class Submission(db.Model):
         nullable=True
     )
 
-    name = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text)
-    image = db.Column(db.String(255))
+    # Existing tag selected by the user
+    tag_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tags.id"),
+        nullable=True
+    )
+
+    # Used when the user chooses "Other"
+    new_tag = db.Column(
+        db.String(80),
+        nullable=True
+    )
+
+    name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    image = db.Column(
+        db.String(255)
+    )
 
     status = db.Column(
         db.String(20),
@@ -170,10 +323,17 @@ class Submission(db.Model):
     )
 
 
+# ==========================================
+# Correction Request
+# ==========================================
+
 class CorrectionRequest(db.Model):
     __tablename__ = "correction_requests"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -192,9 +352,15 @@ class CorrectionRequest(db.Model):
         nullable=False
     )  # text / image / both
 
-    description = db.Column(db.Text, nullable=False)
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
 
-    image = db.Column(db.String(255), nullable=True)
+    image = db.Column(
+        db.String(255),
+        nullable=True
+    )
 
     status = db.Column(
         db.String(20),
@@ -214,10 +380,17 @@ class CorrectionRequest(db.Model):
     )
 
 
+# ==========================================
+# Listing
+# ==========================================
+
 class Listing(db.Model):
     __tablename__ = "listings"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -246,7 +419,9 @@ class Listing(db.Model):
         default="Good"
     )
 
-    description = db.Column(db.Text)
+    description = db.Column(
+        db.Text
+    )
 
     status = db.Column(
         db.String(20),
@@ -260,10 +435,17 @@ class Listing(db.Model):
     )
 
 
+# ==========================================
+# Transaction
+# ==========================================
+
 class Transaction(db.Model):
     __tablename__ = "transactions"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     listing_id = db.Column(
         db.Integer,
@@ -306,10 +488,17 @@ class Transaction(db.Model):
     )
 
 
+# ==========================================
+# Trade
+# ==========================================
+
 class Trade(db.Model):
     __tablename__ = "trades"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     sender_id = db.Column(
         db.Integer,
