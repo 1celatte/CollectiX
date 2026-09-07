@@ -1,7 +1,7 @@
 import unicodedata
 from flask import render_template, request
 from app.browse import browse_bp
-from app.models import Collection, Item, Listing
+from app.models import Collection, Item, Listing, Tag
 from datetime import datetime
 
 #Remove diacritical marks (when search)
@@ -11,6 +11,7 @@ def normalize_text(text):
         "NFKD",
         text
     )
+
 
     return "".join(
         character
@@ -24,44 +25,44 @@ def browse_page():
     #Read user's search and filter choices
     show = request.args.get("show", "all").strip()
     query = request.args.get("q", "").strip()
-    category = request.args.get("category", "").strip()
-    collection_id = request.args.get("collection_id", "").strip()
+    tag = request.args.get("tag", "").strip()
     sort = request.args.get("sort", "newest").strip()
     
     results = []
     
-    #Approved collections for collection filter
-    collections = Collection.query.filter_by(
-        status="approved"
-    ).order_by(
-        Collection.name.asc()
-    ).all()
     
-    #Categories are read from the database
-    categories = [
+    #Tags are read from the database
+    tags = [
         row[0]
-        for row in Collection.query.with_entities(
-            Collection.category
+        for row in Tag.query.join(
+            Collection,
+            Collection.tag_id == Tag.id
+        ).with_entities(
+            Tag.name
         ).filter(
-            Collection.status == "approved",
-            Collection.category.isnot(None)
+            Collection.status == "approved"
         ).distinct().order_by(
-            Collection.category.asc()
+            Tag.name.asc()
         ).all()
     ]
 
     #Add collections to results
     if show in ("all", "collections"):
-        collection_query = Collection.query.filter_by(
-            status="approved"
+        collection_query = Collection.query.join(
+            Tag,
+            Collection.tag_id == Tag.id
+        ).add_entity(
+            Tag
+        ).filter(
+        Collection.status == "approved"
         )
 
-        if category:
+        if tag:
             collection_query = collection_query.filter(
-                Collection.category.ilike(category)
+                Tag.name.ilike(tag)
             )
 
-        for collection in collection_query.all():
+        for collection, tag_record in collection_query.all():
             #Compare search text without case or diacritics differences
             if query and normalize_text(query) not in normalize_text(collection.name):
                 continue
@@ -70,7 +71,7 @@ def browse_page():
                 "type": "collection",
                 "id": collection.id,
                 "name": collection.name,
-                "category": collection.category,
+                "category": tag_record.name,
                 "description": collection.description,
                 "image": collection.image,
                 "collection_name": collection.name,
@@ -82,25 +83,26 @@ def browse_page():
     if show in ("all", "items"):
         item_query = Item.query.join(
             Collection,
-            Item.collection_id == Collection.id
-        ).add_entity(
-            Collection
-        ).filter(
-            Item.status == "approved",
-            Collection.status == "approved"
-        )
+        Item.collection_id == Collection.id
+    ).join(
+        Tag,
+        Collection.tag_id == Tag.id
+    ).add_entity(
+        Collection
+    ).add_entity(
+        Tag
+    ).filter(
+        Item.status == "approved",
+        Collection.status == "approved"
+    )
 
-        if category:
+
+        if tag:
             item_query = item_query.filter(
-                Collection.category.ilike(category)
+                Tag.name.ilike(tag)
             )
 
-        if collection_id:
-            item_query = item_query.filter(
-                Item.collection_id == collection_id
-            )
-
-        for item, collection in item_query.all():
+        for item, collection, tag_record in item_query.all():
             #Compare search text without case or diacritics differences
             if query and normalize_text(query) not in normalize_text(item.name):
                  continue
@@ -108,7 +110,7 @@ def browse_page():
                 "type": "item",
                 "id": item.id,
                 "name": item.name,
-                "category": collection.category,
+                "category": tag_record.name,
                 "description": item.description,
                 "image": item.image,
                 "collection_name": collection.name,
@@ -124,27 +126,27 @@ def browse_page():
         ).join(
             Collection,
             Item.collection_id == Collection.id
+        ).join(
+            Tag,
+            Collection.tag_id == Tag.id
         ).add_entity(
             Item
         ).add_entity(
             Collection
+        ).add_entity(
+            Tag
         ).filter(
             Listing.status == "available",
             Item.status == "approved",
             Collection.status == "approved"
         )
-
-        if category:
+        
+        if tag:
             listing_query = listing_query.filter(
-                Collection.category.ilike(category)
+                Tag.name.ilike(tag)
             )
-
-        if collection_id:
-            listing_query = listing_query.filter(
-                Item.collection_id == collection_id
-            )
-
-        for listing, item, collection in listing_query.all():
+            
+        for listing, item, collection, tag_record in listing_query.all():
             #Compare search text without case or diacritics differences
             if query and normalize_text(query) not in normalize_text(item.name):
                  continue
@@ -153,7 +155,7 @@ def browse_page():
                 "type": "marketplace",
                 "id": listing.id,
                 "name": item.name,
-                "category": collection.category,
+                "category": tag_record.name,
                 "description": listing.description or item.description,
                 "image": item.image,
                 "collection_name": collection.name,
@@ -196,11 +198,9 @@ def browse_page():
         results=results,
         show=show,
         query=query,
-        category=category,
-        collection_id=collection_id,
+        tag=tag,
         sort=sort,
-        categories=categories,
-        collections=collections
+        tags=tags
     )
     
 #Display and search approved collectible items
@@ -216,6 +216,7 @@ def browse_items():
     items_query = Item.query.filter_by(
         status="approved"
     )
+    
     
     #Search by item name
     if query:
@@ -233,12 +234,6 @@ def browse_items():
         Item.created_at.desc()
     ).all()
 
-    #Get collections for the dropdown menu
-    collections = Collection.query.filter_by(
-        status="approved"
-    ).order_by(
-        Collection.name.asc()
-    ).all()
 
     return render_template(
         "items.html",
@@ -256,6 +251,7 @@ def browse_marketplace():
         "sort",
         "newest"
     )
+      
         
     #Start with available listings
     listings_query = Listing.query.join(
