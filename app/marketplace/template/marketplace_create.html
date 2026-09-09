@@ -24,6 +24,13 @@
 
         <select id="item_id" name="item_id">
             <option value="">Select an item</option>
+
+            <!--Show only items owned by the logged-in user-->
+            {% for item in owned_items %}
+            <option value="{{ item.id }}">
+                {{ item.name }}
+            </option>
+            {% endfor %}
         </select>
 
         <br><br>
@@ -39,10 +46,11 @@
         <label for="condition">Condition:</label>
 
         <select id="condition" name="condition">
-            <option value="New">New</option>
-            <option value="Excellent">Excellent</option>
+            <option value="Brand New">Brand New</option>
+            <option value="Like New">Like New</option>
             <option value="Good">Good</option>
             <option value="Fair">Fair</option>
+            <option value="Poor">Poor</option>
         </select>
 
         <br><br>
