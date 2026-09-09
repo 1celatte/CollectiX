@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Check Your Email{% endblock %}
+
+{% block content %}
+
+<div class="text-center">
+
+    <h2>Check Your Email</h2>
+
+    <p>
+        We have sent a password reset link to your email address.
+    </p>
+
+    <p>
+        Please check your inbox and click the link to reset your password.
+    </p>
+
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+        Back to Login
+    </a>
+
+</div>
+
+{% endblock %}
