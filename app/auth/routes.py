@@ -212,7 +212,7 @@ def login():
         if not user.email_verified:
             return render_template(
                 "login.html",
-                login_error="Please verify your email before logging in.",
+                login_error="Please verify your email before logging in. Check your inbox for the verification email.",
                 email=email
             )
 
@@ -328,19 +328,65 @@ def forgot_password():
                 email_error="Email does not exist."
             )
 
-        return redirect(url_for("auth.reset_password", email=email))
+        # Generate password reset token
+        reset_token = secrets.token_urlsafe(32)
+
+        # Token expires after 30 minutes
+        reset_expires_at = datetime.utcnow() + timedelta(minutes=30)
+
+        # Save reset token to the user
+        user.password_reset_token = reset_token
+        user.password_reset_expires_at = reset_expires_at
+
+        db.session.commit()
+
+        # Create password reset link
+        reset_link = url_for(
+            "auth.reset_password",
+            token=reset_token,
+            _external=True
+        )
+
+        # Create reset password email
+        msg = Message(
+            subject="Reset your CollectiX password",
+            recipients=[email]
+        )
+
+        msg.html = render_template(
+            "reset_password_email.html",
+            name=user.name,
+            reset_link=reset_link
+        )
+
+        mail.send(msg)
+
+        return redirect(url_for("auth.check_reset_email"))
 
     return render_template("forgot_password.html")
 
 
-@auth.route("/reset-password", methods=["GET", "POST"])
-def reset_password():
-    email = request.args.get("email")
+@auth.route("/check-reset-email")
+def check_reset_email():
+    return render_template("check_reset_email.html")
 
-    user = User.query.filter_by(email=email).first()
 
+@auth.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    user = User.query.filter_by(
+        password_reset_token=token
+    ).first()
+
+    # Token does not exist
     if user is None:
-        return redirect(url_for("auth.forgot_password"))
+        return "Invalid password reset link."
+
+    # Check whether token has expired
+    if (
+        user.password_reset_expires_at is None
+        or datetime.utcnow() > user.password_reset_expires_at
+    ):
+        return "Password reset link has expired."
 
     if request.method == "POST":
         new_password = request.form.get("new_password")
@@ -353,6 +399,10 @@ def reset_password():
             )
 
         user.password = generate_password_hash(new_password)
+
+        # Clear reset token after successful password reset
+        user.password_reset_token = None
+        user.password_reset_expires_at = None
 
         db.session.commit()
 

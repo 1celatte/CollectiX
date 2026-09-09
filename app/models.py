@@ -12,6 +12,8 @@ class User(UserMixin, db.Model):
     email_verification_token = db.Column(db.String(255), nullable=True)
     email_verification_expires_at = db.Column(db.DateTime, nullable=True)
     password = db.Column(db.String(255), nullable=False)
+    password_reset_token = db.Column(db.String(255), nullable=True)
+    password_reset_expires_at = db.Column(db.DateTime, nullable=True)
     role = db.Column(db.String(20), default="user", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_picture = db.Column(db.String(255), nullable=True)
