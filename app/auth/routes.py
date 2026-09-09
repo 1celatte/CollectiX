@@ -1,11 +1,14 @@
 from flask import render_template, request, redirect, url_for
+from datetime import datetime, timedelta
+import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
+from flask_mail import Message
 import os
 
 from . import auth
-from app.extensions import db
+from app.extensions import db, mail
 from app.models import User
 
 
@@ -13,25 +16,36 @@ from app.models import User
 def test_auth():
     return "Auth Blueprint is working!"
 
+@auth.route("/test-email")
+def test_email():
+    msg = Message(
+        subject="CollectiX Email Test",
+        sender=mail.username,
+        recipients=["cngchifei@gmail.com"]
+    )
+
+    msg.body = "This is a test email from CollectiX."
+
+    mail.send(msg)
+
+    return "Test email sent!"
+
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form.get("username")
+        name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
-        username_error = None
         email_error = None
         password_error = None
 
-        # Check whether username already exists
-        if User.query.filter_by(username=username).first():
-            username_error = "Username already exists."
-
         # Check whether email already exists
-        if User.query.filter_by(email=email).first():
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_user and existing_user.email_verified:
             email_error = "Email already exists."
 
         # Check password confirmation
@@ -39,58 +53,167 @@ def register():
             password_error = "Passwords do not match."
 
         # If there are errors, stay on Register page
-        if username_error or email_error or password_error:
+        if email_error or password_error:
             return render_template(
                 "register.html",
-                username=username,
+                name=name,
                 email=email,
-                username_error=username_error,
                 email_error=email_error,
                 password_error=password_error
             )
 
+        # Generate verification token
+        verification_token = secrets.token_urlsafe(32)
+
+        # Token expires after 30 minutes
+        verification_expires_at = datetime.utcnow() + timedelta(minutes=30)
+
         # Hash password before storing it
         hashed_password = generate_password_hash(password)
 
-        user = User(
-            username=username,
-            email=email,
-            password=hashed_password
-        )
+        # If the email already exists but is not verified,
+        # update the existing account
+        if existing_user:
+            user = existing_user
 
-        db.session.add(user)
+            user.name = name
+            user.password = hashed_password
+            user.email_verified = False
+            user.email_verification_token = verification_token
+            user.email_verification_expires_at = verification_expires_at
+
+        # If the email does not exist,
+        # create a new account
+        else:
+            user = User(
+                name=name,
+                email=email,
+                password=hashed_password,
+                email_verified=False,
+                email_verification_token=verification_token,
+                email_verification_expires_at=verification_expires_at
+            )
+
+            db.session.add(user)
+            
         db.session.commit()
 
-        return redirect(url_for("auth.login"))
+        # Create verification link
+        verification_link = url_for(
+            "auth.verify_email",
+            token=verification_token,
+            _external=True
+        )
+
+        # Create email
+        msg = Message(
+            subject="Verify your CollectiX account",
+            recipients=[email]
+        )
+
+        # Email content is stored in HTML template
+        msg.html = render_template(
+            "verify_email.html",
+            name=name,
+            verification_link=verification_link
+        )
+
+        mail.send(msg)
+
+        return redirect(url_for("auth.check_email"))
 
     return render_template("register.html")
+
+
+@auth.route("/verify-email/<token>")
+def verify_email(token):
+    user = User.query.filter_by(
+        email_verification_token=token
+    ).first()
+
+    # Token does not exist
+    if user is None:
+        return "Invalid verification link."
+
+    # Check whether token has expired
+    if (
+        user.email_verification_expires_at is None
+        or datetime.utcnow() > user.email_verification_expires_at
+    ):
+        return "Verification link has expired."
+
+    return render_template(
+        "confirm_email.html",
+        token=token,
+        email=user.email
+    )    
+
+
+@auth.route("/confirm-email/<token>", methods=["POST"])
+def confirm_email(token):
+    user = User.query.filter_by(
+        email_verification_token=token
+    ).first()
+
+    # Token does not exist
+    if user is None:
+        return "Invalid verification link."
+
+    # Check whether token has expired
+    if (
+        user.email_verification_expires_at is None
+        or datetime.utcnow() > user.email_verification_expires_at
+    ):
+        return "Verification link has expired."
+
+    # Verify email
+    user.email_verified = True
+    user.email_verification_token = None
+    user.email_verification_expires_at = None
+
+    db.session.commit()
+
+    return render_template(
+        "email_verified.html",
+        email=user.email
+    )
+
+
+@auth.route("/check-email")
+def check_email():
+    return render_template("check_email.html")
 
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username_or_email = request.form.get("username_or_email")
+        email = request.form.get("email")
         password = request.form.get("password")
 
-        user = User.query.filter(
-            (User.username == username_or_email) |
-            (User.email == username_or_email)
-        ).first()
+        user = User.query.filter_by(email=email).first()
 
-        # Invalid username/email
+        # Invalid email
         if user is None:
             return render_template(
                 "login.html",
-                login_error="Invalid username/email or password.",
-                username_or_email=username_or_email
+                login_error="Invalid email or password.",
+                email=email
             )
 
         # Incorrect password
         if not check_password_hash(user.password, password):
             return render_template(
                 "login.html",
-                login_error="Invalid username/email or password.",
-                username_or_email=username_or_email
+                login_error="Invalid email or password.",
+                email=email
+            )
+
+        # Email not verified
+        if not user.email_verified:
+            return render_template(
+                "login.html",
+                login_error="Please verify your email before logging in.",
+                email=email
             )
 
         login_user(user)
@@ -121,38 +244,9 @@ def profile():
 @login_required
 def edit_profile():
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
+        name = request.form.get("name")
         profile_picture = request.files.get("profile_picture")
         remove_profile_picture = request.form.get("remove_profile_picture") == "1"
-
-        username_error = None
-        email_error = None
-
-        existing_user = User.query.filter(
-            (User.username == username) &
-            (User.id != current_user.id)
-        ).first()
-
-        if existing_user:
-            username_error = "Username already exists."
-
-        existing_email = User.query.filter(
-            (User.email == email) &
-            (User.id != current_user.id)
-        ).first()
-
-        if existing_email:
-            email_error = "Email already exists."
-
-        if username_error or email_error:
-            return render_template(
-                "edit_profile.html",
-                username=username,
-                email=email,
-                username_error=username_error,
-                email_error=email_error
-            )
 
         # Remove profile picture
         if remove_profile_picture:
@@ -185,8 +279,7 @@ def edit_profile():
 
             current_user.profile_picture = f"uploads/avatars/{filename}"
 
-        current_user.username = username
-        current_user.email = email
+        current_user.name = name
 
         db.session.commit()
 
