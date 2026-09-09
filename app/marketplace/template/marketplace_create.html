@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!--Page title-->
+    <title>Create Marketplace Listing</title>
+</head>
+
+<body>
+
+    <!--Page heading-->
+    <h1>Create Marketplace Listing</h1>
+
+    <!--Explain that login is required-->
+    <p>Only logged-in users can create a listing.</p>
+
+    <!--Form for creating a new marketplace listing-->
+    <form method="POST" enctype="multipart/form-data">
+
+        <!--User selects the item to list-->
+        <label for="item_id">Item:</label>
+
+        <select id="item_id" name="item_id">
+            <option value="">Select an item</option>
+        </select>
+
+        <br><br>
+
+        <!--User uploads photo of the item-->
+        <label for="image">Image:</label>
+
+        <input type="file" id="image" name="image" accept="image/*">
+
+        <br><br>
+
+        <!--User selects the item's condition (temporary right now)-->
+        <label for="condition">Condition:</label>
+
+        <select id="condition" name="condition">
+            <option value="New">New</option>
+            <option value="Excellent">Excellent</option>
+            <option value="Good">Good</option>
+            <option value="Fair">Fair</option>
+        </select>
+
+        <br><br>
+
+        <!--User chooses whether to sell or trade the item-->
+        <label for="listing_type">Listing Type:</label>
+
+        <select id="listing_type" name="listing_type">
+            <option value="sell">Sell</option>
+            <option value="trade">Trade</option>
+        </select>
+
+        <br><br>
+
+        <!--User describes the item-->
+        <label for="description">Description:</label><br>
+
+        <textarea id="description" name="description" rows="5" cols="40"></textarea>
+
+        <br><br>
+
+        <!--User enters the price; trade listings may leave this empty-->
+        <label for="price">Price:</label>
+
+        <input type="number" id="price" name="price" min="0" step="0.01">
+
+        <br><br>
+
+        <!--Submit the listing form-->
+        <button type="submit">
+            Create Listing
+        </button>
+
+    </form>
+
+</body>
+
+</html>

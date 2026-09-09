@@ -47,6 +47,10 @@ def create_app():
     # Register the Browse Blueprint
     from app.browse import browse_bp
     app.register_blueprint(browse_bp)
+    
+    # Register the Marketplace Blueprint
+    from app.marketplace import marketplace_bp
+    app.register_blueprint(marketplace_bp)
 
     @app.route("/")
     def home():
