@@ -69,17 +69,17 @@
         </h1>
 
 
-        {% if collection.category %}
+    <p class="tag">
 
-            <p class="category">
+         <strong>Tag:</strong>
 
-                <strong>Category:</strong>
+        {% if collection.tag %}
+             {{ collection.tag.name }}
+        {% else %}
+         Not assigned
+         {% endif %}
 
-                {{ collection.category }}
-
-            </p>
-
-        {% endif %}
+</p>
 
 
         {% if collection.description %}
