@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Submissions - CollectiX{% endblock %}
+
+{% block content %}
+
+<h1>Pending Submissions</h1>
+
+{% for submission in submissions %}
+
+    <div>
+        <h2>{{ submission.name }}</h2>
+
+        <p>Type: {{ submission.type }}</p>
+
+        <p>{{ submission.description }}</p>
+
+        <p>Status: {{ submission.status }}</p>
+
+        {% if submission.type == "new_collection" or submission.type == "new_item" %}
+            <form method="POST" action="{{ url_for('admin.approve_submission', submission_id=submission.id) }}">
+                <button type="submit">Approve</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('admin.reject_submission', submission_id=submission.id) }}">
+                <button type="submit">Reject</button>
+            </form>
+        {% endif %}
+
+    </div>
+
+    <hr>
+
+{% else %}
+
+    <p>No pending submissions.</p>
+
+{% endfor %}
+
+{% endblock %}

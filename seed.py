@@ -419,7 +419,33 @@ with app.app_context():
         reviewed_by=None
     )
 
-    db.session.add(submission)
+    submission2 = Submission(
+        user_id=charlie.id,
+        type="new_collection",
+        collection_id=None,
+        name="Marvel Figures",
+        description="Marvel collectible figures.",
+        image=None,
+        tag_id=anime_figure.id,
+        new_tag=None,
+        status="pending",
+        reviewed_by=None
+    )
+
+    submission3 = Submission(
+        user_id=charlie.id,
+        type="new_item",
+        collection_id=1,
+        name="Pikachu Figure",
+        description="A Pikachu Collectible figure.",
+        image=None,
+        tag_id=None,
+        new_tag=None,
+        status="pending",
+        reviewed_by=None
+    )
+
+    db.session.add_all([submission, submission2, submission3])
 
     db.session.commit()
 

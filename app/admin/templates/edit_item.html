@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Item - CollectiX{% endblock %}
+
+{% block content %}
+
+<h1>Edit Item</h1>
+
+<form method="POST">
+
+    <label>Name:</label>
+    <input type="text" name="name" value="{{ item.name }}" required>
+
+    <br><br>
+
+    <label>Description:</label>
+    <textarea name="description">{{ item.description }}</textarea>
+
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+
+</form>
+
+{% endblock %}

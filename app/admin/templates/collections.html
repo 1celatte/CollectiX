@@ -15,6 +15,14 @@
 
         <p>Status: {{ collection.status }}</p>
 
+        <a href="{{ url_for('admin.edit_collection', collection_id=collection.id) }}">
+            <button type="button">Edit</button>
+        </a>
+
+        <form method="POST" action="{{ url_for('admin.remove_collection', collection_id=collection.id) }}">
+            <button type="submit">Remove</button>
+        </form>
+
         {% if collection.status == "pending" %}
             <form method="POST" action="{{ url_for('admin.approve_collection', collection_id=collection.id) }}">
                 <button type="submit">Approve</button>
