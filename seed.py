@@ -47,35 +47,31 @@ with app.app_context():
     # =========================
 
     admin = User(
-        name="admin",
+        username="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="admin",
-        email_verified=True
+        role="admin"
     )
 
     alice = User(
-        name="alice",
+        username="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user",
-        email_verified=True
+        role="user"
     )
 
     bob = User(
-        name="bob",
+        username="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user",
-        email_verified=True
+        role="user"
     )
 
     charlie = User(
-        name="charlie",
+        username="charlie",
         email="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user",
-        email_verified=True
+        role="user"
     )
 
     db.session.add_all([
@@ -452,7 +448,7 @@ with app.app_context():
     print("================================")
     print()
     print("Test accounts:")
-    print("admin@collectix.com / Test1234!")
-    print("alice@collectix.com / Test1234!")
-    print("bob@collectix.com / Test1234!")
-    print("charlie@collectix.com / Test1234!")
+    print("admin   / Test1234!")
+    print("alice   / Test1234!")
+    print("bob     / Test1234!")
+    print("charlie / Test1234!")
