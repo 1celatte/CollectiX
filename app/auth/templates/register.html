@@ -21,18 +21,11 @@ Register - CollectiX
 
 <form method="POST">
 
-    <label>Username:</label>
+    <label>Name:</label>
     <input type="text"
-           name="username"
-           value="{{ username or '' }}"
-           class="{% if username_error %}error-input{% endif %}"
+           name="name"
+           value="{{ name or '' }}"
            required>
-
-    {% if username_error %}
-        <div class="error-message">
-            ⚠ {{ username_error }}
-        </div>
-    {% endif %}
 
     <br><br>
 
