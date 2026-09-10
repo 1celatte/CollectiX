@@ -1,6 +1,8 @@
 from datetime import datetime
+
 from app.extensions import db
 from flask_login import UserMixin
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -19,15 +21,61 @@ class User(UserMixin, db.Model):
     profile_picture = db.Column(db.String(255), nullable=True)
 
 
+# ==========================================
+# Tag
+# ==========================================
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(80), unique=True, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# ==========================================
+# Collection
+# ==========================================
+
 class Collection(db.Model):
     __tablename__ = "collections"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    category = db.Column(db.String(80))
-    description = db.Column(db.Text)
-    image = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="pending", nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    tag_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tags.id"),
+        nullable=True
+    )
+
+    tag = db.relationship(
+        "Tag",
+        backref="collections"
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    image = db.Column(
+        db.String(255)
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="pending",
+        nullable=False
+    )
 
     created_by = db.Column(
         db.Integer,
@@ -35,8 +83,14 @@ class Collection(db.Model):
         nullable=False
     )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
+# ==========================================
+# Item
+# ==========================================
 
 class Item(db.Model):
     __tablename__ = "items"
@@ -50,9 +104,16 @@ class Item(db.Model):
     )
 
     name = db.Column(db.String(150), nullable=False)
+
     description = db.Column(db.Text)
+
     image = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="pending", nullable=False)
+
+    status = db.Column(
+        db.String(20),
+        default="pending",
+        nullable=False
+    )
 
     created_by = db.Column(
         db.Integer,
@@ -62,6 +123,10 @@ class Item(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# User Collection
+# ==========================================
 
 class UserCollection(db.Model):
     __tablename__ = "user_collections"
@@ -80,10 +145,7 @@ class UserCollection(db.Model):
         nullable=False
     )
 
-    added_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    added_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (
         db.UniqueConstraint(
@@ -93,6 +155,10 @@ class UserCollection(db.Model):
         ),
     )
 
+
+# ==========================================
+# Owned Item
+# ==========================================
 
 class OwnedItem(db.Model):
     __tablename__ = "owned_items"
@@ -117,10 +183,7 @@ class OwnedItem(db.Model):
         nullable=False
     )
 
-    added_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    added_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (
         db.UniqueConstraint(
@@ -130,6 +193,10 @@ class OwnedItem(db.Model):
         ),
     )
 
+
+# ==========================================
+# Submission
+# ==========================================
 
 class Submission(db.Model):
     __tablename__ = "submissions"
@@ -153,8 +220,23 @@ class Submission(db.Model):
         nullable=True
     )
 
+    # Existing approved tag selected by the user.
+    tag_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tags.id"),
+        nullable=True
+    )
+
+    # User-entered tag request when "Other" is selected.
+    new_tag = db.Column(
+        db.String(80),
+        nullable=True
+    )
+
     name = db.Column(db.String(150), nullable=False)
+
     description = db.Column(db.Text)
+
     image = db.Column(db.String(255))
 
     status = db.Column(
@@ -169,11 +251,12 @@ class Submission(db.Model):
         nullable=True
     )
 
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Correction Request
+# ==========================================
 
 class CorrectionRequest(db.Model):
     __tablename__ = "correction_requests"
@@ -197,9 +280,15 @@ class CorrectionRequest(db.Model):
         nullable=False
     )  # text / image / both
 
-    description = db.Column(db.Text, nullable=False)
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
 
-    image = db.Column(db.String(255), nullable=True)
+    image = db.Column(
+        db.String(255),
+        nullable=True
+    )
 
     status = db.Column(
         db.String(20),
@@ -213,11 +302,12 @@ class CorrectionRequest(db.Model):
         nullable=True
     )
 
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Listing
+# ==========================================
 
 class Listing(db.Model):
     __tablename__ = "listings"
@@ -241,10 +331,7 @@ class Listing(db.Model):
         nullable=False
     )  # sell / trade
 
-    price = db.Column(
-        db.Float,
-        nullable=True
-    )
+    price = db.Column(db.Float, nullable=True)
 
     condition = db.Column(
         db.String(50),
@@ -259,11 +346,12 @@ class Listing(db.Model):
         nullable=False
     )  # available / pending / sold / traded
 
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Transaction
+# ==========================================
 
 class Transaction(db.Model):
     __tablename__ = "transactions"
@@ -294,10 +382,7 @@ class Transaction(db.Model):
         nullable=False
     )
 
-    price = db.Column(
-        db.Float,
-        nullable=False
-    )
+    price = db.Column(db.Float, nullable=False)
 
     status = db.Column(
         db.String(20),
@@ -305,11 +390,12 @@ class Transaction(db.Model):
         nullable=False
     )  # pending / completed / cancelled
 
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Trade
+# ==========================================
 
 class Trade(db.Model):
     __tablename__ = "trades"
@@ -346,7 +432,4 @@ class Trade(db.Model):
         nullable=False
     )  # pending / accepted / rejected / completed
 
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
