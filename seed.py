@@ -2,6 +2,7 @@ from app import create_app
 from app.extensions import db
 from app.models import (
     User,
+    Tag,
     Collection,
     Item,
     UserCollection,
@@ -22,7 +23,10 @@ with app.app_context():
 
     print("Clearing existing seed data...")
 
-    # Clear existing data
+    # =========================
+    # CLEAR EXISTING DATA
+    # =========================
+
     db.session.query(Trade).delete()
     db.session.query(Transaction).delete()
     db.session.query(Listing).delete()
@@ -32,6 +36,7 @@ with app.app_context():
     db.session.query(UserCollection).delete()
     db.session.query(Item).delete()
     db.session.query(Collection).delete()
+    db.session.query(Tag).delete()
     db.session.query(User).delete()
 
     db.session.commit()
@@ -84,12 +89,37 @@ with app.app_context():
 
 
     # =========================
+    # TAGS
+    # =========================
+
+    trading_cards = Tag(
+        name="trading cards"
+    )
+
+    blind_box = Tag(
+        name="blind box"
+    )
+
+    anime_figure = Tag(
+        name="anime figure"
+    )
+
+    db.session.add_all([
+        trading_cards,
+        blind_box,
+        anime_figure
+    ])
+
+    db.session.commit()
+
+
+    # =========================
     # COLLECTIONS
     # =========================
 
     pokemon = Collection(
         name="Pokémon Scarlet & Violet",
-        category="Trading Card",
+        tag_id=trading_cards.id,
         description="Pokémon Scarlet & Violet collectible card series.",
         image=None,
         status="approved",
@@ -98,7 +128,7 @@ with app.app_context():
 
     naruto = Collection(
         name="Naruto Shippuden",
-        category="Anime Figure",
+        tag_id=anime_figure.id,
         description="Naruto Shippuden collectible figures.",
         image="collection.jpg",
         status="approved",
@@ -107,7 +137,7 @@ with app.app_context():
 
     crybaby = Collection(
         name="POP MART Crybaby Series",
-        category="Blind Box",
+        tag_id=blind_box.id,
         description="POP MART Crybaby collectible series.",
         image="crybaby.jpg",
         status="approved",
@@ -383,6 +413,8 @@ with app.app_context():
         name="One Piece Figures",
         description="One Piece collectible figures.",
         image=None,
+        tag_id=anime_figure.id,
+        new_tag=None,
         status="pending",
         reviewed_by=None
     )
@@ -410,6 +442,10 @@ with app.app_context():
 
     db.session.commit()
 
+
+    # =========================
+    # COMPLETE
+    # =========================
 
     print("================================")
     print("Seed database completed!")
