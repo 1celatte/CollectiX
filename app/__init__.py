@@ -47,6 +47,10 @@ def create_app():
     from app.auth import auth
     app.register_blueprint(auth)
 
+    # Register Admin Blueprint
+    from app.admin import admin
+    app.register_blueprint(admin)
+
     # Register the Browse Blueprint
     from app.browse import browse_bp
     app.register_blueprint(browse_bp)

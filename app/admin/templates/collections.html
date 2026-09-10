@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Collections - CollectiX{% endblock %}
+
+{% block content %}
+
+<h1>Manage Collections</h1>
+
+{% for collection in collections %}
+
+    <div>
+        <h2>{{ collection.name }}</h2>
+
+        <p>{{ collection.description }}</p>
+
+        <p>Status: {{ collection.status }}</p>
+
+        {% if collection.status == "pending" %}
+            <form method="POST" action="{{ url_for('admin.approve_collection', collection_id=collection.id) }}">
+                <button type="submit">Approve</button>
+            </form>
+        {% endif %}
+
+    </div>
+
+    <hr>
+
+{% endfor %}
+
+{% endblock %}
