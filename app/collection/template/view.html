@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 {{ collection.name }}
 {% endblock %}
 
-
 {% block content %}
 
 <div class="container">
-
 
     <!-- ===================================================== -->
     <!-- FLASH MESSAGES -->
@@ -35,8 +32,6 @@
 
     {% endwith %}
 
-
-
     <!-- ===================================================== -->
     <!-- COLLECTION INFORMATION -->
     <!-- ===================================================== -->
@@ -56,42 +51,37 @@
             >
 
         {% else %}
+
             <div
-               style="
-                width: 150px;
-                height: 150px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #eee;
-              "
+                style="
+                    width: 150px;
+                    height: 150px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #eee;
+                "
             >
-
-                  No Image
-
+                No Image
             </div>
 
-    
         {% endif %}
-
 
         <h1>
             {{ collection.name }}
         </h1>
 
+        <p class="tag">
 
-    <p class="tag">
+            <strong>Tag:</strong>
 
-         <strong>Tag:</strong>
+            {% if collection.tag %}
+                {{ collection.tag.name }}
+            {% else %}
+                Not assigned
+            {% endif %}
 
-        {% if collection.tag %}
-             {{ collection.tag.name }}
-        {% else %}
-         Not assigned
-         {% endif %}
-
-</p>
-
+        </p>
 
         {% if collection.description %}
 
@@ -107,11 +97,7 @@
 
     </div>
 
-
-
     <hr>
-
-
 
     <!-- ===================================================== -->
     <!-- ADD COLLECTION TO MY COLLECTION -->
@@ -123,28 +109,44 @@
             My Collection
         </h2>
 
+        {% if already_in_collection %}
 
-        <form
-            action="{{ url_for(
-                'collection.add_to_my_collection',
-                collection_id=collection.id
-            ) }}"
-            method="POST"
-        >
-
-            <button type="submit">
-                + Add to My Collection
+            <button
+                type="button"
+                disabled
+                style="
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                "
+            >
+                ✓ Already in My Collection
             </button>
 
-        </form>
+            <p style="color: #b45309;">
+                You already have this collection.
+            </p>
+
+        {% else %}
+
+            <form
+                action="{{ url_for(
+                    'collection.add_to_my_collection',
+                    collection_id=collection.id
+                ) }}"
+                method="POST"
+            >
+
+                <button type="submit">
+                    + Add to My Collection
+                </button>
+
+            </form>
+
+        {% endif %}
 
     </div>
 
-
-
     <hr>
-
-
 
     <!-- ===================================================== -->
     <!-- ITEMS -->
@@ -156,16 +158,13 @@
             Items in this Collection
         </h2>
 
-
         {% if items %}
 
             <div class="item-list">
 
-
                 {% for item in items %}
 
                     <div class="item-card">
-
 
                         <!-- Item Image -->
 
@@ -193,22 +192,16 @@
                                     background: #eee;
                                 "
                             >
-
                                 No Image
-
                             </div>
 
                         {% endif %}
-
-
 
                         <!-- Item Name -->
 
                         <h3>
                             {{ item.name }}
                         </h3>
-
-
 
                         <!-- Item Description -->
 
@@ -220,18 +213,13 @@
 
                         {% endif %}
 
-
                     </div>
-
 
                     <hr>
 
-
                 {% endfor %}
 
-
             </div>
-
 
         {% else %}
 
@@ -240,8 +228,6 @@
             </p>
 
         {% endif %}
-
-
 
         <!-- ================================================= -->
         <!-- ADD ITEM -->
@@ -255,20 +241,14 @@
                 collection_id=collection.id
             ) }}"
         >
-
             <button type="button">
                 + Add Item
             </button>
-
         </a>
 
     </div>
 
-
-
     <hr>
-
-
 
     <!-- ===================================================== -->
     <!-- BACK BUTTON -->
@@ -279,13 +259,10 @@
             'collection.list_collections'
         ) }}"
     >
-
         <button type="button">
             ← Back to Public Collections
         </button>
-
     </a>
-
 
 </div>
 
