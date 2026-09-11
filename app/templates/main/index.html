@@ -20,15 +20,14 @@ Home - CollectiX
         Illustrated collection system, items buy/sell and exchange platform
     </p>
 
-    <!--Main action button-->
+    <!--Browse collections button-->
     <a href="{{ url_for('collection.list_collections') }}" class="btn btn-primary me-2">
         Browse Collections
     </a>
 
-    <!--Secondary action button-->
-    <!--href="#" is temporary because the real route is not ready yet-->
-    <a href="#" class="btn btn-outline-primary">
-        View Marketplace
+    <!--My Listings button-->
+    <a href="{{ url_for('marketplace.my_listings') }}" class="btn btn-outline-primary">
+        My Listings
     </a>
 
     <!--Profile action button-->
