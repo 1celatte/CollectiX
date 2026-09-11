@@ -208,14 +208,6 @@ def login():
                 email=email
             )
 
-        # Email not verified
-        if not user.email_verified:
-            return render_template(
-                "login.html",
-                login_error="Please verify your email before logging in.",
-                email=email
-            )
-
         login_user(user)
 
         next_page = request.args.get("next")
