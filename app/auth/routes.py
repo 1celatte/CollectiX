@@ -238,6 +238,9 @@ def login():
         if next_page:
             return redirect(next_page)
 
+        if user.role == "admin":
+            return redirect(url_for("admin.dashboard"))
+
         return redirect(url_for("home"))
 
     return render_template("login.html")
