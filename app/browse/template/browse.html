@@ -202,4 +202,20 @@ Browse & Search - CollectiX
 
 </div>
 
+<!--Reference links for users who cannot find what they need-->
+<div class="card bg-light border-0 mt-5">
+    <div class="card-body text-center">
+
+        <h5>Can't find what you are looking for?</h5>
+        <a href="{{ url_for('collection.create_collection') }}" class="link-primary me-3">
+            Create Collection
+        </a>
+
+        <a href="{{ url_for('collection.list_collections') }}" class="link-primary">
+            Add an Item
+        </a>
+
+    </div>
+</div>
+
 {% endblock %}
