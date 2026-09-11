@@ -12,6 +12,19 @@ from app.extensions import db, mail
 from app.models import User
 
 
+def validate_password(password): 
+    if (
+        len(password) < 8
+        or not any(char.isupper() for char in password)
+        or not any(char.islower() for char in password)
+        or not any(char.isdigit() for char in password)
+        or not any(char in "!@#$%^&*()_+-=[]{}|;:,.<>?/" for char in password)
+    ):
+        return "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character."
+
+    return None
+
+
 @auth.route("/test-auth")
 def test_auth():
     return "Auth Blueprint is working!"
@@ -30,7 +43,6 @@ def test_email():
 
     return "Test email sent!"
 
-
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -41,15 +53,18 @@ def register():
 
         email_error = None
         password_error = None
-
+    
         # Check whether email already exists
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user and existing_user.email_verified:
             email_error = "Email already exists."
 
+        # Check password requirements
+        password_error = validate_password(password)
+
         # Check password confirmation
-        if password != confirm_password:
+        if not password_error and password != confirm_password:
             password_error = "Passwords do not match."
 
         # If there are errors, stay on Register page
@@ -298,7 +313,15 @@ def change_password():
     if not check_password_hash(current_user.password, current_password):
         return render_template(
             "edit_profile.html",
-            password_error="Current password is incorrect."
+            current_password_error="Current password is incorrect."
+        )
+
+    password_error = validate_password(new_password)
+
+    if password_error:
+        return render_template(
+            "edit_profile.html",
+            password_error=password_error
         )
     
     if new_password != confirm_password:
@@ -391,6 +414,14 @@ def reset_password(token):
     if request.method == "POST":
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
+
+        password_error = validate_password(new_password)
+
+        if password_error:
+            return render_template(
+                "reset_password.html",
+                password_error=password_error
+            )
 
         if new_password != confirm_password:
             return render_template(
