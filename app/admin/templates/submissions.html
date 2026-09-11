@@ -1,40 +1,194 @@
 {% extends "base.html" %}
 
-{% block title %}Pending Submissions - CollectiX{% endblock %}
+{% block title %}Manage Submissions - CollectiX{% endblock %}
 
 {% block content %}
 
-<h1>Pending Submissions</h1>
+<h1>Manage Submissions</h1>
 
-{% for submission in submissions %}
+{% if submissions %}
 
-    <div>
-        <h2>{{ submission.name }}</h2>
+<table class="table table-bordered">
 
-        <p>Type: {{ submission.type }}</p>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
 
-        <p>{{ submission.description }}</p>
+    <tbody>
 
-        <p>Status: {{ submission.status }}</p>
+        {% for submission in submissions %}
 
-        {% if submission.type == "new_collection" or submission.type == "new_item" %}
-            <form method="POST" action="{{ url_for('admin.approve_submission', submission_id=submission.id) }}">
-                <button type="submit">Approve</button>
-            </form>
+        <tr>
 
-            <form method="POST" action="{{ url_for('admin.reject_submission', submission_id=submission.id) }}">
-                <button type="submit">Reject</button>
-            </form>
-        {% endif %}
+            <td>{{ submission.id }}</td>
 
-    </div>
+            <td>{{ submission.user_id }}</td>
 
-    <hr>
+            <td>{{ submission.type }}</td>
+
+            <td>{{ submission.name }}</td>
+
+            <td>{{ submission.description }}</td>
+
+            <td>
+
+                <!-- Approve -->
+                <form method="POST"
+                      action="{{ url_for('admin.approve_submission', submission_id=submission.id) }}"
+                      style="display: inline;">
+
+                    <button type="submit"
+                            class="approve-btn">
+                        Approve
+                    </button>
+
+                </form>
+
+
+                <!-- Reject Button -->
+                <button type="button"
+                        class="reject-btn"
+                        popovertarget="rejectSubmission{{ submission.id }}">
+                    Reject
+                </button>
+
+
+                <!-- Reject Popup -->
+                <div id="rejectSubmission{{ submission.id }}"
+                     popover
+                     class="reject-popup">
+
+                    <div class="reject-box">
+
+                        <p>
+                            Are you sure you want to reject this submission?
+                        </p>
+
+                        <form method="POST"
+                              action="{{ url_for('admin.reject_submission', submission_id=submission.id) }}">
+
+                            <button type="submit"
+                                    class="reject-confirm">
+                                Yes
+                            </button>
+
+                            <button type="button"
+                                    class="cancel-btn"
+                                    popovertarget="rejectSubmission{{ submission.id }}"
+                                    popovertargetaction="hide">
+                                Cancel
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
 
 {% else %}
 
-    <p>No pending submissions.</p>
+<p>No pending submissions.</p>
 
-{% endfor %}
+{% endif %}
+
+
+<a href="{{ url_for('admin.dashboard') }}"
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>
+
+
+<style>
+
+    /* Approve button */
+
+    .approve-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #198754;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+
+    /* Reject button */
+
+    .reject-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+
+    /* Popup */
+
+    .reject-popup {
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+
+
+    /* Popup box */
+
+    .reject-box {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+
+    /* Yes button */
+
+    .reject-confirm {
+        padding: 6px 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+
+    /* Cancel button */
+
+    .cancel-btn {
+        padding: 6px 15px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+</style>
 
 {% endblock %}
