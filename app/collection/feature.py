@@ -5,7 +5,7 @@ from app.models import Collection, Item, Submission,UserCollection,Tag
 from . import collection_bp
 import os
 from werkzeug.utils import secure_filename
-
+from app.utils import normalize_text
 
 collection_bp = Blueprint(
     "collection",
@@ -68,11 +68,11 @@ def view_collection(collection_id):
         already_in_collection=already_in_collection
     )
     
-#================================================================================================================
+# =====================================================================================================
 
-#Create New Collection (goes to pending review by admin).
+# Create New Collection (goes to pending review by admin).
 
-#=================================================================================================================
+# =====================================================================================================
 
 @collection_bp.route("/create", methods=["GET", "POST"])
 @login_required
@@ -85,13 +85,17 @@ def create_collection():
 
         # Get information from the form.
         name = request.form.get("name", "").strip()
+        normalized_name = normalize_text(name)
+
         tag_value = request.form.get("tag_id")
         new_tag = request.form.get("new_tag", "").strip()
+        normalized_new_tag = normalize_text(new_tag)
+
         description = request.form.get("description")
 
         # Check if collection already exists.
         existing_collection = Collection.query.filter_by(
-            name=name
+            normalized_name=normalized_name
         ).first()
 
         if existing_collection:
@@ -124,8 +128,8 @@ def create_collection():
                 )
 
             # Prevent duplicates among approved tags.
-            existing_tag = Tag.query.filter(
-                db.func.lower(Tag.name) == new_tag.lower()
+            existing_tag = Tag.query.filter_by(
+                normalized_name=normalized_new_tag
             ).first()
 
             if existing_tag:
@@ -227,6 +231,7 @@ def create_collection():
         # Create the pending collection.
         collection = Collection(
             name=name,
+            normalized_name=normalized_name,
             tag_id=selected_tag_id,
             description=description,
             image=image_filename,
@@ -272,23 +277,26 @@ def create_collection():
 
 #=====================================================================================================================
 
-#Add items to Public Collection (goes to pending review).
- 
-#======================================================================================================================
+# Add items to Public Collection (goes to pending review).
+
+#=====================================================================================================================
 
 @collection_bp.route("/<int:collection_id>/add", methods=["GET", "POST"])
 @login_required
 def add_item(collection_id):
+
     collection = Collection.query.get_or_404(collection_id)
 
     if request.method == "POST":
 
         name = request.form.get("name", "").strip()
+        normalized_name = normalize_text(name)
+
         description = request.form.get("description", "").strip()
 
-    # Check empty name
+        # Check empty name
         if not name:
-            flash("Item name is required.")
+            flash("Item name is required.", "error")
             return redirect(
                 url_for(
                     "collection.add_item",
@@ -296,14 +304,27 @@ def add_item(collection_id):
                 )
             )
 
-    # Check if item already exists
-        existing_item = Item.query.filter(
-            Item.collection_id == collection.id,
-            db.func.lower(Item.name) == name.lower()
-        ).first()
+        # Check if item already exists in THIS collection.
+        # We normalize the existing item names here instead of
+        # relying on Item.normalized_name for now.
+        existing_items = Item.query.filter_by(
+            collection_id=collection.id
+        ).all()
+
+        existing_item = next(
+            (
+                item
+                for item in existing_items
+                if normalize_text(item.name) == normalized_name
+            ),
+            None
+        )
 
         if existing_item:
-            flash("This item already exists in this collection.")
+            flash(
+                "This item already exists in this collection.",
+                "error"
+            )
             return redirect(
                 url_for(
                     "collection.add_item",
@@ -311,16 +332,28 @@ def add_item(collection_id):
                 )
             )
 
-    # Check if someone has already submitted the same item
-        existing_submission = Submission.query.filter(
+        # Check if someone has already submitted the same item
+        # to THIS collection and it is still pending.
+        pending_submissions = Submission.query.filter(
             Submission.collection_id == collection.id,
             Submission.type == "new_item",
-            db.func.lower(Submission.name) == name.lower(),
             Submission.status == "pending"
-        ).first()
+        ).all()
+
+        existing_submission = next(
+            (
+                submission
+                for submission in pending_submissions
+                if normalize_text(submission.name) == normalized_name
+            ),
+            None
+        )
 
         if existing_submission:
-            flash("This item is already waiting for admin approval.")
+            flash(
+                "This item is already waiting for admin approval.",
+                "error"
+            )
             return redirect(
                 url_for(
                     "collection.add_item",
@@ -328,7 +361,7 @@ def add_item(collection_id):
                 )
             )
 
-    # Create pending submission
+        # Create pending submission
         submission = Submission(
             user_id=current_user.id,
             type="new_item",
@@ -341,7 +374,10 @@ def add_item(collection_id):
         db.session.add(submission)
         db.session.commit()
 
-        flash("Item submitted successfully. Please wait for admin approval.")
+        flash(
+            "Item submitted successfully. Please wait for admin approval.",
+            "success"
+        )
 
         return redirect(
             url_for(
@@ -354,7 +390,6 @@ def add_item(collection_id):
         "item.html",
         collection=collection
     )
-
 
 #================================================================================================================
 

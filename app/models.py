@@ -29,12 +29,27 @@ class User(UserMixin, db.Model):
 class Tag(db.Model):
     __tablename__ = "tags"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    normalized_name = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
 
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
 # ==========================================
 # Collection
@@ -49,6 +64,11 @@ class Collection(db.Model):
     )
 
     name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    normalized_name = db.Column(
         db.String(150),
         nullable=False
     )
@@ -96,7 +116,10 @@ class Collection(db.Model):
 class Item(db.Model):
     __tablename__ = "items"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     collection_id = db.Column(
         db.Integer,
@@ -104,11 +127,23 @@ class Item(db.Model):
         nullable=False
     )
 
-    name = db.Column(db.String(150), nullable=False)
+    name = db.Column(
+        db.String(150),
+        nullable=False
+    )
 
-    description = db.Column(db.Text)
+    normalized_name = db.Column(
+        db.String(150),
+        nullable=False
+    )
 
-    image = db.Column(db.String(255))
+    description = db.Column(
+        db.Text
+    )
+
+    image = db.Column(
+        db.String(255)
+    )
 
     status = db.Column(
         db.String(20),
@@ -122,8 +157,10 @@ class Item(db.Model):
         nullable=False
     )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
 # ==========================================
 # User Collection
