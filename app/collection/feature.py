@@ -45,16 +45,27 @@ def view_collection(collection_id):
 
     collection = Collection.query.get_or_404(collection_id)
 
-    # Get only approved items belonging to this collection
+    # Get only approved items belonging to this collection.
     items = Item.query.filter_by(
         collection_id=collection.id,
         status="approved"
     ).all()
 
+    # Check whether the logged-in user already owns this collection.
+    already_in_collection = False
+
+    if current_user.is_authenticated:
+
+        already_in_collection = UserCollection.query.filter_by(
+            user_id=current_user.id,
+            collection_id=collection.id
+        ).first() is not None
+
     return render_template(
         "view.html",
         collection=collection,
-        items=items
+        items=items,
+        already_in_collection=already_in_collection
     )
     
 #================================================================================================================
