@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 
 from . import admin
-from app.models import Collection,Item, Submission
+from app.models import Collection,Item, Submission, User
 from app.extensions import db
 
 @admin.route("/admin")
@@ -200,3 +200,31 @@ def reject_submission(submission_id):
     return redirect(url_for("admin.submissions"))
 
 
+@admin.route("/admin/users")
+@login_required
+def users():
+
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    users = User.query.all()
+
+    return render_template("users.html", users=users)
+
+
+@admin.route("/admin/users/<int:user_id>/remove", methods=["POST"])
+@login_required
+def remove_user(user_id):
+
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        return "Cannot delete admin user.", 403
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect(url_for("admin.users"))
