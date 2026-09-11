@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - CollectiX{% endblock %}
+
+{% block content %}
+
+<h1>Admin Dashboard</h1>
+
+<p>Welcome, Admin!</p>
+
+<div>
+    <a href="{{ url_for('admin.submissions') }}">Submissions</a>
+</div>
+
+<div>
+    <a href="{{ url_for('admin.collections') }}">Collections</a>
+</div>
+
+<div>
+    <a href="{{ url_for('admin.items') }}">Items</a>
+</div>
+
+{% endblock %}

@@ -12,7 +12,7 @@ def dashboard():
     if current_user.role != "admin":
         return "Access denied.", 403 
 
-    return redirect(url_for("home"))
+    return render_template("dashboard.html")
 
 
 @admin.route("/admin/collections")
