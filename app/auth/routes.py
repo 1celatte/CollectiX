@@ -218,6 +218,9 @@ def login():
 
         login_user(user)
 
+        if user.role == "admin":
+            return redirect(url_for("admin.dashboard"))
+
         next_page = request.args.get("next")
 
         if next_page:
