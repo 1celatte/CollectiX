@@ -27,6 +27,24 @@ def collections():
     return render_template("collections.html", collections = collections)
 
 
+@admin.route("/admin/collections/<int:collection_id>")
+@login_required
+def collection_items(collection_id):
+
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    collection = Collection.query.get_or_404(collection_id)
+
+    items = Item.query.filter_by(collection_id=collection.id).all()
+
+    return render_template(
+        "collection_items.html",
+        collection=collection,
+        items=items
+    )
+
+
 @admin.route("/admin/collections/<int:collection_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_collection(collection_id):
@@ -65,18 +83,6 @@ def remove_collection(collection_id):
     return redirect(url_for("admin.collections"))
 
 
-@admin.route("/admin/items")
-@login_required
-def items():
-
-    if current_user.role != "admin":
-        return "Access denied.", 403
-
-    items = Item.query.all()
-
-    return render_template("admin_items.html", items=items)
-
-
 @admin.route("/admin/items/<int:item_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_item(item_id):
@@ -90,9 +96,11 @@ def edit_item(item_id):
         item.name = request.form["name"]
         item.description = request.form["description"]
 
+        collection_id = item.collection_id
+
         db.session.commit()
 
-        return redirect(url_for("admin.items"))
+        return redirect(url_for("admin.collection_items", collection_id=collection_id))
 
     return render_template(
         "edit_item.html",
@@ -109,26 +117,12 @@ def remove_item(item_id):
 
     item = Item.query.get_or_404(item_id)
 
+    collection_id = item.collection_id
+
     db.session.delete(item)
     db.session.commit()
 
-    return redirect(url_for("admin.items"))
-
-
-@admin.route("/admin/collections/<int:collection_id>/approve", methods=["POST"])
-@login_required
-def approve_collection(collection_id):
-
-    if current_user.role != "admin":
-        return "Access denied.", 403
-
-    collection = Collection.query.get_or_404(collection_id)
-
-    collection.status = "approved"
-
-    db.session.commit()
-
-    return redirect(url_for("admin.collections"))
+    return redirect(url_for("admin.collection_items", collection_id=collection_id))
 
 
 @admin.route("/admin/submissions")

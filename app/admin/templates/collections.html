@@ -9,25 +9,59 @@
 {% for collection in collections %}
 
     <div>
-        <h2>{{ collection.name }}</h2>
+
+        <h2>
+            <a href="{{ url_for('admin.collection_items', collection_id=collection.id) }}">
+                {{ collection.name }}
+            </a>
+        </h2>
 
         <p>{{ collection.description }}</p>
 
         <p>Status: {{ collection.status }}</p>
 
         <a href="{{ url_for('admin.edit_collection', collection_id=collection.id) }}">
-            <button type="button">Edit</button>
+            <button type="button">
+                Edit
+            </button>
         </a>
 
-        <form method="POST" action="{{ url_for('admin.remove_collection', collection_id=collection.id) }}">
-            <button type="submit">Remove</button>
-        </form>
+        <button type="button"
+                class="remove-btn"
+                popovertarget="deleteCollection{{ collection.id }}">
+            Remove
+        </button>
 
-        {% if collection.status == "pending" %}
-            <form method="POST" action="{{ url_for('admin.approve_collection', collection_id=collection.id) }}">
-                <button type="submit">Approve</button>
-            </form>
-        {% endif %}
+        <div id="deleteCollection{{ collection.id }}"
+             popover
+             class="delete-popup">
+
+            <div class="delete-box">
+
+                <p>
+                    Are you sure you want to delete this collection?
+                </p>
+
+                <form method="POST"
+                      action="{{ url_for('admin.remove_collection', collection_id=collection.id) }}">
+
+                    <button type="submit"
+                            class="delete-confirm">
+                        Yes
+                    </button>
+
+                    <button type="button"
+                            class="cancel-btn"
+                            popovertarget="deleteCollection{{ collection.id }}"
+                            popovertargetaction="hide">
+                        Cancel
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -35,4 +69,59 @@
 
 {% endfor %}
 
+<a href="{{ url_for('admin.dashboard') }}"
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>
+
+
+<style>
+
+    .remove-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .delete-popup {
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+
+    .delete-box {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .delete-confirm {
+        padding: 6px 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .cancel-btn {
+        padding: 6px 15px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+</style>
+
 {% endblock %}
+
