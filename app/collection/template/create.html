@@ -4,7 +4,6 @@
 Create New Collection
 {% endblock %}
 
-
 {% block content %}
 
 <h1>Create New Collection</h1>
@@ -15,13 +14,13 @@ Create New Collection
     appearing publicly.
 </p>
 
-
 <form
     method="POST"
     enctype="multipart/form-data"
 >
 
     <!-- Collection Name -->
+
     <div>
 
         <label for="name">
@@ -39,33 +38,76 @@ Create New Collection
 
     </div>
 
+    <br>
+
+    <!-- Tag -->
+
+    <div>
+
+        <label for="tag_id">
+            Tag:
+        </label>
+
+        <br>
+
+        <select
+            id="tag_id"
+            name="tag_id"
+            required
+            onchange="toggleNewTagField()"
+        >
+
+            <option value="">
+                -- Select a tag --
+            </option>
+
+            {% for tag in tags %}
+
+                <option value="{{ tag.id }}">
+                    {{ tag.name }}
+                </option>
+
+            {% endfor %}
+
+            <option value="other">
+                Other 
+            </option>
+
+        </select>
+
+    </div>
 
     <br>
 
+    <!-- New Tag: shown only for Other -->
 
-    <!-- Category -->
-    <div>
+    <div
+        id="new-tag-field"
+        style="display: none;"
+    >
 
-        <label for="category">
-            Category:
+        <label for="new_tag">
+            New Tag Name:
         </label>
 
         <br>
 
         <input
             type="text"
-            id="category"
-            name="category"
-            placeholder="e.g. Trading Cards"
+            id="new_tag"
+            name="new_tag"
+            maxlength="80"
+            placeholder="e.g. KPOP MERCHANDISE"
         >
+
+        <p>
+            Your new tag will require admin approval.
+        </p>
 
     </div>
 
-
-    <br>
-
-
     <!-- Description -->
+
     <div>
 
         <label for="description">
@@ -83,11 +125,10 @@ Create New Collection
 
     </div>
 
-
     <br>
 
-
     <!-- Collection Image -->
+
     <div>
 
         <label for="image">
@@ -105,25 +146,41 @@ Create New Collection
 
     </div>
 
-
     <br>
 
-
     <!-- Submit -->
+
     <button type="submit">
         Create Collection
     </button>
 
 </form>
 
-
 <br>
-
 
 <!-- Back to Collections -->
 
 <a href="{{ url_for('collection.list_collections') }}">
-   <button>← Back to Collections</button>
+    <button type="button">
+        ← Back to Collections
+    </button>
 </a>
+
+<script>
+    function toggleNewTagField() {
+        const tagSelect = document.getElementById("tag_id");
+        const newTagField = document.getElementById("new-tag-field");
+        const newTagInput = document.getElementById("new_tag");
+
+        const selectedOther = tagSelect.value === "other";
+
+        newTagField.style.display = selectedOther ? "block" : "none";
+        newTagInput.required = selectedOther;
+
+        if (!selectedOther) {
+            newTagInput.value = "";
+        }
+    }
+</script>
 
 {% endblock %}
