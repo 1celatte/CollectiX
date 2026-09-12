@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 Add Item
 {% endblock %}
-
 
 {% block content %}
 
@@ -12,12 +10,20 @@ Add Item
     Add Item to {{ collection.name }}
 </h1>
 
-
 <p>
     You are adding a new item to:
     <strong>{{ collection.name }}</strong>
 </p>
 
+<p>
+    <strong>Collection Tag:</strong>
+
+    {% if collection.tag %}
+        {{ collection.tag.name }}
+    {% else %}
+        Not assigned
+    {% endif %}
+</p>
 
 <!-- ===================================================== -->
 <!-- ADD ITEM FORM -->
@@ -27,7 +33,6 @@ Add Item
     method="POST"
     enctype="multipart/form-data"
 >
-
 
     <!-- Item Name -->
 
@@ -48,9 +53,7 @@ Add Item
 
     </div>
 
-
     <br>
-
 
     <!-- Description -->
 
@@ -71,9 +74,7 @@ Add Item
 
     </div>
 
-
     <br>
-
 
     <!-- Item Image -->
 
@@ -94,9 +95,7 @@ Add Item
 
     </div>
 
-
     <br>
-
 
     <!-- Submit -->
 
@@ -104,12 +103,9 @@ Add Item
         Submit Item
     </button>
 
-
 </form>
 
-
 <br>
-
 
 <!-- ===================================================== -->
 <!-- BACK TO COLLECTION -->
@@ -121,12 +117,9 @@ Add Item
         collection_id=collection.id
     ) }}"
 >
-
     <button type="button">
         ← Back to Collection
     </button>
-
 </a>
-
 
 {% endblock %}

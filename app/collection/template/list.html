@@ -4,11 +4,9 @@
 Public Collections
 {% endblock %}
 
-
 {% block content %}
 
 <h1>Public Collections</h1>
-
 
 <!-- Create Collection Link -->
 
@@ -17,7 +15,6 @@ Public Collections
         Create New Collection
     </button>
 </a>
-
 
 <!-- Flash Messages -->
 
@@ -41,8 +38,6 @@ Public Collections
 
 {% endwith %}
 
-
-
 <!-- Collections -->
 
 {% if collections %}
@@ -52,7 +47,6 @@ Public Collections
         {% for collection in collections %}
 
             <div class="collection-card">
-
 
                 <!-- Collection Image -->
 
@@ -70,13 +64,22 @@ Public Collections
 
                 {% else %}
 
-                    <div class="no-image">
-                        No Image
+                    <div    
+                         
+                        style="
+                            width: 150px;
+                            height: 150px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: #eee;
+                        "
+                        >
+
+                           No Image
                     </div>
 
                 {% endif %}
-
-
 
                 <!-- Collection Information -->
 
@@ -95,20 +98,21 @@ Public Collections
 
                     </h2>
 
-
                     <p>
 
-                        <strong>Category:</strong>
+                        <strong>Tag:</strong>
 
-                        {{ collection.category }}
+                        {% if collection.tag %}
+                            {{ collection.tag.name }}
+                        {% else %}
+                            Not assigned
+                        {% endif %}
 
                     </p>
-
 
                     <p>
                         {{ collection.description }}
                     </p>
-
 
                     <p>
 
@@ -120,13 +124,11 @@ Public Collections
 
                 </div>
 
-
             </div>
 
         {% endfor %}
 
     </div>
-
 
 {% else %}
 
