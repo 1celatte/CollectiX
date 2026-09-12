@@ -22,37 +22,23 @@ Edit Profile - CollectiX
 <!-- Edit Profile Form -->
 <form method="POST" enctype="multipart/form-data">
 
-    <label>Username:</label>
+    <label>Name:</label>
     <input type="text"
-           name="username"
-           value="{{ username or current_user.username }}"
-           class="{% if username_error %}error-input{% endif %}"
+           name="Name"
+           value="{{ name or current_user.name }}"
            required>
-
-    {% if username_error %}
-        <div class="error-message">
-            ⚠ {{ username_error }}
-        </div>
-    {% endif %}
 
     <br><br>
 
     <label>Email:</label>
     <input type="email"
            name="email"
-           value="{{ email or current_user.email }}"
-           class="{% if email_error %}error-input{% endif %}"
-           required>
-
-    {% if email_error %}
-        <div class="error-message">
-            ⚠ {{ email_error }}
-        </div>
-    {% endif %}
+           value="{{ current_user.email }}"
+           disabled>
 
     <br><br>
 
-    <!-- Upload New Profile Picture -->
+    <!-- Display Current Profile Picture -->
     {% if current_user.profile_picture %}
         <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
              alt="Profile Picture"
@@ -67,6 +53,7 @@ Edit Profile - CollectiX
 
     <br><br>
 
+    <!-- Upload New Profile Picture -->
     <label>Profile Picture:</label>
     <input type="file"
            name="profile_picture"
@@ -74,7 +61,7 @@ Edit Profile - CollectiX
 
     <br><br>
 
-    <!-- Remove Profile Picture -->
+    <!-- Remove Current Profile Picture -->
     <label>
         <input type="checkbox"
                name="remove_profile_picture"
