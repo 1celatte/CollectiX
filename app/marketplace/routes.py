@@ -131,13 +131,61 @@ def mark_listing_unavailable(listing_id):
         user_id=current_user.id
     ).first_or_404()
 
-    # Change its status so it is no longer available.
+    #Change status to unavailable
     listing.status = "unavailable"
 
-    # Save the new status in the database.
+    #Save the new status in the database.
     db.session.commit()
 
-    # Return the user to their My Listings page.
+    #Return the user to their My Listings page.
+    return redirect(
+        url_for("marketplace.my_listings")
+    )
+
+# ake one of the current user's listings available again.
+@marketplace_bp.route(
+    "/<int:listing_id>/available",
+    methods=["POST"]
+)
+@login_required
+def mark_listing_available(listing_id):
+
+    #Find the listing only if it belongs to the logged-in user.
+    listing = Listing.query.filter_by(
+        id=listing_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    #Make the listing visible in the public marketplace again.
+    listing.status = "available"
+
+    #Save the updated status.
+    db.session.commit()
+
+    #Return the user to My Listings page.
+    return redirect(
+        url_for("marketplace.my_listings")
+    ) 
+    
+#Delete one of the current user's listings.
+@marketplace_bp.route(
+    "/<int:listing_id>/delete",
+    methods=["POST"]
+)
+@login_required
+def delete_listing(listing_id):
+
+    #Find the listing only if it belongs to the logged-in user.
+    listing = Listing.query.filter_by(
+        id=listing_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    #Remove the listing record from the database.
+    db.session.delete(listing)
+    db.session.commit()
+
+    #Return the user to My Listings page.
     return redirect(
         url_for("marketplace.my_listings")
     )
