@@ -72,6 +72,15 @@
 
     {% endif %}
 
+    <!--Open the edit page for this listing-->
+    <a href="{{ url_for(
+    'marketplace.edit_listing',
+    listing_id=listing.id
+    ) }}">
+        Edit Listing
+    </a>
+
+    <br><br>
 
     <form method="POST" action="{{ url_for(
         'marketplace.delete_listing',

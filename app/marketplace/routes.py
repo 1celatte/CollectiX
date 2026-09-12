@@ -130,6 +130,11 @@ def mark_listing_unavailable(listing_id):
         id=listing_id,
         user_id=current_user.id
     ).first_or_404()
+    
+    #Find the item connected to this listing.
+    item = Item.query.filter_by(
+        id=listing.item_id
+    ).first_or_404()
 
     #Change status to unavailable
     listing.status = "unavailable"
@@ -186,6 +191,73 @@ def delete_listing(listing_id):
     db.session.commit()
 
     #Return the user to My Listings page.
+    return redirect(
+        url_for("marketplace.my_listings")
+    )
+    
+#Show or update one listing owned by the logged-in user.
+@marketplace_bp.route(
+    "/<int:listing_id>/edit",
+    methods=["GET", "POST"]
+)
+
+@login_required
+def edit_listing(listing_id):
+
+    #Find the listing only when it belongs to the logged-in user.
+    listing = Listing.query.filter_by(
+        id=listing_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    #Find the item connected to this listing.
+    item = Item.query.filter_by(
+        id=listing.item_id
+    ).first_or_404()
+    
+    if request.method == "GET":
+        return render_template(
+            "marketplace_edit.html",
+            listing=listing,
+            item=item
+        )
+
+    #read the new values submitted by the edit form.
+    condition = request.form.get("condition", "").strip()
+    listing_type = request.form.get("listing_type", "").strip()
+    description = request.form.get("description", "").strip()
+    price = request.form.get("price", "").strip()
+
+    #for sell must enter a price (cannot leave empty)
+    if listing_type == "sell":
+        try:
+            listing.price = float(price)
+        except ValueError:
+            return "Please enter a valid price for a sell listing."
+
+    #leave the price empty for trade
+    elif listing_type == "trade":
+        if price:
+            try:
+                listing.price = float(price)
+            except ValueError:
+                return "Please enter a valid price."
+        else:
+            listing.price = None
+
+    #Reject an invalid listing type.
+    else:
+        return "Please choose Sell or Trade."
+
+    #Update the editable listing information.
+    listing.condition = condition
+    listing.listing_type = listing_type
+    listing.description = description
+
+    #Save the changes to the database.
+    db.session.commit()
+
+    #Return to My Listings after a successful update.
     return redirect(
         url_for("marketplace.my_listings")
     )

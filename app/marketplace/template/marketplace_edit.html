@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!--Page title-->
+    <title>Edit Marketplace Listing</title>
+</head>
+
+<body>
+
+    <!--Page heading-->
+    <h1>Edit Listing</h1>
+
+    <!--Show which item this listing is for.-->
+    <p>
+        Item: <strong>{{ item.name }}</strong>
+    </p>
+
+
+    <form method="POST">
+
+        <!--User updates the item's condition-->
+        <label for="condition">Condition:</label>
+
+        <select id="condition" name="condition">
+            <option value="Brand New" {% if listing.condition == "Brand New" %}selected{% endif %}>
+                Brand New
+            </option>
+            <option value="Like New" {% if listing.condition == "Like New" %}selected{% endif %}>
+                Like New
+            </option>
+            <option value="Good" {% if listing.condition == "Good" %}selected{% endif %}>
+                Good
+            </option>
+            <option value="Fair" {% if listing.condition == "Fair" %}selected{% endif %}>
+                Fair
+            </option>
+            <option value="Poor" {% if listing.condition == "Poor" %}selected{% endif %}>
+                Poor
+            </option>
+        </select>
+
+        <br><br>
+
+        <!--User updates to sell or to trade-->
+        <label for="listing_type">Listing Type:</label>
+
+        <select id="listing_type" name="listing_type">
+            <option value="sell" {% if listing.listing_type == "sell" %}selected{% endif %}>
+                Sell
+            </option>
+            <option value="trade" {% if listing.listing_type == "trade" %}selected{% endif %}>
+                Trade
+            </option>
+        </select>
+
+        <br><br>
+
+        <!--User updates the description-->
+        <label for="description">Description:</label><br>
+
+        <textarea id="description" name="description" rows="5" cols="40">{{ listing.description or "" }}</textarea>
+
+        <br><br>
+
+        <!--User updates the price. (leave empty for trade)-->
+        <label for="price">Price:</label>
+
+        <input
+            type="number"
+            id="price"
+            name="price"
+            min="0"
+            step="0.01"
+            value="{{ listing.price if listing.price is not none else '' }}"
+        >
+
+        <br><br>
+
+        <!--Submit the edited information-->
+        <button type="submit">
+            Save Changes
+        </button>
+    </form>
+
+    <br>
+
+    <!--Return without saving any changes-->
+    <a href="{{ url_for('marketplace.my_listings') }}">
+        Cancel
+    </a>
+
+</body>
+
+</html>

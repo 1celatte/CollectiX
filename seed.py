@@ -14,6 +14,7 @@ from app.models import (
     Trade
 )
 from werkzeug.security import generate_password_hash
+from app.utils import normalize_text
 
 
 app = create_app()
@@ -47,28 +48,28 @@ with app.app_context():
     # =========================
 
     admin = User(
-        username="admin",
+        name="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="admin"
     )
 
     alice = User(
-        username="alice",
+        name="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
     )
 
     bob = User(
-        username="bob",
+        name="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
     )
 
     charlie = User(
-        username="charlie",
+        name="charlie",
         email="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
         role="user"
@@ -89,15 +90,18 @@ with app.app_context():
     # =========================
 
     trading_cards = Tag(
-        name="trading cards"
+        name="trading cards",
+        normalized_name=normalize_text("trading cards")
     )
 
     blind_box = Tag(
-        name="blind box"
+        name="blind box",
+        normalized_name=normalize_text("blind box")
     )
 
     anime_figure = Tag(
-        name="anime figure"
+        name="anime figure",
+        normalized_name=normalize_text("anime figure")
     )
 
     db.session.add_all([
@@ -140,6 +144,9 @@ with app.app_context():
         created_by=admin.id
     )
 
+    for collection in [pokemon, naruto, crybaby]:
+        collection.normalized_name = normalize_text(collection.name)
+    
     db.session.add_all([
         pokemon,
         naruto,
@@ -243,6 +250,21 @@ with app.app_context():
         created_by=admin.id
     )
 
+
+    for item in [
+        pikachu,
+        charizard,
+        eevee,
+        naruto_item,
+        sasuke,
+        sakura,
+        kakashi,
+        crybaby_love,
+        crybaby_angel,
+        crybaby_bear
+    ]:
+        item.normalized_name = normalize_text(item.name)
+    
     db.session.add_all([
         pikachu,
         charizard,
