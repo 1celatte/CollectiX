@@ -62,45 +62,25 @@ Browse & Search - CollectiX
                     </select>
                 </div>
 
-                <!--Category-->
+                <!--Tag-->
                 <div class="col-md-3">
-                    <label for="category" class="form-label">
-                        Category
+                    <label for="tag" class="form-label">
+                        Tag
                     </label>
 
-                    <select id="category" name="category" class="form-select">
-                        <option value="" {% if not category %}selected{% endif %}>
-                            All categories
+                    <select id="tag" name="tag" class="form-select">
+                        <option value="" {% if not tag %}selected{% endif %}>
+                            All tags
                         </option>
 
-                        {% for category_option in categories %}
-                        <option value="{{ category_option }}" {% if category==category_option %}selected{% endif %}>
-                            {{ category_option }}
+                        {% for tag_option in tags %}
+                        <option value="{{ tag_option }}" {% if tag==tag_option %}selected{% endif %}>
+                            {{ tag_option }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <!--Collection-->
-                <div class="col-md-3">
-                    <label for="collection_id" class="form-label">
-                        Collection
-                    </label>
-
-                    <select id="collection_id" name="collection_id" class="form-select">
-
-                        <option value="" {% if not collection_id %}selected{% endif %}>
-                            All collections
-                        </option>
-
-                        {% for collection in collections %}
-                        <option value="{{ collection.id }}" {% if collection_id|string==collection.id|string %} selected
-                            {% endif %}>
-                            {{ collection.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
 
                 <!--Sort-->
                 <div class="col-md-3">
@@ -170,9 +150,9 @@ Browse & Search - CollectiX
                     {{ result.name }}
                 </h5>
 
-                <!--Category-->
+                <!--Tag-->
                 <p class="text-muted">
-                    Category: {{ result.category }}
+                    Tag: {{ result.category }}
                 </p>
 
                 <!--Collection name for items and listings-->
@@ -220,6 +200,22 @@ Browse & Search - CollectiX
 
     {% endif %}
 
+</div>
+
+<!--Reference links for users who cannot find what they need-->
+<div class="card bg-light border-0 mt-5">
+    <div class="card-body text-center">
+
+        <h5>Can't find what you are looking for?</h5>
+        <a href="{{ url_for('collection.create_collection') }}" class="link-primary me-3">
+            Create Collection
+        </a>
+
+        <a href="{{ url_for('collection.list_collections') }}" class="link-primary">
+            Add an Item
+        </a>
+
+    </div>
 </div>
 
 {% endblock %}
