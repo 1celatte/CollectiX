@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for
-from app.extensions import db, login_manager
-from flask_migrate import Migrate
+from app.extensions import db, login_manager,mail
+import flask_migrate
 from config import Config
 
 
@@ -10,11 +10,14 @@ def create_app():
     # Load configuration
     app.config.from_object(Config)
 
+    # Connect Flask-Mail to Flask
+    mail.init_app(app)
+
     # Connect SQLAlchemy to Flask
     db.init_app(app)
 
     # Connect Flask-Migrate to SQLAlchemy
-    Migrate(app, db)
+    flask_migrate.Migrate(app, db)
 
     # Connect Flask-Login to Flask
     login_manager.init_app(app)
