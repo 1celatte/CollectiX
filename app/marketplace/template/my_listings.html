@@ -44,19 +44,43 @@
         Status: {{ listing.status }}
     </p>
 
+    <!--Check the currrent status of this listing-->
     {% if listing.status == "available" %}
 
+    <!--Show this button only when the listing is available-->
     <form method="POST" action="{{ url_for(
-            'marketplace.mark_listing_unavailable',
-            listing_id=listing.id
-        ) }}">
+        'marketplace.mark_listing_unavailable',
+        listing_id=listing.id
+    ) }}">
         <button type="submit">
             Mark as Unavailable
         </button>
     </form>
 
+    <!--If the listing is unavailable, show the restore button-->
+    {% elif listing.status == "unavailable" %}
+
+    <!--Change the listing status back to available-->
+    <form method="POST" action="{{ url_for(
+        'marketplace.mark_listing_available',
+        listing_id=listing.id
+    ) }}">
+        <button type="submit">
+            Mark as Available
+        </button>
+    </form>
+
     {% endif %}
 
+
+    <form method="POST" action="{{ url_for(
+        'marketplace.delete_listing',
+        listing_id=listing.id
+    ) }}">
+        <button type="submit">
+            Delete Listing
+        </button>
+    </form>
     {% endfor %}
 
     {% else %}
