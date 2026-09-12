@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Your Email{% endblock %}
+
+{% block content %}
+
+<div class="text-center">
+
+    <h2>Confirm Your Email</h2>
+
+    <p>
+        You are verifying this email address:
+    </p>
+
+    <p>
+        <strong>{{ email }}</strong>
+    </p>
+
+    <p>
+        Is this you?
+    </p>
+
+    <form method="POST"
+          action="{{ url_for('auth.confirm_email', token=token) }}">
+
+        <button type="submit" class="btn btn-primary">
+            Yes, this is me
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
