@@ -203,46 +203,6 @@ def browse_page():
         tags=tags
     )
     
-#Display and search approved collectible items
-@browse_bp.route("/items")
-def browse_items():
-    #Get the keyword from the search box
-    query = request.args.get("q", "").strip()
-    collection_id = request.args.get(
-        "collection_id",
-        ""
-    ).strip()
-    
-    items_query = Item.query.filter_by(
-        status="approved"
-    )
-    
-    
-    #Search by item name
-    if query:
-        items_query = items_query.filter(
-            Item.name.ilike(f"%{query}%")
-        )
-
-    #Filter items by collection
-    if collection_id:
-        items_query = items_query.filter(
-            Item.collection_id == collection_id
-        )
-
-    items = items_query.order_by(
-        Item.created_at.desc()
-    ).all()
-
-
-    return render_template(
-        "items.html",
-        items=items,
-        query=query,
-        collections=collections,
-        selected_collection=collection_id
-    )
-    
 #Display available marketplace listings
 @browse_bp.route("/marketplace")
 def browse_marketplace():
