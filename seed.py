@@ -47,31 +47,35 @@ with app.app_context():
     # =========================
 
     admin = User(
-        username="admin",
+        name="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="admin"
+        role="admin",
+        email_verified=True
     )
 
     alice = User(
-        username="alice",
+        name="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     bob = User(
-        username="bob",
+        name="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     charlie = User(
-        username="charlie",
+        name="charlie",
         email="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     db.session.add_all([
@@ -89,15 +93,18 @@ with app.app_context():
     # =========================
 
     trading_cards = Tag(
-        name="trading cards"
+        name="trading cards", 
+        normalized_name="trading cards"
     )
 
     blind_box = Tag(
-        name="blind box"
+        name="blind box",
+        normalized_name="blind box"
     )
 
     anime_figure = Tag(
-        name="anime figure"
+        name="anime figure",
+        normalized_name="anime figure"
     )
 
     db.session.add_all([
@@ -415,33 +422,7 @@ with app.app_context():
         reviewed_by=None
     )
 
-    submission2 = Submission(
-        user_id=charlie.id,
-        type="new_collection",
-        collection_id=None,
-        name="Marvel Figures",
-        description="Marvel collectible figures.",
-        image=None,
-        tag_id=anime_figure.id,
-        new_tag=None,
-        status="pending",
-        reviewed_by=None
-    )
-
-    submission3 = Submission(
-        user_id=charlie.id,
-        type="new_item",
-        collection_id=1,
-        name="Pikachu Figure",
-        description="A Pikachu Collectible figure.",
-        image=None,
-        tag_id=None,
-        new_tag=None,
-        status="pending",
-        reviewed_by=None
-    )
-
-    db.session.add_all([submission, submission2, submission3])
+    db.session.add(submission)
 
     db.session.commit()
 
