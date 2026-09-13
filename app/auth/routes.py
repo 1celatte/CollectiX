@@ -208,7 +208,6 @@ def login():
                 email=email
             )
 
-<<<<<<< HEAD
         # Email not verified
         if not user.email_verified:
             return render_template(
@@ -217,8 +216,6 @@ def login():
                 email=email
             )
 
-=======
->>>>>>> origin/zijian/browse-search
         login_user(user)
 
         if user.role == "admin":
