@@ -12,7 +12,12 @@ def dashboard():
     if current_user.role != "admin":
         return "Access denied.", 403 
 
-    return render_template("dashboard.html")
+    pending_count = Submission.query.filter_by(status="pending").count()
+
+    return render_template(
+        "dashboard.html",
+       pending_count=pending_count
+    )
 
 
 @admin.route("/admin/collections")
