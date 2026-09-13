@@ -66,11 +66,12 @@ def create_listing():
         except ValueError:
             return "Please enter a valid price for a Sell listing."
 
-    elif listing_type == "trade" and price:
-        try:
-            listing_price = float(price)
-        except ValueError:
-            return "Please enter a valid price."
+    #A trade listing must not have a price.
+    elif listing_type == "trade":
+        if price:
+            return "Trade listings should not have a price!"
+
+        listing_price = None
 
     else:
         if listing_type not in ("sell", "trade"):
@@ -235,15 +236,12 @@ def edit_listing(listing_id):
         except ValueError:
             return "Please enter a valid price for a sell listing."
 
-    #leave the price empty for trade
+    #A trade listing must not have a price.
     elif listing_type == "trade":
         if price:
-            try:
-                listing.price = float(price)
-            except ValueError:
-                return "Please enter a valid price."
-        else:
-            listing.price = None
+            return "Trade listings should not have a price."
+
+        listing_price = None
 
     #Reject an invalid listing type.
     else:
@@ -260,4 +258,29 @@ def edit_listing(listing_id):
     #Return to My Listings after a successful update.
     return redirect(
         url_for("marketplace.my_listings")
+    )
+
+
+
+
+#NOW IS FOR BUY
+#Show the details of one marketplace listing.
+@marketplace_bp.route("/<int:listing_id>")
+def view_listing(listing_id):
+
+    #Find the marketplace listing using its ID.
+    listing = Listing.query.filter_by(
+        id=listing_id
+    ).first_or_404()
+
+    #Find the item connected to this listing.
+    item = Item.query.filter_by(
+        id=listing.item_id
+    ).first_or_404()
+
+    #Send the listing and item information to the detail page.
+    return render_template(
+        "marketplace_detail.html",
+        listing=listing,
+        item=item
     )

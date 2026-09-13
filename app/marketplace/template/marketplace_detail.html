@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+Marketplace Listing
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>Marketplace Listing Details</h1>
+
+<!--Show the collectible item name-->
+<h2>{{ item.name }}</h2>
+
+<!--Show the type of listing: Sell or Trade-->
+<p>
+    Listing Type: <strong>{{ listing.listing_type|title }}</strong>
+</p>
+
+<!--Show the condition selected by the seller-->
+<p>
+    Condition: <strong>{{ listing.condition }}</strong>
+</p>
+
+<!--Show the seller's description-->
+<p>
+    Description:
+    {{ listing.description or "No description provided." }}
+</p>
+
+<!--Show the price (Trade will be empty)-->
+{% if listing.price is not none %}
+<p>
+    Price: <strong>RM {{ "%.2f"|format(listing.price) }}</strong>
+</p>
+{% else %}
+<p>
+    Price: <strong>Trade only</strong>
+</p>
+{% endif %}
+
+<!--Show the current listing status-->
+<p>
+    Status: <strong>{{ listing.status|title }}</strong>
+</p>
+
+<!--Purchase functionality will be added in the next step-->
+{% if listing.status == "available" and listing.listing_type == "sell" %}
+    <p>This item is available for purchase.</p>
+{% elif listing.status == "available" and listing.listing_type == "trade" %}
+    <p>This item is available for trade.</p>
+{% else %}
+    <p>This listing is no longer available.</p>
+{% endif %}
+
+<br>
+
+<!--Return to the Browse and Search page-->
+<a href="{{ url_for('browse.browse_page') }}">
+    Back to Browse & Search
+</a>
+
+{% endblock %}
