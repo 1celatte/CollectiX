@@ -122,6 +122,7 @@ with app.app_context():
 
     pokemon = Collection(
         name="Pokémon Scarlet & Violet",
+        normalized_name="pokemon scarlet & violet",
         tag_id=trading_cards.id,
         description="Pokémon Scarlet & Violet collectible card series.",
         image=None,
@@ -131,6 +132,7 @@ with app.app_context():
 
     naruto = Collection(
         name="Naruto Shippuden",
+        normalized_name="naruto shippuden",
         tag_id=anime_figure.id,
         description="Naruto Shippuden collectible figures.",
         image="collection.jpg",
@@ -140,6 +142,7 @@ with app.app_context():
 
     crybaby = Collection(
         name="POP MART Crybaby Series",
+        normalized_name="pop mart crybaby series",
         tag_id=blind_box.id,
         description="POP MART Crybaby collectible series.",
         image="crybaby.jpg",
@@ -163,6 +166,7 @@ with app.app_context():
     pikachu = Item(
         collection_id=pokemon.id,
         name="Pikachu",
+        normalized_name="pikachu",
         description="Pikachu collectible card.",
         image="pikachu.png",
         status="approved",
@@ -172,6 +176,7 @@ with app.app_context():
     charizard = Item(
         collection_id=pokemon.id,
         name="Charizard",
+        normalized_name="charizard",
         description="Charizard collectible card.",
         image="charizard.jpg",
         status="approved",
@@ -181,6 +186,7 @@ with app.app_context():
     eevee = Item(
         collection_id=pokemon.id,
         name="Eevee",
+        normalized_name="eevee",
         description="Eevee collectible card.",
         image=None,
         status="approved",
@@ -190,6 +196,7 @@ with app.app_context():
     naruto_item = Item(
         collection_id=naruto.id,
         name="Naruto Uzumaki",
+        normalized_name="naruto uzumaki",
         description="Naruto Uzumaki collectible figure.",
         image="naruto.png",
         status="approved",
@@ -199,6 +206,7 @@ with app.app_context():
     sasuke = Item(
         collection_id=naruto.id,
         name="Sasuke Uchiha",
+        normalized_name="sasuke uchiha",
         description="Sasuke Uchiha collectible figure.",
         image=None,
         status="approved",
@@ -208,6 +216,7 @@ with app.app_context():
     sakura = Item(
         collection_id=naruto.id,
         name="Sakura Haruno",
+        normalized_name="sakura haruno",
         description="Sakura Haruno collectible figure.",
         image="sakura.jpg",
         status="approved",
@@ -217,6 +226,7 @@ with app.app_context():
     kakashi = Item(
         collection_id=naruto.id,
         name="Kakashi Hatake",
+        normalized_name="kakashi hatake",
         description="Kakashi Hatake collectible figure.",
         image="kakashi_test.png",
         status="approved",
@@ -226,6 +236,7 @@ with app.app_context():
     crybaby_love = Item(
         collection_id=crybaby.id,
         name="Crybaby Love",
+        normalized_name="crybaby love",
         description="Crybaby Love collectible figure.",
         image=None,
         status="approved",
@@ -235,6 +246,7 @@ with app.app_context():
     crybaby_angel = Item(
         collection_id=crybaby.id,
         name="Crybaby Angel",
+        normalized_name="crybaby angel",
         description="Crybaby Angel collectible figure.",
         image=None,
         status="approved",
@@ -244,6 +256,7 @@ with app.app_context():
     crybaby_bear = Item(
         collection_id=crybaby.id,
         name="Crybaby Pink Bear",
+        normalized_name="crybaby pink bear",
         description="Crybaby Pink Bear collectible figure.",
         image=None,
         status="approved",

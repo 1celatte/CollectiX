@@ -9,7 +9,12 @@
 <p>Welcome, Admin!</p>
 
 <div>
-    <a href="{{ url_for('admin.submissions') }}">Submissions</a>
+    <a href="{{ url_for('admin.submissions') }}">
+        Submissions
+        {% if pending_count > 0 %}
+            <span class="badge">{{ pending_count }}</span>
+        {% endif %}
+    </a>
 </div>
 
 <div>
@@ -23,5 +28,36 @@
 <div>
     <a href="{{ url_for('auth.logout') }}">Logout</a>
 </div>
+
+<style>
+.dashboard-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 300px;
+}
+
+.dashboard-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #f0f0f0;
+    color: #000;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.dashboard-btn:hover {
+    background-color: #ddd;
+}
+
+.badge {
+    background-color: red;
+    color: white;
+    padding: 3px 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 5px;
+}
+</style>
 
 {% endblock %}
