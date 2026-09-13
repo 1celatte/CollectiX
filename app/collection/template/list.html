@@ -10,7 +10,7 @@ Public Collections
 
 <!-- Create Collection Link -->
 
-<a href="{{ url_for('collection.create_collection') }}">
+<a href="{{ url_for('browse.browse_page') }}">
     <button type="button">
         Create New Collection
     </button>
@@ -64,8 +64,19 @@ Public Collections
 
                 {% else %}
 
-                    <div class="no-image">
-                        No Image
+                    <div    
+                         
+                        style="
+                            width: 150px;
+                            height: 150px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: #eee;
+                        "
+                        >
+
+                           No Image
                     </div>
 
                 {% endif %}
