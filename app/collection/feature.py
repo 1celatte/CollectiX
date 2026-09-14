@@ -91,7 +91,20 @@ def create_collection():
         new_tag = request.form.get("new_tag", "").strip()
         normalized_new_tag = normalize_text(new_tag)
 
-        description = request.form.get("description")
+        description = request.form.get("description", "").strip()
+
+        # Check that collection name was provided.
+        if not name:
+
+            flash(
+                "Collection name is required.",
+                "error"
+            )
+
+            return render_template(
+                "create.html",
+                tags=tags
+            )
 
         # Check if collection already exists.
         existing_collection = Collection.query.filter_by(
@@ -112,7 +125,9 @@ def create_collection():
         selected_tag_id = None
         requested_new_tag = None
 
-        # User selected Other.
+        # -----------------------------------------
+        # User selected "Other"
+        # -----------------------------------------
         if tag_value == "other":
 
             if not new_tag:
@@ -163,11 +178,14 @@ def create_collection():
                 )
 
             # Do not create a Tag yet.
+            # Admin will approve/create it later.
             requested_new_tag = new_tag
 
+        # -----------------------------------------
+        # User selected an existing tag
+        # -----------------------------------------
         else:
 
-            # User selected an existing tag.
             if not tag_value:
 
                 flash(
@@ -180,9 +198,24 @@ def create_collection():
                     tags=tags
                 )
 
+            try:
+                tag_id = int(tag_value)
+
+            except (TypeError, ValueError):
+
+                flash(
+                    "The selected tag is not valid.",
+                    "error"
+                )
+
+                return render_template(
+                    "create.html",
+                    tags=tags
+                )
+
             selected_tag = db.session.get(
                 Tag,
-                int(tag_value)
+                tag_id
             )
 
             if not selected_tag:
@@ -199,7 +232,9 @@ def create_collection():
 
             selected_tag_id = selected_tag.id
 
-        # Get uploaded image.
+        # -----------------------------------------
+        # Get uploaded image
+        # -----------------------------------------
         image_file = request.files.get("image")
         image_filename = None
 
@@ -228,7 +263,9 @@ def create_collection():
                 )
             )
 
-        # Create the pending collection.
+        # -----------------------------------------
+        # Create pending collection
+        # -----------------------------------------
         collection = Collection(
             name=name,
             normalized_name=normalized_name,
@@ -240,25 +277,28 @@ def create_collection():
         )
 
         db.session.add(collection)
+
+        # Get collection.id before creating Submission.
         db.session.flush()
 
-        # Save a requested new tag for later admin approval.
-        if requested_new_tag:
+        # -----------------------------------------
+        # Create submission for admin approval
+        # -----------------------------------------
+        submission = Submission(
+            user_id=current_user.id,
+            type="new_collection",
+            collection_id=collection.id,
+            tag_id=selected_tag_id,
+            new_tag=requested_new_tag,
+            name=name,
+            description=description,
+            image=image_filename,
+            status="pending"
+        )
 
-            submission = Submission(
-                user_id=current_user.id,
-                type="new_collection",
-                collection_id=collection.id,
-                tag_id=None,
-                new_tag=requested_new_tag,
-                name=name,
-                description=description,
-                image=image_filename,
-                status="pending"
-            )
+        db.session.add(submission)
 
-            db.session.add(submission)
-
+        # Save collection + submission.
         db.session.commit()
 
         flash(
@@ -270,6 +310,7 @@ def create_collection():
             url_for("collection.list_collections")
         )
 
+    # GET request
     return render_template(
         "create.html",
         tags=tags

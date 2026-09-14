@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit {{ collection.name }}
+{% endblock %}
+
+{% block content %}
+
+<h1>Edit My Collection</h1>
+
+<h2>{{ collection.name }}</h2>
+
+<p>
+    <strong>Tag:</strong>
+    {% if collection.tag %}
+        {{ collection.tag.name }}
+    {% else %}
+        Not assigned
+    {% endif %}
+</p>
+
+<p>
+    <strong>Description:</strong>
+    {{ collection.description }}
+</p>
+
+<hr>
+
+<h2>Items</h2>
+
+<form method="POST">
+
+    {% for item in items %}
+
+        {% set owned = owned_items
+            |selectattr("item_id", "equalto", item.id)
+            |list
+            |first
+        %}
+
+        <hr>
+
+        <h3>{{ item.name }}</h3>
+
+        {% if item.image %}
+            <img
+                src="{{ url_for(
+                    'collection.static',
+                    filename='uploads/' + item.image
+                ) }}"
+                alt="{{ item.name }}"
+                width="150"
+            >
+           {% else %}
+
+            <div
+                style="
+                    width: 150px;
+                    height: 150px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #eee;
+                "
+            >
+                No Image
+            </div>
+    
+        {% endif %}
+
+        <p>{{ item.description }}</p>
+
+        {% if owned %}
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="owned_{{ item.id }}"
+                    value="1"
+                    checked
+                >
+                Owned
+            </label>
+
+            <p>
+                <label>
+                    Quantity:
+
+                    <input
+                        type="number"
+                        name="quantity_{{ item.id }}"
+                        value="{{ owned.quantity }}"
+                        min="1"
+                    >
+                </label>
+            </p>
+
+        {% else %}
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="owned_{{ item.id }}"
+                    value="1"
+                >
+                Owned
+            </label>
+
+            <p>
+                <label>
+                    Quantity:
+
+                    <input
+                        type="number"
+                        name="quantity_{{ item.id }}"
+                        value="0"
+                        min="0"
+                    >
+                </label>
+            </p>
+
+        {% endif %}
+
+    {% endfor %}
+
+    <br>
+
+    <button type="submit">
+        Save Changes & Exit
+    </button>
+
+</form>
+
+{% endblock %}
