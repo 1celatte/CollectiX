@@ -46,11 +46,21 @@ Marketplace Listing
 
 <!--Purchase functionality will be added in the next step-->
 {% if listing.status == "available" and listing.listing_type == "sell" %}
-    <p>This item is available for purchase.</p>
+
+<!--Open the purchase confirmation page-->
+<a href="{{ url_for(
+            'marketplace.purchase_listing',
+            listing_id=listing.id
+        ) }}">
+    Buy Now
+</a>
+
 {% elif listing.status == "available" and listing.listing_type == "trade" %}
-    <p>This item is available for trade.</p>
+<p>This item is available for trade.</p>
+
 {% else %}
-    <p>This listing is no longer available.</p>
+<p>This listing is no longer available.</p>
+
 {% endif %}
 
 <br>
