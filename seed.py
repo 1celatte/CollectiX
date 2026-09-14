@@ -54,6 +54,14 @@ with app.app_context():
         email_verified=True
     )
 
+    admin = User(
+        name="coco",
+        email="cngchifei@gmail.com",
+        password=generate_password_hash("Test1234!"),
+        role="admin",
+        email_verified=True
+    )
+
     alice = User(
         name="alice",
         email="alice@collectix.com",
