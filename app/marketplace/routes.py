@@ -1,8 +1,10 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from app.models import Item, OwnedItem, Listing, Transaction
+from app.models import Item, OwnedItem, Listing, Transaction, User
 from app.extensions import db
 from app.marketplace import marketplace_bp
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
 
 
 #Temporary route used to test the Marketplace module.
@@ -335,3 +337,44 @@ def purchase_listing(listing_id):
     db.session.commit()
 
     return "Purchase completed successfully."
+
+
+#TRANSACTION HISTORY
+#Show transactions where the current user is the buyer or seller.
+@marketplace_bp.route("/transactions")
+@login_required
+def transaction_history():
+
+    #Create two names for the User table: one for the buyer and one for the seller.
+    Buyer = aliased(User)
+    Seller = aliased(User)
+
+    #Get transactions related to the logged-in user.
+    transactions = db.session.query(
+        Transaction,
+        Item,
+        Buyer,
+        Seller
+    ).join(
+        Item,
+        Transaction.item_id == Item.id
+    ).join(
+        Buyer,
+        Transaction.buyer_id == Buyer.id
+    ).join(
+        Seller,
+        Transaction.seller_id == Seller.id
+    ).filter(
+        or_(
+            Transaction.buyer_id == current_user.id,
+            Transaction.seller_id == current_user.id
+        )
+    ).order_by(
+        Transaction.created_at.desc()
+    ).all()
+
+    #Send all transaction information to the history page.
+    return render_template(
+        "marketplace_history.html",
+        transactions=transactions
+    )

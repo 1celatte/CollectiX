@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+Transaction History
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>My Transaction History</h1>
+
+{% if transactions %}
+
+<!--Display every transaction related to the logged-in user-->
+{% for transaction, item, buyer, seller in transactions %}
+
+<hr>
+
+<!--Show the item in this transaction-->
+<h2>{{ item.name }}</h2>
+
+<!--Explain whether the user bought or sold this item-->
+{% if transaction.buyer_id == current_user.id %}
+<p>
+    You purchased this item from
+    <strong>{{ seller.name }}</strong>.
+</p>
+{% else %}
+<p>
+    You sold this item to
+    <strong>{{ buyer.name }}</strong>.
+</p>
+{% endif %}
+
+<!--Show the transaction price-->
+<p>
+    Price: RM {{ "%.2f"|format(transaction.price) }}
+</p>
+
+<!--Show the current transaction status-->
+<p>
+    Status: {{ transaction.status|title }}
+</p>
+
+<!--Show when this transaction was created-->
+<p>
+    Date:
+    {{ transaction.created_at.strftime("%d %b %Y, %I:%M %p") }}
+</p>
+
+{% endfor %}
+
+{% else %}
+
+<!--Message when the user has no purchase or sale records-->
+<p>You do not have any transactions yet.</p>
+
+{% endif %}
+
+<br>
+
+<!--Return to Browse and Search-->
+<a href="{{ url_for('browse.browse_page') }}">
+    Back to Browse & Search
+</a>
+
+{% endblock %}
