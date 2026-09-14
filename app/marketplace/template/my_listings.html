@@ -87,14 +87,11 @@ My Listings
 
 <br><br>
 
-<form method="POST" action="{{ url_for(
-        'marketplace.delete_listing',
-        listing_id=listing.id
-    ) }}">
-    <button type="submit">
-        Delete Listing
-    </button>
+<form action="{{ url_for('marketplace.delete_listing', listing_id=listing.id) }}" method="POST"
+    onsubmit="return confirm('Are you sure you want to delete this listing?')">
+    <button type="submit">Delete</button>
 </form>
+
 {% endfor %}
 
 {% else %}

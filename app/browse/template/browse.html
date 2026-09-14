@@ -176,18 +176,19 @@ Browse & Search - CollectiX
                 </p>
                 {% endif %}
 
-                <!--Marketplace listings open the purchase detail page-->
                 {% if result.type == "marketplace" %}
-                <a href="{{ url_for(
-                        'marketplace.view_listing',
-                        listing_id=result.id
-                ) }}" class="btn btn-outline-primary">
-                    View Listing Details
+                <a href="{{ url_for('marketplace.view_listing', listing_id=result.id) }}" class="btn btn-primary">
+                    View Details
                 </a>
 
-                <!--Collection and item detail links will be connected separately-->
-                {% else %}
-                <a href="#" class="btn btn-outline-primary">
+                {% elif result.type == "collection" %}
+                <a href="{{ url_for('collection.view_collection', collection_id=result.id) }}" class="btn btn-primary">
+                    View Details
+                </a>
+
+                {% elif result.type == "item" %}
+                <a href="{{ url_for('collection.view_collection', collection_id=result.collection_id) }}"
+                    class="btn btn-primary">
                     View Details
                 </a>
                 {% endif %}
