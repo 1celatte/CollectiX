@@ -45,7 +45,7 @@ Transaction History
 <!--Show when this transaction was created-->
 <p>
     Date:
-    {{ transaction.created_at.strftime("%d %b %Y, %I:%M %p") }}
+    {{ (transaction.created_at+ + malaysia_offset).strftime("%d %b %Y, %I:%M %p") }}
 </p>
 
 {% endfor %}
