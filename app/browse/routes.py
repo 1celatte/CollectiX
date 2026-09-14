@@ -1,23 +1,8 @@
-import unicodedata
 from flask import render_template, request
 from app.browse import browse_bp
 from app.models import Collection, Item, Listing, Tag
 from datetime import datetime
-
-#Remove diacritical marks (when search)
-def normalize_text(text):
-    text = text or ""
-    normalized = unicodedata.normalize(
-        "NFKD",
-        text
-    )
-
-
-    return "".join(
-        character
-        for character in normalized
-        if not unicodedata.combining(character)
-    ).casefold()
+from app.utils import normalize_text
 
 #Browse all public collections
 @browse_bp.route("/")
@@ -109,6 +94,7 @@ def browse_page():
             results.append({
                 "type": "item",
                 "id": item.id,
+                "collection_id":item.collection_id,
                 "name": item.name,
                 "category": tag_record.name,
                 "description": item.description,
