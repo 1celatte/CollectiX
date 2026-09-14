@@ -322,7 +322,10 @@ def create_collection():
 
 #=====================================================================================================================
 
-@collection_bp.route("/<int:collection_id>/add", methods=["GET", "POST"])
+@collection_bp.route(
+    "/<int:collection_id>/add",
+    methods=["GET", "POST"]
+)
 @login_required
 def add_item(collection_id):
 
@@ -337,7 +340,10 @@ def add_item(collection_id):
 
         # Check empty name
         if not name:
-            flash("Item name is required.", "error")
+            flash(
+                "Item name is required.",
+                "error"
+            )
             return redirect(
                 url_for(
                     "collection.add_item",
@@ -345,9 +351,7 @@ def add_item(collection_id):
                 )
             )
 
-        # Check if item already exists in THIS collection.
-        # We normalize the existing item names here instead of
-        # relying on Item.normalized_name for now.
+        # Check if item already exists in THIS collection
         existing_items = Item.query.filter_by(
             collection_id=collection.id
         ).all()
@@ -373,8 +377,7 @@ def add_item(collection_id):
                 )
             )
 
-        # Check if someone has already submitted the same item
-        # to THIS collection and it is still pending.
+        # Check pending submissions
         pending_submissions = Submission.query.filter(
             Submission.collection_id == collection.id,
             Submission.type == "new_item",
@@ -402,13 +405,47 @@ def add_item(collection_id):
                 )
             )
 
-        # Create pending submission
+        # ==========================================
+        # SAVE IMAGE
+        # ==========================================
+
+        image_file = request.files.get("image")
+        image_filename = None
+
+        if image_file and image_file.filename:
+            image_filename = secure_filename(
+                image_file.filename
+            )
+
+            upload_folder = os.path.join(
+                collection_bp.root_path,
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(
+                upload_folder,
+                exist_ok=True
+            )
+
+            image_file.save(
+                os.path.join(
+                    upload_folder,
+                    image_filename
+                )
+            )
+
+        # ==========================================
+        # CREATE PENDING SUBMISSION
+        # ==========================================
+
         submission = Submission(
             user_id=current_user.id,
             type="new_item",
             collection_id=collection.id,
             name=name,
             description=description,
+            image=image_filename,
             status="pending"
         )
 
