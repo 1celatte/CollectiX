@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from app.models import Item, OwnedItem, Listing
+from app.models import Item, OwnedItem, Listing, Transaction
 from app.extensions import db
 from app.marketplace import marketplace_bp
 
@@ -148,7 +148,7 @@ def mark_listing_unavailable(listing_id):
         url_for("marketplace.my_listings")
     )
 
-# ake one of the current user's listings available again.
+#Make one of the current user's listings available again.
 @marketplace_bp.route(
     "/<int:listing_id>/available",
     methods=["POST"]
@@ -241,7 +241,7 @@ def edit_listing(listing_id):
         if price:
             return "Trade listings should not have a price."
 
-        listing_price = None
+        listing.price = None
 
     #Reject an invalid listing type.
     else:
@@ -284,3 +284,54 @@ def view_listing(listing_id):
         listing=listing,
         item=item
     )
+
+#Show the purchase confirmation page or complete the purchase
+@marketplace_bp.route(
+    "/<int:listing_id>/purchase",
+    methods=["GET", "POST"]
+)
+@login_required
+def purchase_listing(listing_id):
+
+    #Only available sell listings can be purchased.
+    listing = Listing.query.filter_by(
+        id=listing_id,
+        status="available",
+        listing_type="sell"
+    ).first_or_404()
+
+    #A user cannot purchase their own listing.
+    if listing.user_id == current_user.id:
+        return "You cannot purchase your own listing."
+
+    #Find the item connected to this listing.
+    item = Item.query.filter_by(
+        id=listing.item_id
+    ).first_or_404()
+
+    #GET: show the confirmation page.
+    if request.method == "GET":
+        return render_template(
+            "marketplace_purchase_confirm.html",
+            listing=listing,
+            item=item
+        )
+
+    #POST: create a completed transaction record.
+    new_transaction = Transaction(
+        listing_id=listing.id,
+        buyer_id=current_user.id,
+        seller_id=listing.user_id,
+        item_id=item.id,
+        price=listing.price,
+        status="completed"
+    )
+
+    #Change the listing so it cannot be purchased again.
+    listing.status = "sold"
+
+    #Save both the transaction and listing status together.
+    db.session.add(new_transaction)
+    db.session.commit()
+
+    return "Purchase completed successfully."
