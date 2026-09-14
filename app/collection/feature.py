@@ -91,7 +91,20 @@ def create_collection():
         new_tag = request.form.get("new_tag", "").strip()
         normalized_new_tag = normalize_text(new_tag)
 
-        description = request.form.get("description")
+        description = request.form.get("description", "").strip()
+
+        # Check that collection name was provided.
+        if not name:
+
+            flash(
+                "Collection name is required.",
+                "error"
+            )
+
+            return render_template(
+                "create.html",
+                tags=tags
+            )
 
         # Check if collection already exists.
         existing_collection = Collection.query.filter_by(
@@ -112,7 +125,9 @@ def create_collection():
         selected_tag_id = None
         requested_new_tag = None
 
-        # User selected Other.
+        # -----------------------------------------
+        # User selected "Other"
+        # -----------------------------------------
         if tag_value == "other":
 
             if not new_tag:
@@ -163,11 +178,14 @@ def create_collection():
                 )
 
             # Do not create a Tag yet.
+            # Admin will approve/create it later.
             requested_new_tag = new_tag
 
+        # -----------------------------------------
+        # User selected an existing tag
+        # -----------------------------------------
         else:
 
-            # User selected an existing tag.
             if not tag_value:
 
                 flash(
@@ -180,9 +198,24 @@ def create_collection():
                     tags=tags
                 )
 
+            try:
+                tag_id = int(tag_value)
+
+            except (TypeError, ValueError):
+
+                flash(
+                    "The selected tag is not valid.",
+                    "error"
+                )
+
+                return render_template(
+                    "create.html",
+                    tags=tags
+                )
+
             selected_tag = db.session.get(
                 Tag,
-                int(tag_value)
+                tag_id
             )
 
             if not selected_tag:
@@ -199,7 +232,9 @@ def create_collection():
 
             selected_tag_id = selected_tag.id
 
-        # Get uploaded image.
+        # -----------------------------------------
+        # Get uploaded image
+        # -----------------------------------------
         image_file = request.files.get("image")
         image_filename = None
 
@@ -228,7 +263,9 @@ def create_collection():
                 )
             )
 
-        # Create the pending collection.
+        # -----------------------------------------
+        # Create pending collection
+        # -----------------------------------------
         collection = Collection(
             name=name,
             normalized_name=normalized_name,
@@ -240,9 +277,13 @@ def create_collection():
         )
 
         db.session.add(collection)
+
+        # Get collection.id before creating Submission.
         db.session.flush()
 
-        # Save a requested new tag for later admin approval.
+        # -----------------------------------------
+        # Create submission for admin approval
+        # -----------------------------------------
         submission = Submission(
             user_id=current_user.id,
             type="new_collection",
@@ -257,6 +298,7 @@ def create_collection():
 
         db.session.add(submission)
 
+        # Save collection + submission.
         db.session.commit()
 
         notify_admin_new_submission(submission)
@@ -270,6 +312,7 @@ def create_collection():
             url_for("collection.list_collections")
         )
 
+    # GET request
     return render_template(
         "create.html",
         tags=tags
@@ -281,7 +324,10 @@ def create_collection():
 
 #=====================================================================================================================
 
-@collection_bp.route("/<int:collection_id>/add", methods=["GET", "POST"])
+@collection_bp.route(
+    "/<int:collection_id>/add",
+    methods=["GET", "POST"]
+)
 @login_required
 def add_item(collection_id):
 
@@ -296,7 +342,10 @@ def add_item(collection_id):
 
         # Check empty name
         if not name:
-            flash("Item name is required.", "error")
+            flash(
+                "Item name is required.",
+                "error"
+            )
             return redirect(
                 url_for(
                     "collection.add_item",
@@ -304,9 +353,7 @@ def add_item(collection_id):
                 )
             )
 
-        # Check if item already exists in THIS collection.
-        # We normalize the existing item names here instead of
-        # relying on Item.normalized_name for now.
+        # Check if item already exists in THIS collection
         existing_items = Item.query.filter_by(
             collection_id=collection.id
         ).all()
@@ -332,8 +379,7 @@ def add_item(collection_id):
                 )
             )
 
-        # Check if someone has already submitted the same item
-        # to THIS collection and it is still pending.
+        # Check pending submissions
         pending_submissions = Submission.query.filter(
             Submission.collection_id == collection.id,
             Submission.type == "new_item",
@@ -361,13 +407,47 @@ def add_item(collection_id):
                 )
             )
 
-        # Create pending submission
+        # ==========================================
+        # SAVE IMAGE
+        # ==========================================
+
+        image_file = request.files.get("image")
+        image_filename = None
+
+        if image_file and image_file.filename:
+            image_filename = secure_filename(
+                image_file.filename
+            )
+
+            upload_folder = os.path.join(
+                collection_bp.root_path,
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(
+                upload_folder,
+                exist_ok=True
+            )
+
+            image_file.save(
+                os.path.join(
+                    upload_folder,
+                    image_filename
+                )
+            )
+
+        # ==========================================
+        # CREATE PENDING SUBMISSION
+        # ==========================================
+
         submission = Submission(
             user_id=current_user.id,
             type="new_item",
             collection_id=collection.id,
             name=name,
             description=description,
+            image=image_filename,
             status="pending"
         )
 
