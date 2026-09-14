@@ -440,6 +440,6 @@ def reset_password(token):
 
         db.session.commit()
 
-        return redirect(url_for("auth.login"))
+        return render_template( "reset_password_success.html")
 
     return render_template("reset_password.html")
