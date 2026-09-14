@@ -6,94 +6,101 @@ My Listings
 
 {% block content %}
 
-    <h1>My Listings</h1>
+<h1>My Listings</h1>
 
-    <a href="{{ url_for('marketplace.create_listing') }}">
-        Create New Listing
-    </a>
+<a href="{{ url_for('marketplace.create_listing') }}">
+    Create New Listing
+</a>
 
-    {% if listings %}
+<br><br>
 
-    {% for listing, item in listings %}
+<!--Open the transaction history page-->
+<a href="{{ url_for('marketplace.transaction_history') }}">
+    View Transaction History
+</a>
 
-    <hr>
+{% if listings %}
 
-    <h2>{{ item.name }}</h2>
+{% for listing, item in listings %}
 
-    <p>
-        Listing Type: {{ listing.listing_type }}
-    </p>
+<hr>
 
-    <p>
-        Condition: {{ listing.condition }}
-    </p>
+<h2>{{ item.name }}</h2>
 
-    <p>
-        Description: {{ listing.description or "No description provided." }}
-    </p>
+<p>
+    Listing Type: {{ listing.listing_type }}
+</p>
 
-    {% if listing.price is not none %}
-    <p>
-        Price: RM {{ "%.2f"|format(listing.price) }}
-    </p>
-    {% endif %}
+<p>
+    Condition: {{ listing.condition }}
+</p>
 
-    <p>
-        Status: {{ listing.status }}
-    </p>
+<p>
+    Description: {{ listing.description or "No description provided." }}
+</p>
 
-    <!--Check the currrent status of this listing-->
-    {% if listing.status == "available" %}
+{% if listing.price is not none %}
+<p>
+    Price: RM {{ "%.2f"|format(listing.price) }}
+</p>
+{% endif %}
 
-    <!--Show this button only when the listing is available-->
-    <form method="POST" action="{{ url_for(
+<p>
+    Status: {{ listing.status }}
+</p>
+
+<!--Check the currrent status of this listing-->
+{% if listing.status == "available" %}
+
+<!--Show this button only when the listing is available-->
+<form method="POST" action="{{ url_for(
         'marketplace.mark_listing_unavailable',
         listing_id=listing.id
     ) }}">
-        <button type="submit">
-            Mark as Unavailable
-        </button>
-    </form>
+    <button type="submit">
+        Mark as Unavailable
+    </button>
+</form>
 
-    <!--If the listing is unavailable, show the restore button-->
-    {% elif listing.status == "unavailable" %}
+<!--If the listing is unavailable, show the restore button-->
+{% elif listing.status == "unavailable" %}
 
-    <!--Change the listing status back to available-->
-    <form method="POST" action="{{ url_for(
+<!--Change the listing status back to available-->
+<form method="POST" action="{{ url_for(
         'marketplace.mark_listing_available',
         listing_id=listing.id
     ) }}">
-        <button type="submit">
-            Mark as Available
-        </button>
-    </form>
+    <button type="submit">
+        Mark as Available
+    </button>
+</form>
 
-    {% endif %}
+{% endif %}
 
-    <!--Open the edit page for this listing-->
-    <a href="{{ url_for(
+<!--Open the edit page for this listing-->
+<a href="{{ url_for(
     'marketplace.edit_listing',
     listing_id=listing.id
     ) }}">
-        Edit Listing
-    </a>
+    Edit Listing
+</a>
 
-    <br><br>
+<br><br>
 
-    <form method="POST" action="{{ url_for(
+<form method="POST" action="{{ url_for(
         'marketplace.delete_listing',
         listing_id=listing.id
     ) }}">
-        <button type="submit">
-            Delete Listing
-        </button>
-    </form>
-    {% endfor %}
+    <button type="submit">
+        Delete Listing
+    </button>
+</form>
+{% endfor %}
 
-    {% else %}
+{% else %}
 
-    <p>You have not created any listings yet.</p>
+<p>You have not created any listings yet.</p>
 
-    {% endif %}
+{% endif %}
 
 {% endblock %}
