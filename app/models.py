@@ -257,11 +257,17 @@ class Submission(db.Model):
         nullable=True
     )
 
+    collection = db.relationship("Collection")
+
     # Existing approved tag selected by the user.
     tag_id = db.Column(
         db.Integer,
         db.ForeignKey("tags.id"),
         nullable=True
+    )
+
+    tag = db.relationship(
+        "Tag"
     )
 
     # User-entered tag request when "Other" is selected.

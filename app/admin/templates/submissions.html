@@ -15,7 +15,10 @@
             <th>ID</th>
             <th>User ID</th>
             <th>Type</th>
+            <th>Collection</th>
+            <th>Tag</th>
             <th>Name</th>
+            <th>Image</th>
             <th>Description</th>
             <th>Action</th>
         </tr>
@@ -33,9 +36,45 @@
 
             <td>{{ submission.type }}</td>
 
+            <td>
+                {% if submission.collection %}
+                    {{ submission.collection.name }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+
+            <td>
+                {% if submission.new_tag %}
+                    {{ submission.new_tag }}
+                {% elif submission.collection and submission.collection.tag %}
+                    {{ submission.collection.tag.name }}
+                {% elif submission.tag %}
+                    {{ submission.tag.name }}
+                {% else %}
+                    --    
+                {% endif %}
+            </td>
+
             <td>{{ submission.name }}</td>
 
-            <td>{{ submission.description }}</td>
+            <td>
+                {% if submission.image %}
+                    <img src="{{ url_for('collection.static', filename='uploads/' + submission.image) }}"
+                        alt="{{ submission.name }}"
+                        style="width: 100px; height: 100px; object-fit: cover;">
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+
+            <td>
+                {% if submission.description %}
+                    {{ submission.description }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
 
             <td>
 

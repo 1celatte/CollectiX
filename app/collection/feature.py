@@ -5,7 +5,7 @@ from app.models import Collection, Item, Submission,UserCollection,Tag
 from . import collection_bp
 import os
 from werkzeug.utils import secure_filename
-from app.utils import normalize_text
+from app.utils import normalize_text, notify_admin_new_submission
 
 collection_bp = Blueprint(
     "collection",
@@ -205,7 +205,7 @@ def create_collection():
 
         # Save image.
         if image_file and image_file.filename:
-
+    
             image_filename = secure_filename(
                 image_file.filename
             )
@@ -243,23 +243,23 @@ def create_collection():
         db.session.flush()
 
         # Save a requested new tag for later admin approval.
-        if requested_new_tag:
+        submission = Submission(
+            user_id=current_user.id,
+            type="new_collection",
+            collection_id=collection.id,
+            tag_id=selected_tag_id,
+            new_tag=requested_new_tag,
+            name=name,
+            description=description,
+            image=image_filename,
+            status="pending"
+        )
 
-            submission = Submission(
-                user_id=current_user.id,
-                type="new_collection",
-                collection_id=collection.id,
-                tag_id=None,
-                new_tag=requested_new_tag,
-                name=name,
-                description=description,
-                image=image_filename,
-                status="pending"
-            )
-
-            db.session.add(submission)
+        db.session.add(submission)
 
         db.session.commit()
+
+        notify_admin_new_submission(submission)
 
         flash(
             "Collection submitted successfully! Waiting for admin approval.",
@@ -373,6 +373,8 @@ def add_item(collection_id):
 
         db.session.add(submission)
         db.session.commit()
+
+        notify_admin_new_submission(submission)
 
         flash(
             "Item submitted successfully. Please wait for admin approval.",

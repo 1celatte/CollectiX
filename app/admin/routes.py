@@ -1,8 +1,10 @@
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, current_user
+import os
+from werkzeug.utils import secure_filename
 
 from . import admin
-from app.models import Collection,Item, Submission, User
+from app.models import Collection,Item, Submission, User, Tag
 from app.extensions import db
 
 @admin.route("/admin")
@@ -59,9 +61,65 @@ def edit_collection(collection_id):
 
     collection = Collection.query.get_or_404(collection_id)
 
+    tags = Tag.query.order_by(Tag.name).all()
+
     if request.method == "POST":
         collection.name = request.form["name"]
         collection.description = request.form["description"]
+        tag_id = request.form.get("tag_id")
+
+        if tag_id:
+            collection.tag_id = int(tag_id)
+
+        remove_image = request.form.get("remove_image")
+
+        if remove_image == "1" and collection.image:
+
+            image_path = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(__file__)
+                ),
+                "collection",
+                "static",
+                "uploads",
+                collection.image
+            )
+
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+            collection.image = None
+
+        image_file = request.files.get("image")
+
+        if image_file and image_file.filename:
+
+            image_filename = secure_filename(
+                image_file.filename
+            )
+
+            upload_folder = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(__file__)
+                ),
+                "collection",
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(
+                upload_folder,
+                exist_ok=True
+            )
+
+            image_file.save(
+                os.path.join(
+                    upload_folder,
+                    image_filename
+                )
+            )
+
+            collection.image = image_filename
 
         db.session.commit()
 
@@ -69,7 +127,8 @@ def edit_collection(collection_id):
 
     return render_template(
         "edit_collection.html",
-        collection=collection
+        collection=collection,
+        tags=tags
     )
 
 
@@ -100,6 +159,56 @@ def edit_item(item_id):
     if request.method == "POST":
         item.name = request.form["name"]
         item.description = request.form["description"]
+
+        remove_image = request.form.get("remove_image")
+
+        if remove_image == "1" and item.image:
+
+            image_path = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(__file__)
+                ),
+                "collection",
+                "static",
+                "uploads",
+                item.image
+            )
+
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+            item.image = None
+
+        image_file = request.files.get("image")
+
+        if image_file and image_file.filename:
+
+            image_filename = secure_filename(
+                image_file.filename
+            )
+
+            upload_folder = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(__file__)
+                ),
+                "collection",
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(
+                upload_folder,
+                exist_ok=True
+            )
+
+            image_file.save(
+                os.path.join(
+                    upload_folder,
+                    image_filename
+                )
+            )
+
+            item.image = image_filename
 
         collection_id = item.collection_id
 
