@@ -5,6 +5,7 @@ from app.extensions import db
 from app.marketplace import marketplace_bp
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
+from datetime import timedelta
 
 
 #Temporary route used to test the Marketplace module.
@@ -28,6 +29,31 @@ def create_listing():
         Item.name.asc()
     ).all()
     
+    #Only show items that not listed yet
+    available_items = []
+
+    for item in owned_items:
+        active_listing_count = Listing.query.filter(
+            Listing.user_id == current_user.id,
+            Listing.item_id == item.id,
+            Listing.status.in_(["available", "pending", "unavailable"])
+        ).count()
+
+        #Add the item only when it has no active listing
+        if active_listing_count == 0:
+            available_items.append(item)
+
+    #The HTML dropdown will use this filtered item list.
+    owned_items = available_items
+    
+    #Show the create form again with an error message.
+    def show_form_error(message):
+        return render_template(
+            "marketplace_create.html",
+            owned_items=owned_items,
+            error=message
+        )
+        
     #When the user first time open the page, show the form
     if request.method == "GET":
             return render_template(
@@ -44,11 +70,15 @@ def create_listing():
 
     #Check that the user selected an item.
     if not item_id:
-        return "Please select an item before creating a listing."
+        return show_form_error(
+            "Please select an item before creating a listing."
+        )
 
     #A Sell listing must have a price.
     if listing_type == "sell" and not price:
-        return "Please enter a price for a Sell listing."
+        return show_form_error(
+            "Please enter a price for a Sell listing."
+        )
 
     #Check that the selected item belongs to the current user.
     owned_item = OwnedItem.query.filter_by(
@@ -57,7 +87,22 @@ def create_listing():
     ).first()
 
     if not owned_item or owned_item.quantity <= 0:
-        return "You can only create a listing for an item you own."
+        return show_form_error(
+            "You can only create a listing for an item you own."
+        )
+        
+    #Count existing listings that still reserve this owned item.
+    active_listing_count = Listing.query.filter(
+        Listing.user_id == current_user.id,
+        Listing.item_id == owned_item.item_id,
+        Listing.status.in_(["available", "pending", "unavailable"])
+    ).count()
+
+    #Prevent the user from creating multiple listings at the same time
+    if active_listing_count > 0:
+        return show_form_error(
+            "This item already has an active listing."
+        )
     
     #Convert the price text into a number before saving.
     listing_price = None
@@ -66,18 +111,24 @@ def create_listing():
         try:
             listing_price = float(price)
         except ValueError:
-            return "Please enter a valid price for a Sell listing."
+            return show_form_error(
+                "Please enter a valid price for a Sell listing."
+            )
 
     #A trade listing must not have a price.
     elif listing_type == "trade":
         if price:
-            return "Trade listings should not have a price!"
+            return show_form_error(
+                "Trade listings should not have a price!"
+            )
 
         listing_price = None
 
     else:
         if listing_type not in ("sell", "trade"):
-            return "Please choose a valid listing type."
+            return show_form_error(
+                "Please choose a valid listing type."
+            )
 
 
     #Create a new marketplace listing record.
@@ -376,5 +427,6 @@ def transaction_history():
     #Send all transaction information to the history page.
     return render_template(
         "marketplace_history.html",
-        transactions=transactions
+        transactions=transactions,
+        malaysia_offset=timedelta(hours=8)
     )
