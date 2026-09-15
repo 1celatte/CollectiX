@@ -262,7 +262,7 @@ def profile():
 @login_required
 def edit_profile():
     if request.method == "POST":
-        name = request.form.get("name")
+        name = request.form.get("name", "").strip()
         profile_picture = request.files.get("profile_picture")
         remove_profile_picture = request.form.get("remove_profile_picture") == "1"
 
@@ -297,7 +297,8 @@ def edit_profile():
 
             current_user.profile_picture = f"uploads/avatars/{filename}"
 
-        current_user.name = name
+        if name:
+            current_user.name = name
 
         db.session.commit()
 
