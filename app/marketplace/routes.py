@@ -7,6 +7,25 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from datetime import timedelta
 
+#Display all available marketplace listings.
+@marketplace_bp.route("/")
+def marketplace_home():
+    listings = Listing.query.join(
+        Item,
+        Listing.item_id == Item.id
+    ).add_entity(
+        Item
+    ).filter(
+        Listing.status == "available"
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    return render_template(
+        "marketplace_list.html",
+        listings=listings
+    )
+    
 #Create Listing page.
 #Login is required before the user can access this page.
 @marketplace_bp.route("/create", methods=["GET", "POST"])
