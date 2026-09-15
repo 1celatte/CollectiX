@@ -64,6 +64,7 @@ def view_my_collection(collection_id):
     # Get all approved items inside this collection
     items = Item.query.filter_by(
         collection_id=collection_id,
+        status="approved"
     ).all()
 
     # Get items owned by the current user
@@ -77,7 +78,6 @@ def view_my_collection(collection_id):
         items=items,
         owned_items=owned_items
     )
-
 #=======================================================================================================================
 
 # Edit my collection (let useers make items owned or not and set quantity)
