@@ -16,24 +16,22 @@
         <div class="container-fluid">
 
             <div class="d-flex align-items-center">
+
+                <!-- CollectiX -->
                 <a class="navbar-brand me-3" href="/">
                     CollectiX
                 </a>
+                
+                <!-- Search Icon -->
+                <a href="{{ url_for('browse.browse_page') }}" 
+                    class="btn btn-outline-light ms-2" 
+                    title="Search"> 
+                    <i class="bi bi-search"></i> 
+                </a>
 
-                <form action="{{ url_for('browse.browse_page') }}" method="GET" class="d-flex ms-3">
-                    <input
-                        type="text"
-                        name="q"
-                        class="form-control"
-                        placeholder="Search collections or items..."
-                        style="width: 300px;"
-                    >
-                    <button type="submit" class="btn btn-light ms-2">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light ms-3">
+                <!-- Login -->
+                <a href="{{ url_for('auth.login') }}" 
+                   class="btn btn-outline-light ms-3">
                     Login
                 </a>
 
@@ -46,6 +44,7 @@
     <main class="container py-4">
         {% block content %}{% endblock %}
     </main>
+    
     <footer class="text-center py-4 text-muted">
         <p>&copy; 2026 CollectiX</p>
     </footer>
