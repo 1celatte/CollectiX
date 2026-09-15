@@ -14,6 +14,7 @@ from app.models import (
     Trade
 )
 from werkzeug.security import generate_password_hash
+from app.utils import normalize_text
 
 
 app = create_app()
@@ -101,18 +102,31 @@ with app.app_context():
     # =========================
 
     trading_cards = Tag(
+<<<<<<< HEAD
         name="trading cards", 
         normalized_name="trading cards"
+=======
+        name="trading cards",
+        normalized_name=normalize_text("trading cards")
+>>>>>>> origin/zijian/marketplace
     )
 
     blind_box = Tag(
         name="blind box",
+<<<<<<< HEAD
         normalized_name="blind box"
+=======
+        normalized_name=normalize_text("blind box")
+>>>>>>> origin/zijian/marketplace
     )
 
     anime_figure = Tag(
         name="anime figure",
+<<<<<<< HEAD
         normalized_name="anime figure"
+=======
+        normalized_name=normalize_text("anime figure")
+>>>>>>> origin/zijian/marketplace
     )
 
     db.session.add_all([
@@ -158,6 +172,9 @@ with app.app_context():
         created_by=admin.id
     )
 
+    for collection in [pokemon, naruto, crybaby]:
+        collection.normalized_name = normalize_text(collection.name)
+    
     db.session.add_all([
         pokemon,
         naruto,
@@ -271,6 +288,21 @@ with app.app_context():
         created_by=admin.id
     )
 
+
+    for item in [
+        pikachu,
+        charizard,
+        eevee,
+        naruto_item,
+        sasuke,
+        sakura,
+        kakashi,
+        crybaby_love,
+        crybaby_angel,
+        crybaby_bear
+    ]:
+        item.normalized_name = normalize_text(item.name)
+    
     db.session.add_all([
         pikachu,
         charizard,
