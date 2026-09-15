@@ -1,14 +1,21 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Edit Item - CollectiX{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
+    <title>Edit Item - CollectiX</title>
+</head>
+
+<body>
 
 <h1>Edit Item</h1>
 
 <form method="POST" enctype="multipart/form-data">
 
     <label>Name:</label>
+
     <input
         type="text"
         name="name"
@@ -71,7 +78,13 @@
 
     <label>Description:</label>
 
-    <textarea name="description">{{ item.description }}</textarea>
+    <br>
+
+    <textarea
+        name="description"
+        rows="5"
+        cols="50"
+    >{{ item.description }}</textarea>
 
     <br><br>
 
@@ -83,16 +96,28 @@
 
 <br>
 
-<a href="{{ url_for(
-    'admin.collection_items',
-    collection_id=item.collection_id
-) }}">
-    <button type="button">
-        ← Back
-    </button>
+<a
+    href="{{ url_for(
+        'admin.collection_items',
+        collection_id=item.collection_id
+    ) }}"
+    class="back-btn"
+>
+    ← Back
 </a>
 
 <style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+
+    input[type="text"],
+    textarea {
+        padding: 6px;
+        font-size: 14px;
+    }
 
     .image-box {
         width: 150px;
@@ -116,6 +141,33 @@
         font-size: 14px;
     }
 
+    .save-btn {
+        padding: 8px 15px;
+        background-color: #198754;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .save-btn:hover {
+        background-color: #157347;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .back-btn:hover {
+        background-color: #5c636a;
+    }
+
 </style>
 
-{% endblock %}
+</body>
+</html>
