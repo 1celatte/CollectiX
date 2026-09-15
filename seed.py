@@ -54,7 +54,7 @@ with app.app_context():
         email_verified=True
     )
 
-    admin = User(
+    admin2 = User(
         name="coco",
         email="cngchifei@gmail.com",
         password=generate_password_hash("Test1234!"),
@@ -88,6 +88,7 @@ with app.app_context():
 
     db.session.add_all([
         admin,
+        admin2,
         alice,
         bob,
         charlie
@@ -476,7 +477,8 @@ with app.app_context():
     print("================================")
     print()
     print("Test accounts:")
-    print("admin   / Test1234!")
-    print("alice   / Test1234!")
-    print("bob     / Test1234!")
-    print("charlie / Test1234!")
+    print("admin@collectix.com / Test1234!")
+    print("cngchifei@gmail.com / Test1234!")
+    print("alice@collectix.com / Test1234!")
+    print("bob@collectix.com / Test1234!")
+    print("charlie@collectix.com / Test1234!")

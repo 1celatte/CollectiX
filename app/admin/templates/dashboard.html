@@ -1,63 +1,123 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
 
-{% block title %}Admin Dashboard - CollectiX{% endblock %}
+<html lang="en">
 
-{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<h1>Admin Dashboard</h1>
-
-<p>Welcome, Admin!</p>
-
-<div>
-    <a href="{{ url_for('admin.submissions') }}">
-        Submissions
-        {% if pending_count > 0 %}
-            <span class="badge">{{ pending_count }}</span>
-        {% endif %}
-    </a>
-</div>
-
-<div>
-    <a href="{{ url_for('admin.collections') }}">Collections</a>
-</div>
-
-<div>
-    <a href="{{ url_for('admin.users') }}">Users</a>
-</div>
-
-<div>
-    <a href="{{ url_for('auth.logout') }}">Logout</a>
-</div>
+<title>Admin Dashboard - CollectiX</title>
 
 <style>
-.dashboard-links {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 300px;
-}
+    * {
+        box-sizing: border-box;
+    }
 
-.dashboard-btn {
-    display: inline-block;
-    padding: 12px 20px;
-    background-color: #f0f0f0;
-    color: #000;
-    text-decoration: none;
-    border-radius: 6px;
-}
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fb;
+    }
 
-.dashboard-btn:hover {
-    background-color: #ddd;
-}
+    .dashboard {
+        width: 90%;
+        max-width: 700px;
+        margin: 80px auto;
+        background-color: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
 
-.badge {
-    background-color: red;
-    color: white;
-    padding: 3px 7px;
-    border-radius: 10px;
-    font-size: 12px;
-    margin-left: 5px;
-}
+    h1 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .welcome {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-links {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .dashboard-btn {
+        display: block;
+        padding: 14px 20px;
+        background-color: #f0f0f0;
+        color: #000;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .dashboard-btn:hover {
+        background-color: #ddd;
+    }
+
+    .badge {
+        background-color: red;
+        color: white;
+        padding: 3px 7px;
+        border-radius: 10px;
+        font-size: 12px;
+        margin-left: 5px;
+    }
+
+    .logout {
+        margin-top: 25px;
+        display: inline-block;
+        color: #d00;
+        text-decoration: none;
+    }
+
+    .logout:hover {
+        text-decoration: underline;
+    }
 </style>
 
-{% endblock %}
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <h1>Admin Dashboard</h1>
+
+    <p class="welcome">Welcome, Admin!</p>
+
+    <div class="dashboard-links">
+
+        <a href="{{ url_for('admin.submissions') }}" class="dashboard-btn">
+            Submissions
+
+            {% if pending_count > 0 %}
+                <span class="badge">
+                    {{ pending_count }}
+                </span>
+            {% endif %}
+        </a>
+
+        <a href="{{ url_for('admin.collections') }}" class="dashboard-btn">
+            Collections
+        </a>
+
+        <a href="{{ url_for('admin.users') }}" class="dashboard-btn">
+            Users
+        </a>
+
+    </div>
+
+    <a href="{{ url_for('auth.logout') }}" class="logout">
+        Logout
+    </a>
+
+</div>
+
+</body>
+
+</html>
