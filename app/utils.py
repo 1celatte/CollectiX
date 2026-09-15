@@ -19,14 +19,16 @@ def normalize_text(text):
 
 
 def notify_admin_new_submission(submission):
-    admin = User.query.filter_by(role="admin").first()
+    admins = User.query.filter_by(role="admin").all()
 
-    if not admin:
+    if not admins:
         return
+
+    admin_emails = [admin.email for admin in admins]
 
     msg = Message(
         subject="New Submission - CollectiX",
-        recipients=[admin.email]
+        recipients=admin_emails
     )
 
     msg.body = f"""
