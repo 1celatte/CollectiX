@@ -102,31 +102,18 @@ with app.app_context():
     # =========================
 
     trading_cards = Tag(
-<<<<<<< HEAD
         name="trading cards", 
         normalized_name="trading cards"
-=======
-        name="trading cards",
-        normalized_name=normalize_text("trading cards")
->>>>>>> origin/zijian/marketplace
     )
 
     blind_box = Tag(
         name="blind box",
-<<<<<<< HEAD
         normalized_name="blind box"
-=======
-        normalized_name=normalize_text("blind box")
->>>>>>> origin/zijian/marketplace
     )
 
     anime_figure = Tag(
         name="anime figure",
-<<<<<<< HEAD
         normalized_name="anime figure"
-=======
-        normalized_name=normalize_text("anime figure")
->>>>>>> origin/zijian/marketplace
     )
 
     db.session.add_all([
