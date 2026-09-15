@@ -14,6 +14,7 @@ from app.models import (
     Trade
 )
 from werkzeug.security import generate_password_hash
+from app.utils import normalize_text
 
 
 app = create_app()
@@ -159,6 +160,9 @@ with app.app_context():
         created_by=admin.id
     )
 
+    for collection in [pokemon, naruto, crybaby]:
+        collection.normalized_name = normalize_text(collection.name)
+    
     db.session.add_all([
         pokemon,
         naruto,
@@ -272,6 +276,21 @@ with app.app_context():
         created_by=admin.id
     )
 
+
+    for item in [
+        pikachu,
+        charizard,
+        eevee,
+        naruto_item,
+        sasuke,
+        sakura,
+        kakashi,
+        crybaby_love,
+        crybaby_angel,
+        crybaby_bear
+    ]:
+        item.normalized_name = normalize_text(item.name)
+    
     db.session.add_all([
         pikachu,
         charizard,

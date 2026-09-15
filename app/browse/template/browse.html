@@ -176,10 +176,22 @@ Browse & Search - CollectiX
                 </p>
                 {% endif %}
 
-                <!--Temporary details button-->
-                <a href="#" class="btn btn-outline-primary">
+                {% if result.type == "marketplace" %}
+                <a href="{{ url_for('marketplace.view_listing', listing_id=result.id) }}" class="btn btn-primary">
                     View Details
                 </a>
+
+                {% elif result.type == "collection" %}
+                <a href="{{ url_for('collection.view_collection', collection_id=result.id) }}" class="btn btn-primary">
+                    View Details
+                </a>
+
+                {% elif result.type == "item" %}
+                <a href="{{ url_for('collection.view_collection', collection_id=result.collection_id) }}"
+                    class="btn btn-primary">
+                    View Details
+                </a>
+                {% endif %}
 
             </div>
 
@@ -209,10 +221,6 @@ Browse & Search - CollectiX
         <h5>Can't find what you are looking for?</h5>
         <a href="{{ url_for('collection.create_collection') }}" class="link-primary me-3">
             Create Collection
-        </a>
-
-        <a href="{{ url_for('collection.list_collections') }}" class="link-primary">
-            Add an Item
         </a>
 
     </div>

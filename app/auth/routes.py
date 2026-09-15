@@ -31,7 +31,7 @@ def test_auth():
 
 @auth.route("/test-email")
 def test_email():
-    msg = Message(
+    msg = Message(  #建立email
         subject="CollectiX Email Test",
         sender=mail.username,
         recipients=["cngchifei@gmail.com"]
@@ -39,7 +39,7 @@ def test_email():
 
     msg.body = "This is a test email from CollectiX."
 
-    mail.send(msg)
+    mail.send(msg) #发出去
 
     return "Test email sent!"
 
