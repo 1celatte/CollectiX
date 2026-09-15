@@ -7,12 +7,6 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from datetime import timedelta
 
-
-#Temporary route used to test the Marketplace module.
-@marketplace_bp.route("/")
-def marketplace_home():
-    return "Marketplace module is working!"
-
 #Create Listing page.
 #Login is required before the user can access this page.
 @marketplace_bp.route("/create", methods=["GET", "POST"])
@@ -146,7 +140,9 @@ def create_listing():
     db.session.add(new_listing)
     db.session.commit()
 
-    return "Listing created successfully."
+    return redirect(
+        url_for("marketplace.my_listings")
+    )
 
 #Display listings created by the current user.
 @marketplace_bp.route("/my-listings")
