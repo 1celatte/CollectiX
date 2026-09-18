@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 import os
 from werkzeug.utils import secure_filename
+from app.utils import normalize_text
 
 from . import admin
 from app.models import Collection,Item, Submission, User, Tag
@@ -261,24 +262,32 @@ def approve_submission(submission_id):
     submission = Submission.query.get_or_404(submission_id)
 
     if submission.type == "new_collection":
-        collection = Collection(
+        collection = submission.collection
+
+        if submission.new_tag:
+            new_tag = Tag(
+                name=submission.new_tag,
+                normalized_name=normalize_text(submission.new_tag)
+            )
+
+            db.session.add(new_tag)
+            db.session.flush()
+
+            collection.tag_id = new_tag.id
+
+        else:
+            collection.tag_id = submission.tag_id
+
+        collection.status = "approved"
+       
+    elif submission.type == "new_item":
+        item = Item(
+            collection_id=submission.collection_id,
             name=submission.name,
             description=submission.description,
             image=submission.image,
             status="approved",
             created_by=submission.user_id
-        )
-
-        db.session.add(collection)
-
-    elif submission.type == "new_item":
-        item = Item(
-        collection_id=submission.collection_id,
-        name=submission.name,
-        description=submission.description,
-        image=submission.image,
-        status="approved",
-        created_by=submission.user_id
         )
 
         db.session.add(item)
