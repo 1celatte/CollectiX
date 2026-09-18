@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ collection.name }} - Items</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .edit-btn,
+    .remove-btn {
+        display: inline-block;
+        min-width: 75px;
+        padding: 6px 12px;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .edit-btn {
+        background-color: #0d6efd;
+        color: white;
+        text-decoration: none;
+    }
+
+    .edit-btn:hover {
+        background-color: #0b5ed7;
+    }
+
+    .remove-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+
+    .delete-popup {
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+
+    .delete-box {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .delete-confirm {
+        padding: 6px 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .cancel-btn {
+        padding: 6px 15px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .back-btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .back-btn:hover {
+        background-color: #5c636a;
+    }
+</style>
+
+</head>
+
+<body>
+
+<h1>{{ collection.name }}</h1>
+
+<p>{{ collection.description }}</p>
+
+<hr>
+
+<h2>Items</h2>
+
+{% if items %}
+
+<table>
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Item Name</th>
+            <th>Image</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for item in items %}
+
+        <tr>
+
+            <td>{{ item.id }}</td>
+
+            <td>{{ item.name }}</td>
+
+            <td>
+                {% if item.image %}
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' + item.image
+                        ) }}"
+                        alt="{{ item.name }}"
+                        class="item-image"
+                    >
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+
+            <td>
+                {% if item.description %}
+                    {{ item.description }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+
+            <td>
+                {{ item.status }}
+            </td>
+
+            <td>
+
+                <a
+                    href="{{ url_for(
+                        'admin.edit_item',
+                        item_id=item.id
+                    ) }}"
+                    class="edit-btn"
+                >
+                    Edit
+                </a>
+
+                <button
+                    type="button"
+                    class="remove-btn"
+                    popovertarget="deleteItem{{ item.id }}"
+                >
+                    Remove
+                </button>
+
+                <div
+                    id="deleteItem{{ item.id }}"
+                    popover
+                    class="delete-popup"
+                >
+
+                    <div class="delete-box">
+
+                        <p>
+                            Are you sure you want to delete this item?
+                        </p>
+
+                        <form
+                            action="{{ url_for(
+                                'admin.remove_item',
+                                item_id=item.id
+                            ) }}"
+                            method="POST"
+                        >
+
+                            <button
+                                type="submit"
+                                class="delete-confirm"
+                            >
+                                Yes
+                            </button>
+
+                            <button
+                                type="button"
+                                class="cancel-btn"
+                                popovertarget="deleteItem{{ item.id }}"
+                                popovertargetaction="hide"
+                            >
+                                Cancel
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% else %}
+
+<p>No items in this collection.</p>
+
+{% endif %}
+
+<a
+    href="{{ url_for('admin.collections') }}"
+    class="back-btn"
+>
+    Back to Collections
+</a>
+
+</body>
+
+</html>

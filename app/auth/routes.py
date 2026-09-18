@@ -12,13 +12,26 @@ from app.extensions import db, mail
 from app.models import User
 
 
+def validate_password(password): 
+    if (
+        len(password) < 8
+        or not any(char.isupper() for char in password)
+        or not any(char.islower() for char in password)
+        or not any(char.isdigit() for char in password)
+        or not any(char in "!@#$%^&*()_+-=[]{}|;:,.<>?/" for char in password)
+    ):
+        return "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character."
+
+    return None
+
+
 @auth.route("/test-auth")
 def test_auth():
     return "Auth Blueprint is working!"
 
 @auth.route("/test-email")
 def test_email():
-    msg = Message(
+    msg = Message(  #建立email
         subject="CollectiX Email Test",
         sender=mail.username,
         recipients=["cngchifei@gmail.com"]
@@ -26,10 +39,9 @@ def test_email():
 
     msg.body = "This is a test email from CollectiX."
 
-    mail.send(msg)
+    mail.send(msg) #发出去
 
     return "Test email sent!"
-
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
@@ -41,15 +53,18 @@ def register():
 
         email_error = None
         password_error = None
-
+    
         # Check whether email already exists
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user and existing_user.email_verified:
             email_error = "Email already exists."
 
+        # Check password requirements
+        password_error = validate_password(password)
+
         # Check password confirmation
-        if password != confirm_password:
+        if not password_error and password != confirm_password:
             password_error = "Passwords do not match."
 
         # If there are errors, stay on Register page
@@ -208,7 +223,18 @@ def login():
                 email=email
             )
 
+        # Email not verified
+        if not user.email_verified:
+            return render_template(
+                "login.html",
+                login_error="Please verify your email before logging in. Check your inbox for the verification email.",
+                email=email
+            )
+
         login_user(user)
+
+        if user.role == "admin":
+            return redirect(url_for("admin.dashboard"))
 
         next_page = request.args.get("next")
 
@@ -236,7 +262,7 @@ def profile():
 @login_required
 def edit_profile():
     if request.method == "POST":
-        name = request.form.get("name")
+        name = request.form.get("name", "").strip()
         profile_picture = request.files.get("profile_picture")
         remove_profile_picture = request.form.get("remove_profile_picture") == "1"
 
@@ -271,7 +297,8 @@ def edit_profile():
 
             current_user.profile_picture = f"uploads/avatars/{filename}"
 
-        current_user.name = name
+        if name:
+            current_user.name = name
 
         db.session.commit()
 
@@ -290,7 +317,15 @@ def change_password():
     if not check_password_hash(current_user.password, current_password):
         return render_template(
             "edit_profile.html",
-            password_error="Current password is incorrect."
+            current_password_error="Current password is incorrect."
+        )
+
+    password_error = validate_password(new_password)
+
+    if password_error:
+        return render_template(
+            "edit_profile.html",
+            password_error=password_error
         )
     
     if new_password != confirm_password:
@@ -320,23 +355,77 @@ def forgot_password():
                 email_error="Email does not exist."
             )
 
-        return redirect(url_for("auth.reset_password", email=email))
+        # Generate password reset token
+        reset_token = secrets.token_urlsafe(32)
+
+        # Token expires after 30 minutes
+        reset_expires_at = datetime.utcnow() + timedelta(minutes=30)
+
+        # Save reset token to the user
+        user.password_reset_token = reset_token
+        user.password_reset_expires_at = reset_expires_at
+
+        db.session.commit()
+
+        # Create password reset link
+        reset_link = url_for(
+            "auth.reset_password",
+            token=reset_token,
+            _external=True
+        )
+
+        # Create reset password email
+        msg = Message(
+            subject="Reset your CollectiX password",
+            recipients=[email]
+        )
+
+        msg.html = render_template(
+            "reset_password_email.html",
+            name=user.name,
+            reset_link=reset_link
+        )
+
+        mail.send(msg)
+
+        return redirect(url_for("auth.check_reset_email"))
 
     return render_template("forgot_password.html")
 
 
-@auth.route("/reset-password", methods=["GET", "POST"])
-def reset_password():
-    email = request.args.get("email")
+@auth.route("/check-reset-email")
+def check_reset_email():
+    return render_template("check_reset_email.html")
 
-    user = User.query.filter_by(email=email).first()
 
+@auth.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    user = User.query.filter_by(
+        password_reset_token=token
+    ).first()
+
+    # Token does not exist
     if user is None:
-        return redirect(url_for("auth.forgot_password"))
+        return "Invalid password reset link."
+
+    # Check whether token has expired
+    if (
+        user.password_reset_expires_at is None
+        or datetime.utcnow() > user.password_reset_expires_at
+    ):
+        return "Password reset link has expired."
 
     if request.method == "POST":
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
+
+        password_error = validate_password(new_password)
+
+        if password_error:
+            return render_template(
+                "reset_password.html",
+                password_error=password_error
+            )
 
         if new_password != confirm_password:
             return render_template(
@@ -346,8 +435,12 @@ def reset_password():
 
         user.password = generate_password_hash(new_password)
 
+        # Clear reset token after successful password reset
+        user.password_reset_token = None
+        user.password_reset_expires_at = None
+
         db.session.commit()
 
-        return redirect(url_for("auth.login"))
+        return render_template( "reset_password_success.html")
 
     return render_template("reset_password.html")

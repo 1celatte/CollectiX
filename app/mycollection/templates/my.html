@@ -1,72 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+My Collections
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block content %}
 
-    <title>My Collections</title>
-</head>
+<h1>My Collections</h1>
 
-<body>
+{% if collections %}
 
-    <h1>My Collections</h1>
+    {% for collection in collections %}
 
-    {% if collections %}
+        <hr>
 
-        {% for collection in collections %}
+        <h2>
+            {{ collection.name }}
+        </h2>
 
-            <hr>
+        {% if collection.image %}
 
-            <h2>
-                {{ collection.name }}
-            </h2>
-
-            {% if collection.image %}
-
-                <img
-                    src="{{ url_for(
-                        'collection.static',
-                        filename='uploads/' + collection.image
-                    ) }}"
-                    alt="{{ collection.name }}"
-                    width="150"
-                >
-
-            {% endif %}
-
-            <p>
-                <strong>Category:</strong>
-                {{ collection.category }}
-            </p>
-
-            <p>
-                {{ collection.description }}
-            </p>
-
-            <a
-                href="{{ url_for(
-                    'my_collection.view_my_collection',
-                    collection_id=collection.id
+            <img
+                src="{{ url_for(
+                    'collection.static',
+                    filename='uploads/' + collection.image
                 ) }}"
+                alt="{{ collection.name }}"
+                width="150"
             >
-                <button>View Collection Details</button>
-            </a>
 
-        {% endfor %}
+        {% else %}
 
-    {% else %}
+            <div
+                style="
+                    width: 150px;
+                    height: 150px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #eee;
+                "
+            >
+                No Image
+            </div>
+
+        {% endif %}
 
         <p>
-            You have not added any collections yet.
+            <strong>Tag:</strong>
+
+            {% if collection.tag %}
+                {{ collection.tag.name }}
+            {% else %}
+                Not assigned
+            {% endif %}
         </p>
 
-    {% endif %}
+        <p>
+            {{ collection.description }}
+        </p>
 
-</body>
+        <a
+            href="{{ url_for(
+                'my_collection.view_my_collection',
+                collection_id=collection.id
+            ) }}"
+        >
+            <button type="button">
+                View Collection Details
+            </button>
+        </a>
 
-</html>
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        You have not added any collections yet.
+    </p>
+
+{% endif %}
+
+{% endblock %}

@@ -8,19 +8,54 @@ class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-
-    username = db.Column(db.String(80), unique=True, nullable=False)
-
+    name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
+    email_verification_token = db.Column(db.String(255), nullable=True)
+    email_verification_expires_at = db.Column(db.DateTime, nullable=True)
     password = db.Column(db.String(255), nullable=False)
-
+    password_reset_token = db.Column(db.String(255), nullable=True)
+    password_reset_expires_at = db.Column(db.DateTime, nullable=True)
     role = db.Column(db.String(20), default="user", nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_picture = db.Column(db.String(255), nullable=True)
 
     profile_picture = db.Column(db.String(255), nullable=True)
 
+
+# ==========================================
+# Tag
+# ==========================================
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
+
+    normalized_name = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+# ==========================================
+# Collection
+# ==========================================
 
 # ==========================================
 # Tag
@@ -258,11 +293,17 @@ class Submission(db.Model):
         nullable=True
     )
 
+    collection = db.relationship("Collection")
+
     # Existing approved tag selected by the user.
     tag_id = db.Column(
         db.Integer,
         db.ForeignKey("tags.id"),
         nullable=True
+    )
+
+    tag = db.relationship(
+        "Tag"
     )
 
     # User-entered tag request when "Other" is selected.

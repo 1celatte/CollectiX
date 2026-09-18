@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Listings
+{% endblock %}
+
+{% block content %}
+
+<h1>My Listings</h1>
+
+<a href="{{ url_for('marketplace.create_listing') }}">
+    Create New Listing
+</a>
+
+<br><br>
+
+<!--Open the transaction history page-->
+<a href="{{ url_for('marketplace.transaction_history') }}">
+    View Transaction History
+</a>
+
+{% if listings %}
+
+{% for listing, item in listings %}
+
+<hr>
+
+<h2>{{ item.name }}</h2>
+
+<p>
+    Listing Type: {{ listing.listing_type }}
+</p>
+
+<p>
+    Condition: {{ listing.condition }}
+</p>
+
+<p>
+    Description: {{ listing.description or "No description provided." }}
+</p>
+
+{% if listing.price is not none %}
+<p>
+    Price: RM {{ "%.2f"|format(listing.price) }}
+</p>
+{% endif %}
+
+<p>
+    Status: {{ listing.status }}
+</p>
+
+<!--Check the currrent status of this listing-->
+{% if listing.status == "available" %}
+
+<!--Show this button only when the listing is available-->
+<form method="POST" action="{{ url_for(
+        'marketplace.mark_listing_unavailable',
+        listing_id=listing.id
+    ) }}">
+    <button type="submit">
+        Mark as Unavailable
+    </button>
+</form>
+
+<!--If the listing is unavailable, show the restore button-->
+{% elif listing.status == "unavailable" %}
+
+<!--Change the listing status back to available-->
+<form method="POST" action="{{ url_for(
+        'marketplace.mark_listing_available',
+        listing_id=listing.id
+    ) }}">
+    <button type="submit">
+        Mark as Available
+    </button>
+</form>
+
+{% endif %}
+
+<!--Open the edit page for this listing-->
+<a href="{{ url_for(
+    'marketplace.edit_listing',
+    listing_id=listing.id
+    ) }}">
+    Edit Listing
+</a>
+
+<br><br>
+
+<form action="{{ url_for('marketplace.delete_listing', listing_id=listing.id) }}" method="POST"
+    onsubmit="return confirm('Are you sure you want to delete this listing?')">
+    <button type="submit">Delete</button>
+</form>
+
+{% endfor %}
+
+{% else %}
+
+<p>You have not created any listings yet.</p>
+
+{% endif %}
+
+{% endblock %}

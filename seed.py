@@ -14,6 +14,7 @@ from app.models import (
     Trade
 )
 from werkzeug.security import generate_password_hash
+from app.utils import normalize_text
 
 
 app = create_app()
@@ -47,35 +48,48 @@ with app.app_context():
     # =========================
 
     admin = User(
-        username="admin",
+        name="admin",
         email="admin@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="admin"
+        role="admin",
+        email_verified=True
+    )
+
+    admin2 = User(
+        name="coco",
+        email="cngchifei@gmail.com",
+        password=generate_password_hash("Test1234!"),
+        role="admin",
+        email_verified=True
     )
 
     alice = User(
-        username="alice",
+        name="alice",
         email="alice@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     bob = User(
-        username="bob",
+        name="bob",
         email="bob@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     charlie = User(
-        username="charlie",
+        name="charlie",
         email="charlie@collectix.com",
         password=generate_password_hash("Test1234!"),
-        role="user"
+        role="user",
+        email_verified=True
     )
 
     db.session.add_all([
         admin,
+        admin2,
         alice,
         bob,
         charlie
@@ -89,15 +103,18 @@ with app.app_context():
     # =========================
 
     trading_cards = Tag(
-        name="trading cards"
+        name="trading cards", 
+        normalized_name="trading cards"
     )
 
     blind_box = Tag(
-        name="blind box"
+        name="blind box",
+        normalized_name="blind box"
     )
 
     anime_figure = Tag(
-        name="anime figure"
+        name="anime figure",
+        normalized_name="anime figure"
     )
 
     db.session.add_all([
@@ -115,6 +132,7 @@ with app.app_context():
 
     pokemon = Collection(
         name="Pokémon Scarlet & Violet",
+        normalized_name="pokemon scarlet & violet",
         tag_id=trading_cards.id,
         description="Pokémon Scarlet & Violet collectible card series.",
         image=None,
@@ -124,6 +142,7 @@ with app.app_context():
 
     naruto = Collection(
         name="Naruto Shippuden",
+        normalized_name="naruto shippuden",
         tag_id=anime_figure.id,
         description="Naruto Shippuden collectible figures.",
         image="collection.jpg",
@@ -133,6 +152,7 @@ with app.app_context():
 
     crybaby = Collection(
         name="POP MART Crybaby Series",
+        normalized_name="pop mart crybaby series",
         tag_id=blind_box.id,
         description="POP MART Crybaby collectible series.",
         image="crybaby.jpg",
@@ -140,6 +160,9 @@ with app.app_context():
         created_by=admin.id
     )
 
+    for collection in [pokemon, naruto, crybaby]:
+        collection.normalized_name = normalize_text(collection.name)
+    
     db.session.add_all([
         pokemon,
         naruto,
@@ -156,6 +179,7 @@ with app.app_context():
     pikachu = Item(
         collection_id=pokemon.id,
         name="Pikachu",
+        normalized_name="pikachu",
         description="Pikachu collectible card.",
         image="pikachu.png",
         status="approved",
@@ -165,6 +189,7 @@ with app.app_context():
     charizard = Item(
         collection_id=pokemon.id,
         name="Charizard",
+        normalized_name="charizard",
         description="Charizard collectible card.",
         image="charizard.jpg",
         status="approved",
@@ -174,6 +199,7 @@ with app.app_context():
     eevee = Item(
         collection_id=pokemon.id,
         name="Eevee",
+        normalized_name="eevee",
         description="Eevee collectible card.",
         image=None,
         status="approved",
@@ -183,6 +209,7 @@ with app.app_context():
     naruto_item = Item(
         collection_id=naruto.id,
         name="Naruto Uzumaki",
+        normalized_name="naruto uzumaki",
         description="Naruto Uzumaki collectible figure.",
         image="naruto.png",
         status="approved",
@@ -192,6 +219,7 @@ with app.app_context():
     sasuke = Item(
         collection_id=naruto.id,
         name="Sasuke Uchiha",
+        normalized_name="sasuke uchiha",
         description="Sasuke Uchiha collectible figure.",
         image=None,
         status="approved",
@@ -201,6 +229,7 @@ with app.app_context():
     sakura = Item(
         collection_id=naruto.id,
         name="Sakura Haruno",
+        normalized_name="sakura haruno",
         description="Sakura Haruno collectible figure.",
         image="sakura.jpg",
         status="approved",
@@ -210,6 +239,7 @@ with app.app_context():
     kakashi = Item(
         collection_id=naruto.id,
         name="Kakashi Hatake",
+        normalized_name="kakashi hatake",
         description="Kakashi Hatake collectible figure.",
         image="kakashi_test.png",
         status="approved",
@@ -219,6 +249,7 @@ with app.app_context():
     crybaby_love = Item(
         collection_id=crybaby.id,
         name="Crybaby Love",
+        normalized_name="crybaby love",
         description="Crybaby Love collectible figure.",
         image=None,
         status="approved",
@@ -228,6 +259,7 @@ with app.app_context():
     crybaby_angel = Item(
         collection_id=crybaby.id,
         name="Crybaby Angel",
+        normalized_name="crybaby angel",
         description="Crybaby Angel collectible figure.",
         image=None,
         status="approved",
@@ -237,12 +269,28 @@ with app.app_context():
     crybaby_bear = Item(
         collection_id=crybaby.id,
         name="Crybaby Pink Bear",
+        normalized_name="crybaby pink bear",
         description="Crybaby Pink Bear collectible figure.",
         image=None,
         status="approved",
         created_by=admin.id
     )
 
+
+    for item in [
+        pikachu,
+        charizard,
+        eevee,
+        naruto_item,
+        sasuke,
+        sakura,
+        kakashi,
+        crybaby_love,
+        crybaby_angel,
+        crybaby_bear
+    ]:
+        item.normalized_name = normalize_text(item.name)
+    
     db.session.add_all([
         pikachu,
         charizard,
@@ -448,7 +496,8 @@ with app.app_context():
     print("================================")
     print()
     print("Test accounts:")
-    print("admin   / Test1234!")
-    print("alice   / Test1234!")
-    print("bob     / Test1234!")
-    print("charlie / Test1234!")
+    print("admin@collectix.com / Test1234!")
+    print("cngchifei@gmail.com / Test1234!")
+    print("alice@collectix.com / Test1234!")
+    print("bob@collectix.com / Test1234!")
+    print("charlie@collectix.com / Test1234!")

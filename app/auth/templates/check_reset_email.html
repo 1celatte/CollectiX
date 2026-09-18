@@ -49,11 +49,6 @@
         margin: 10px 0;
     }
 
-    .email-text {
-        font-weight: bold;
-        color: #333;
-    }
-
     .btn {
         display: inline-block;
         margin-top: 25px;
@@ -83,22 +78,21 @@
 
 <div class="email-box">
 
-    <div class="email-icon">📧</div>
+    <div class="email-icon">🔐</div>
 
     <h2>Check Your Email</h2>
 
     <p>
-        We have sent a verification link to your email address.
+        We have sent a password reset link to your email address.
     </p>
 
     <p>
-        Please check your inbox and click the verification link
-<<<<<<< HEAD
-        to verify your <span class="email-text">CollectiX</span> account.
+        Please check your inbox and click the link
+        to reset your CollectiX password.
     </p>
 
     <a href="{{ url_for('auth.login') }}" class="btn">
-        Go to Login
+        Back to Login
     </a>
 
     <p class="small-text">
@@ -110,15 +104,3 @@
 </body>
 
 </html>
-=======
-        to verify your CollectiX account.
-    </p>
-
-    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
-        Go to Login
-    </a>
-
-</div>
-
-{% endblock %}
->>>>>>> origin/main
