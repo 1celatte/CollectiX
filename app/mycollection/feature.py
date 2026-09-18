@@ -78,6 +78,7 @@ def view_my_collection(collection_id):
         owned_items=owned_items
     )
 
+<<<<<<< HEAD
 #=======================================================================================================================
 
 # Edit my collection (let useers make items owned or not and set quantity)
@@ -213,4 +214,16 @@ def remove_from_my_collection(collection_id):
     return redirect(
         url_for("my_collection.list_my_collections")
     )
+=======
+
+
+
+
+
+
+
+
+
+
+>>>>>>> origin/main
 
