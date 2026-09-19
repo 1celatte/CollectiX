@@ -212,5 +212,9 @@ def remove_from_my_collection(collection_id):
 
     return redirect(
         url_for("my_collection.list_my_collections")
+<<<<<<< HEAD
     )
 
+=======
+    )
+>>>>>>> coco/admin
