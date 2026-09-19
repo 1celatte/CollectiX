@@ -524,3 +524,27 @@ def add_to_my_collection(collection_id):
             collection_id=collection.id
         )
     )
+    
+# ===========================================================================================================
+
+#View item details
+
+# ============================================================================================================
+@collection_bp.route(
+    "/<int:collection_id>/items/<int:item_id>"
+)
+def view_item(collection_id, item_id):
+
+    collection = Collection.query.get_or_404(collection_id)
+
+    item = Item.query.filter_by(
+        id=item_id,
+        collection_id=collection_id,
+        status="approved"   # only show approved
+    ).first_or_404()
+
+    return render_template(
+        "item_detail.html",
+        collection=collection,
+        item=item
+    )
