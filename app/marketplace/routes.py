@@ -1,11 +1,11 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from app.models import Item, OwnedItem, Listing, Transaction, User
+from app.models import Item, OwnedItem, Listing, Transaction, User, Collection
 from app.extensions import db
 from app.marketplace import marketplace_bp
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-from datetime import timedelta
+from sqlalchemy.orm import aliased  #for transaction history used(show buyer and seller)
+from datetime import timedelta  #for me to change the time to Malaysia Time(cuz default is UTC+0)
 
 #Display all available marketplace listings.
 @marketplace_bp.route("/")
@@ -30,7 +30,8 @@ def marketplace_home():
 #Login is required before the user can access this page.
 @marketplace_bp.route("/create", methods=["GET", "POST"])
 @login_required #(check whether user login or not; if not,system will ask user to login 1st)
-def create_listing(): 
+def create_listing():
+         
     #Get items owned by the currently logged-in user.
     owned_items = Item.query.join(
         OwnedItem,
@@ -40,6 +41,22 @@ def create_listing():
         OwnedItem.quantity > 0
     ).order_by(
         Item.name.asc()
+    ).all()
+    
+    #Store available items under their collection ID.
+    items_by_collection = {}
+    
+    for item in owned_items:
+        items_by_collection.setdefault(
+            item.collection_id,
+            []
+        ).append(item)
+            
+    #Get collections that contain available items to list.
+    collections = Collection.query.filter(
+        Collection.id.in_(list(items_by_collection))
+    ).order_by(
+        Collection.name.asc()
     ).all()
     
     #Only show items that not listed yet
@@ -64,6 +81,8 @@ def create_listing():
         return render_template(
             "marketplace_create.html",
             owned_items=owned_items,
+            collections=collections,
+            items_by_collection=items_by_collection,
             error=message
         )
         
@@ -71,7 +90,9 @@ def create_listing():
     if request.method == "GET":
             return render_template(
                 "marketplace_create.html",
-                owned_items=owned_items
+                owned_items=owned_items,
+                collections=collections,
+                items_by_collection=items_by_collection
             )
     
     #Read the values submitted by the user.

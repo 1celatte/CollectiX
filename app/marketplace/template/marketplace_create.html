@@ -25,11 +25,15 @@ Create Marketplace Listing
     <select id="item_id" name="item_id">
         <option value="">Select an item</option>
 
-        <!--Show only items owned by the logged-in user-->
-        {% for item in owned_items %}
-        <option value="{{ item.id }}">
-            {{ item.name }}
-        </option>
+        <!--Show collection, follow by all the items-->
+        {% for collection in collections %}
+        <optgroup label="{{ collection.name }}">
+            {% for item in items_by_collection[collection.id] %}
+            <option value="{{ item.id }}">
+                {{ item.name }}
+            </option>
+            {% endfor %}
+        </optgroup>
         {% endfor %}
     </select>
 
@@ -42,7 +46,7 @@ Create Marketplace Listing
 
     <br><br>
 
-    <!--User selects the item's condition (temporary right now)-->
+    <!--User selects the item's condition-->
     <label for="condition">Condition:</label>
 
     <select id="condition" name="condition">
