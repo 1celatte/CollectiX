@@ -1,81 +1,211 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Manage Collections - CollectiX{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
+    <title>Manage Collections - CollectiX</title>
+</head>
+
+<body>
 
 <h1>Manage Collections</h1>
 
-{% for collection in collections %}
+<table>
 
-    <div>
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Collection</th>
+            <th>Tag</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
 
-        <h2>
-            <a href="{{ url_for('admin.collection_items', collection_id=collection.id) }}">
-                {{ collection.name }}
-            </a>
-        </h2>
+    <tbody>
 
-        <p>{{ collection.description }}</p>
+        {% for collection in collections %}
 
-        <p>Status: {{ collection.status }}</p>
+        <tr>
 
-        <a href="{{ url_for('admin.edit_collection', collection_id=collection.id) }}">
-            <button type="button">
-                Edit
-            </button>
-        </a>
+            <!-- Image -->
+            <td>
+                {% if collection.image %}
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' + collection.image
+                        ) }}"
+                        alt="{{ collection.name }}"
+                        style="
+                            width: 100px;
+                            height: 100px;
+                            object-fit: cover;
+                        "
+                    >
+                {% else %}
+                    --
+                {% endif %}
+            </td>
 
-        <button type="button"
-                class="remove-btn"
-                popovertarget="deleteCollection{{ collection.id }}">
-            Remove
-        </button>
+            <!-- Collection -->
+            <td>
+                <a href="{{ url_for(
+                    'admin.collection_items',
+                    collection_id=collection.id
+                ) }}">
+                    {{ collection.name }}
+                </a>
+            </td>
 
-        <div id="deleteCollection{{ collection.id }}"
-             popover
-             class="delete-popup">
+            <!-- Tag -->
+            <td>
+                {% if collection.tag %}
+                    {{ collection.tag.name }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
 
-            <div class="delete-box">
+            <!-- Description -->
+            <td>
+                {% if collection.description %}
+                    {{ collection.description }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
 
-                <p>
-                    Are you sure you want to delete this collection?
-                </p>
+            <!-- Status -->
+            <td>
+                {{ collection.status }}
+            </td>
 
-                <form method="POST"
-                      action="{{ url_for('admin.remove_collection', collection_id=collection.id) }}">
+            <!-- Action -->
+            <td>
 
-                    <button type="submit"
-                            class="delete-confirm">
-                        Yes
+                <a href="{{ url_for(
+                    'admin.edit_collection',
+                    collection_id=collection.id
+                ) }}">
+                    <button type="button" class="edit-btn">
+                        Edit
                     </button>
+                </a>
 
-                    <button type="button"
-                            class="cancel-btn"
-                            popovertarget="deleteCollection{{ collection.id }}"
-                            popovertargetaction="hide">
-                        Cancel
-                    </button>
+                <button
+                    type="button"
+                    class="remove-btn"
+                    popovertarget="deleteCollection{{ collection.id }}"
+                >
+                    Remove
+                </button>
 
-                </form>
+                <div
+                    id="deleteCollection{{ collection.id }}"
+                    popover
+                    class="delete-popup"
+                >
 
-            </div>
+                    <div class="delete-box">
 
-        </div>
+                        <p>
+                            Are you sure you want to delete this collection?
+                        </p>
 
-    </div>
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin.remove_collection',
+                                collection_id=collection.id
+                            ) }}"
+                        >
 
-    <hr>
+                            <button
+                                type="submit"
+                                class="delete-confirm"
+                            >
+                                Yes
+                            </button>
 
-{% endfor %}
+                            <button
+                                type="button"
+                                class="cancel-btn"
+                                popovertarget="deleteCollection{{ collection.id }}"
+                                popovertargetaction="hide"
+                            >
+                                Cancel
+                            </button>
 
-<a href="{{ url_for('admin.dashboard') }}"
-   class="btn btn-secondary">
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+<br>
+
+<a
+    href="{{ url_for('admin.dashboard') }}"
+    class="back-btn"
+>
     Back to Dashboard
 </a>
 
-
 <style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    td img {
+        display: block;
+    }
+
+    .edit-btn {
+        padding: 6px 15px;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .edit-btn:hover {
+        background-color: #0b5ed7;
+    }
 
     .remove-btn {
         display: inline-block;
@@ -121,7 +251,20 @@
         margin-left: 5px;
     }
 
+    .back-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .back-btn:hover {
+        background-color: #5c636a;
+    }
+
 </style>
 
-{% endblock %}
-
+</body>
+</html>

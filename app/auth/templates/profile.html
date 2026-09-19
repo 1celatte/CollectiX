@@ -26,7 +26,13 @@ My Profile - CollectiX
 
 <h2>My Collection</h2>
 
-<button type="button">View My Collection</button>
+<a href="{{ url_for('my_collection.list_my_collections') }}">
+    <button type="button">View My Collection</button>
+</a>
+
+<a href="{{ url_for('marketplace.my_listings') }}">
+    <button type="button">View My Listing</button>
+</a>
 
 <a href="{{ url_for('auth.edit_profile') }}">
     <button>Edit Profile</button>

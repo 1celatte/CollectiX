@@ -31,7 +31,7 @@ def test_auth():
 
 @auth.route("/test-email")
 def test_email():
-    msg = Message(
+    msg = Message(  #建立email
         subject="CollectiX Email Test",
         sender=mail.username,
         recipients=["cngchifei@gmail.com"]
@@ -39,7 +39,7 @@ def test_email():
 
     msg.body = "This is a test email from CollectiX."
 
-    mail.send(msg)
+    mail.send(msg) #发出去
 
     return "Test email sent!"
 
@@ -262,7 +262,7 @@ def profile():
 @login_required
 def edit_profile():
     if request.method == "POST":
-        name = request.form.get("name")
+        name = request.form.get("name", "").strip()
         profile_picture = request.files.get("profile_picture")
         remove_profile_picture = request.form.get("remove_profile_picture") == "1"
 
@@ -297,7 +297,8 @@ def edit_profile():
 
             current_user.profile_picture = f"uploads/avatars/{filename}"
 
-        current_user.name = name
+        if name:
+            current_user.name = name
 
         db.session.commit()
 
@@ -440,6 +441,6 @@ def reset_password(token):
 
         db.session.commit()
 
-        return redirect(url_for("auth.login"))
+        return render_template( "reset_password_success.html")
 
     return render_template("reset_password.html")

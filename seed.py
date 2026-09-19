@@ -14,6 +14,7 @@ from app.models import (
     Trade
 )
 from werkzeug.security import generate_password_hash
+from app.utils import normalize_text
 
 
 app = create_app()
@@ -54,6 +55,14 @@ with app.app_context():
         email_verified=True
     )
 
+    admin2 = User(
+        name="coco",
+        email="cngchifei@gmail.com",
+        password=generate_password_hash("Test1234!"),
+        role="admin",
+        email_verified=True
+    )
+
     alice = User(
         name="alice",
         email="alice@collectix.com",
@@ -80,6 +89,7 @@ with app.app_context():
 
     db.session.add_all([
         admin,
+        admin2,
         alice,
         bob,
         charlie
@@ -150,6 +160,9 @@ with app.app_context():
         created_by=admin.id
     )
 
+    for collection in [pokemon, naruto, crybaby]:
+        collection.normalized_name = normalize_text(collection.name)
+    
     db.session.add_all([
         pokemon,
         naruto,
@@ -263,6 +276,21 @@ with app.app_context():
         created_by=admin.id
     )
 
+
+    for item in [
+        pikachu,
+        charizard,
+        eevee,
+        naruto_item,
+        sasuke,
+        sakura,
+        kakashi,
+        crybaby_love,
+        crybaby_angel,
+        crybaby_bear
+    ]:
+        item.normalized_name = normalize_text(item.name)
+    
     db.session.add_all([
         pikachu,
         charizard,
@@ -468,7 +496,8 @@ with app.app_context():
     print("================================")
     print()
     print("Test accounts:")
-    print("admin   / Test1234!")
-    print("alice   / Test1234!")
-    print("bob     / Test1234!")
-    print("charlie / Test1234!")
+    print("admin@collectix.com / Test1234!")
+    print("cngchifei@gmail.com / Test1234!")
+    print("alice@collectix.com / Test1234!")
+    print("bob@collectix.com / Test1234!")
+    print("charlie@collectix.com / Test1234!")

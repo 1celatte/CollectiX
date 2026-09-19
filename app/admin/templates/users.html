@@ -1,17 +1,24 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Manage Users - CollectiX{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
+    <title>Manage Users - CollectiX</title>
+</head>
+
+<body>
 
 <h1>Manage Users</h1>
 
-<table class="table table-bordered">
+<table>
 
     <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Profile Picture</th>
             <th>Email</th>
             <th>Role</th>
             <th>Action</th>
@@ -23,24 +30,46 @@
         {% for user in users %}
 
         <tr>
+
             <td>{{ user.id }}</td>
+
             <td>{{ user.name }}</td>
+
+            <td>
+                {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
+                    <img src="{{ url_for('auth.static', filename='uploads/avatars/' + user.profile_picture) }}"
+                        width="60"
+                        height="60"
+                        style="object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                        width="60"
+                        height="60"
+                        style="object-fit: cover; border-radius: 50%;">
+                {% endif %}
+            </td>
+
             <td>{{ user.email }}</td>
+
             <td>{{ user.role }}</td>
 
             <td>
 
                 {% if user.role != "admin" %}
 
-                <button type="button"
-                        class="remove-btn"
-                        popovertarget="deleteUser{{ user.id }}">
+                <button
+                    type="button"
+                    class="remove-btn"
+                    popovertarget="deleteUser{{ user.id }}"
+                >
                     Delete
                 </button>
 
-                <div id="deleteUser{{ user.id }}"
-                     popover
-                     class="delete-popup">
+                <div
+                    id="deleteUser{{ user.id }}"
+                    popover
+                    class="delete-popup"
+                >
 
                     <div class="delete-box">
 
@@ -48,18 +77,27 @@
                             Are you sure you want to delete this user?
                         </p>
 
-                        <form action="{{ url_for('admin.remove_user', user_id=user.id) }}"
-                              method="POST">
+                        <form
+                            action="{{ url_for(
+                                'admin.remove_user',
+                                user_id=user.id
+                            ) }}"
+                            method="POST"
+                        >
 
-                            <button type="submit"
-                                    class="delete-confirm">
+                            <button
+                                type="submit"
+                                class="delete-confirm"
+                            >
                                 Yes
                             </button>
 
-                            <button type="button"
-                                    class="cancel-btn"
-                                    popovertarget="deleteUser{{ user.id }}"
-                                    popovertargetaction="hide">
+                            <button
+                                type="button"
+                                class="cancel-btn"
+                                popovertarget="deleteUser{{ user.id }}"
+                                popovertargetaction="hide"
+                            >
                                 Cancel
                             </button>
 
@@ -71,11 +109,12 @@
 
                 {% else %}
 
-                -
+                    -
 
                 {% endif %}
 
             </td>
+
         </tr>
 
         {% endfor %}
@@ -84,11 +123,43 @@
 
 </table>
 
-<a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+<br>
+
+<a
+    href="{{ url_for('admin.dashboard') }}"
+    class="back-btn"
+>
     Back to Dashboard
 </a>
 
+
 <style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+
+    /* Delete button */
 
     .remove-btn {
         display: inline-block;
@@ -100,11 +171,21 @@
         cursor: pointer;
     }
 
+    .remove-btn:hover {
+        background-color: #bb2d3b;
+    }
+
+
+    /* Popup */
+
     .delete-popup {
         padding: 0;
         border: none;
         background: transparent;
     }
+
+
+    /* Popup box */
 
     .delete-box {
         background-color: white;
@@ -115,6 +196,9 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
+
+    /* Yes button */
+
     .delete-confirm {
         padding: 6px 15px;
         background-color: #dc3545;
@@ -123,6 +207,9 @@
         border-radius: 4px;
         cursor: pointer;
     }
+
+
+    /* Cancel button */
 
     .cancel-btn {
         padding: 6px 15px;
@@ -134,7 +221,28 @@
         margin-left: 5px;
     }
 
+    .cancel-btn:hover {
+        background-color: #5c636a;
+    }
+
+
+    /* Back button */
+
+    .back-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .back-btn:hover {
+        background-color: #5c636a;
+    }
+
 </style>
 
-{% endblock %}
+</body>
+</html>
 

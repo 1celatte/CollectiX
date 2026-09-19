@@ -1,34 +1,69 @@
-{% extends "base.html" %}
+<!DOCTYPE html> 
+<html lang="en"> 
+    
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    
+    <title>Confirm Your Email</title> 
+    
+    <style> 
+        body { 
+            font-family: Arial, 
+            sans-serif; text-align: center; 
+            padding-top: 100px; 
+        } 
+        
+        .confirm-box { 
+            max-width: 500px; 
+            margin: auto; 
+        } 
+        
+        button { 
+            padding: 10px 20px; 
+            background-color: #0d6efd; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        } 
+        
+        button:hover { 
+            background-color: #0b5ed7; 
+        } 
+    </style> 
+        
+</head>
 
-{% block title %}Confirm Your Email{% endblock %}
+<body>
 
-{% block content %}
+    <div class="confirm-box">
 
-<div class="text-center">
+        <h2>Confirm Your Email</h2>
 
-    <h2>Confirm Your Email</h2>
+        <p>
+            You are verifying this email address:
+        </p>
 
-    <p>
-        You are verifying this email address:
-    </p>
+        <p>
+            <strong>{{ email }}</strong>
+        </p>
 
-    <p>
-        <strong>{{ email }}</strong>
-    </p>
+        <p>
+            Is this you?
+        </p>
 
-    <p>
-        Is this you?
-    </p>
+        <form method="POST"
+            action="{{ url_for('auth.confirm_email', token=token) }}">
 
-    <form method="POST"
-          action="{{ url_for('auth.confirm_email', token=token) }}">
+            <button type="submit" class="btn btn-primary">
+                Yes, this is me
+            </button>
 
-        <button type="submit" class="btn btn-primary">
-            Yes, this is me
-        </button>
+        </form>
 
-    </form>
+    </div>
 
-</div>
+</body>
 
-{% endblock %}
+</html>
