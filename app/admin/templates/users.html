@@ -18,6 +18,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Profile Picture</th>
             <th>Email</th>
             <th>Role</th>
             <th>Action</th>
@@ -33,6 +34,20 @@
             <td>{{ user.id }}</td>
 
             <td>{{ user.name }}</td>
+
+            <td>
+                {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
+                    <img src="{{ url_for('auth.static', filename='uploads/avatars/' + user.profile_picture) }}"
+                        width="60"
+                        height="60"
+                        style="object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                        width="60"
+                        height="60"
+                        style="object-fit: cover; border-radius: 50%;">
+                {% endif %}
+            </td>
 
             <td>{{ user.email }}</td>
 
