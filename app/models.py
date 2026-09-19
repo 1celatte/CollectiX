@@ -17,45 +17,9 @@ class User(UserMixin, db.Model):
     password_reset_token = db.Column(db.String(255), nullable=True)
     password_reset_expires_at = db.Column(db.DateTime, nullable=True)
     role = db.Column(db.String(20), default="user", nullable=False)
-
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_picture = db.Column(db.String(255), nullable=True)
 
-    profile_picture = db.Column(db.String(255), nullable=True)
-
-
-# ==========================================
-# Tag
-# ==========================================
-
-class Tag(db.Model):
-    __tablename__ = "tags"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    name = db.Column(
-        db.String(80),
-        unique=True,
-        nullable=False
-    )
-
-    normalized_name = db.Column(
-        db.String(80),
-        unique=True,
-        nullable=False
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
-
-# ==========================================
-# Collection
-# ==========================================
 
 # ==========================================
 # Tag
