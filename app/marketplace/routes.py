@@ -46,22 +46,6 @@ def create_listing():
         Item.name.asc()
     ).all()
     
-    #Store available items under their collection ID.
-    items_by_collection = {}
-    
-    for item in owned_items:
-        items_by_collection.setdefault(
-            item.collection_id,
-            []
-        ).append(item)
-            
-    #Get collections that contain available items to list.
-    collections = Collection.query.filter(
-        Collection.id.in_(list(items_by_collection))
-    ).order_by(
-        Collection.name.asc()
-    ).all()
-    
     #Only show items that not listed yet
     available_items = []
 
@@ -72,13 +56,35 @@ def create_listing():
             Listing.status.in_(["available", "pending", "unavailable"])
         ).count()
 
-        #Add the item only when it has no active listing
-        if active_listing_count == 0:
+        #Get the quantity the current user owns for this item.
+        owned_item = OwnedItem.query.filter_by(
+            user_id=current_user.id,
+            item_id=item.id
+        ).first()
+
+        #Show the item while the user has more copies than active listings.
+        if owned_item and active_listing_count < owned_item.quantity:
             available_items.append(item)
 
     #The HTML dropdown will use this filtered item list.
     owned_items = available_items
     
+    #Store available items under their collection ID.
+    items_by_collection = {}
+            
+    for item in owned_items:
+        items_by_collection.setdefault(
+            item.collection_id,
+            []
+        ).append(item)
+                    
+    #Get collections that contain available items to list.
+    collections = Collection.query.filter(
+        Collection.id.in_(list(items_by_collection))
+    ).order_by(
+        Collection.name.asc()
+    ).all()
+        
     #Show the create form again with an error message.
     def show_form_error(message):
         return render_template(
@@ -89,7 +95,7 @@ def create_listing():
             error=message
         )
         
-    #When the user first time open the page, show the form
+    #When the user first time open the create listing page, show the form
     if request.method == "GET":
             return render_template(
                 "marketplace_create.html",
@@ -149,10 +155,10 @@ def create_listing():
         Listing.status.in_(["available", "pending", "unavailable"])
     ).count()
 
-    #Prevent the user from creating multiple listings at the same time
-    if active_listing_count > 0:
+    #Prevent listings from exceeding the quantity the user owns.
+    if active_listing_count >= owned_item.quantity:
         return show_form_error(
-            "This item already has an active listing."
+            "You have already listed all copies of this item."
         )
     
     #Convert the price text into a number before saving.
@@ -460,7 +466,41 @@ def purchase_listing(listing_id):
             listing=listing,
             item=item
         )
+    
+    #Get the seller's owned item record.
+    seller_owned_item = OwnedItem.query.filter_by(
+        user_id=listing.user_id,
+        item_id=item.id
+    ).first_or_404()
 
+    #Stop the purchase if the seller no longer owns this item.
+    if seller_owned_item.quantity <= 0:
+        return "The item is unavailable right now!."
+
+    #Reduce the seller's quantity by one.
+    seller_owned_item.quantity -= 1
+    
+    #Remove the ownership record when the seller has no copies left.
+    if seller_owned_item.quantity == 0:
+        db.session.delete(seller_owned_item)
+
+    #Find whether the buyer already owns this item.
+    buyer_owned_item = OwnedItem.query.filter_by(
+        user_id=current_user.id,
+        item_id=item.id
+    ).first()
+
+    #Add one item to the buyer's collection.
+    if buyer_owned_item:
+        buyer_owned_item.quantity += 1
+    else:
+        buyer_owned_item = OwnedItem(
+            user_id=current_user.id,
+            item_id=item.id,
+            quantity=1
+        )
+        db.session.add(buyer_owned_item)
+        
     #POST: create a completed transaction record.
     new_transaction = Transaction(
         listing_id=listing.id,
