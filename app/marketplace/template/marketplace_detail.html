@@ -12,6 +12,19 @@ Marketplace Listing
 <!--Show the collectible item name-->
 <h2>{{ item.name }}</h2>
 
+{% if listing.image %}
+<img
+    src="{{ url_for(
+        'marketplace.static',
+        filename='uploads/listings/' ~ listing.image
+    ) }}"
+    alt="{{ item.name }}"
+    style="max-width: 400px; max-height: 400px; object-fit: contain;"
+>
+{% else %}
+<p>No image available.</p>
+{% endif %}
+
 <!--Show the type of listing: Sell or Trade-->
 <p>
     Listing Type: <strong>{{ listing.listing_type|title }}</strong>

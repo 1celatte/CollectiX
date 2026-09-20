@@ -5,7 +5,10 @@ from app.extensions import db
 from app.marketplace import marketplace_bp
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased  #for transaction history used(show buyer and seller)
-from datetime import timedelta  #for me to change the time to Malaysia Time(cuz default is UTC+0)
+from datetime import timedelta  #to change the time to Malaysia Time(cuz default is UTC+0)
+import os  #create the image folder and file path
+from uuid import uuid4  #give each uploaded image a unique filename
+from werkzeug.utils import secure_filename  #make the uploaded filename safe
 
 #Display all available marketplace listings.
 @marketplace_bp.route("/")
@@ -101,6 +104,20 @@ def create_listing():
     listing_type = request.form.get("listing_type")
     description = request.form.get("description")
     price = request.form.get("price")
+    
+    #Get the image file selected by the user.
+    image_file = request.files.get("image")
+    
+    image_filename = None
+
+    if image_file and image_file.filename:
+        original_filename = secure_filename(
+            image_file.filename
+        )
+
+        image_filename = (
+            f"{uuid4().hex}_{original_filename}"
+        )
 
     #Check that the user selected an item.
     if not item_id:
@@ -173,6 +190,7 @@ def create_listing():
         price=listing_price,
         condition=condition,
         description=description,
+        image=image_filename,
         status="available"
     )
 
@@ -180,6 +198,27 @@ def create_listing():
     db.session.add(new_listing)
     db.session.commit()
 
+    #Save the uploaded image file in the app static folder.
+    if image_file and image_filename:
+        upload_folder = os.path.join(
+            marketplace_bp.root_path,
+            "static",
+            "uploads",
+            "listings"
+        )
+
+        os.makedirs(
+            upload_folder,
+            exist_ok=True
+        )
+
+        image_file.save(
+            os.path.join(
+                upload_folder,
+                image_filename
+            )
+        )
+        
     return redirect(
         url_for("marketplace.my_listings")
     )
@@ -276,9 +315,25 @@ def delete_listing(listing_id):
         user_id=current_user.id
     ).first_or_404()
 
+    #Remember the image filename before deleting the listing.
+    image_filename = listing.image
+    
     #Remove the listing record from the database.
     db.session.delete(listing)
     db.session.commit()
+    
+    #Remove the uploaded image file if this listing has one.
+    if image_filename:
+        image_path = os.path.join(
+            marketplace_bp.root_path,
+            "static",
+            "uploads",
+            "listings",
+            image_filename
+        )
+
+        if os.path.exists(image_path):
+            os.remove(image_path)
 
     #Return the user to My Listings page.
     return redirect(

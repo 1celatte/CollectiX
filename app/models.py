@@ -388,6 +388,8 @@ class Listing(db.Model):
     )
 
     description = db.Column(db.Text)
+    
+    image = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),

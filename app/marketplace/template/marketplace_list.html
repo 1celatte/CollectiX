@@ -25,6 +25,25 @@ View Marketplace
     <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
 
+            {% if listing.image %}
+            <img
+                src="{{ url_for(
+                    'marketplace.static',
+                    filename='uploads/listings/' ~ listing.image
+                ) }}"
+                alt="{{ item.name }}"
+                class="card-img-top"
+                style="height: 220px; object-fit: cover;"
+            >
+            {% else %}
+            <div
+                class="bg-light d-flex align-items-center justify-content-center text-muted"
+                style="height: 220px;"
+            >
+                No image available
+            </div>
+            {% endif %}
+
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
 
