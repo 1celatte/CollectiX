@@ -19,6 +19,12 @@ My Listings
     View Transaction History
 </a>
 
+<br><br>
+
+<a href="{{ url_for('marketplace.payment_requests') }}" class="btn btn-outline-primary">
+    Review Payment Requests
+</a>
+
 {% if listings %}
 
 {% for listing, item in listings %}
@@ -31,9 +37,7 @@ My Listings
 <img src="{{ url_for(
         'marketplace.static',
         filename='uploads/listings/' ~ listing.image
-    ) }}" 
-    alt="{{ item.name }}" 
-    style="width: 200px; height: 200px; object-fit: cover;">
+    ) }}" alt="{{ item.name }}" style="width: 200px; height: 200px; object-fit: cover;">
 {% else %}
 <p>No image available.</p>
 {% endif %}
@@ -88,6 +92,7 @@ My Listings
 
 {% endif %}
 
+{% if listing.status in ("available", "unavailable") %}
 <!--Open the edit page for this listing-->
 <a href="{{ url_for(
     'marketplace.edit_listing',
@@ -102,6 +107,8 @@ My Listings
     onsubmit="return confirm('Are you sure you want to delete this listing?')">
     <button type="submit">Delete</button>
 </form>
+
+{% endif %}
 
 {% endfor %}
 

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Payment Proof
+{% endblock %}
+
+{% block content %}
+
+<h1>Complete Payment</h1>
+
+<p>
+    Upload your payment proof after making payment.
+</p>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="card p-4 mt-4">
+
+    <h2 class="h4">{{ item.name }}</h2>
+
+    <p>
+        Price:
+        <strong>RM {{ "%.2f"|format(transaction.price) }}</strong>
+    </p>
+
+    <p>
+        Transaction status:
+        <strong>{{ transaction.status|replace("_", " ")|title }}</strong>
+    </p>
+
+    <hr>
+
+    <h3 class="h5">Payment Instructions</h3>
+
+    <div
+        class="bg-light border rounded d-flex align-items-center justify-content-center text-muted mb-3"
+        style="width: 180px; height: 180px;"
+    >
+        Seller QR Code<br>(Demo)
+    </div>
+
+    <p class="text-muted">
+        Scan the seller's DuitNow QR, make payment, then upload a screenshot as proof.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <label for="payment_proof" class="form-label">
+            Payment Proof Image
+        </label>
+
+        <input
+            type="file"
+            id="payment_proof"
+            name="payment_proof"
+            accept="image/*"
+            class="form-control"
+            required
+        >
+
+        <button type="submit" class="btn btn-primary mt-3">
+            Submit Payment Proof
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

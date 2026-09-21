@@ -434,6 +434,8 @@ class Transaction(db.Model):
     )
 
     price = db.Column(db.Float, nullable=False)
+    
+    payment_proof = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),

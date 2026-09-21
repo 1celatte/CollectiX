@@ -467,60 +467,269 @@ def purchase_listing(listing_id):
             item=item
         )
     
-    #Get the seller's owned item record.
-    seller_owned_item = OwnedItem.query.filter_by(
-        user_id=listing.user_id,
-        item_id=item.id
-    ).first_or_404()
-
-    #Stop the purchase if the seller no longer owns this item.
-    if seller_owned_item.quantity <= 0:
-        return "The item is unavailable right now!."
-
-    #Reduce the seller's quantity by one.
-    seller_owned_item.quantity -= 1
-    
-    #Remove the ownership record when the seller has no copies left.
-    if seller_owned_item.quantity == 0:
-        db.session.delete(seller_owned_item)
-
-    #Find whether the buyer already owns this item.
-    buyer_owned_item = OwnedItem.query.filter_by(
-        user_id=current_user.id,
-        item_id=item.id
-    ).first()
-
-    #Add one item to the buyer's collection.
-    if buyer_owned_item:
-        buyer_owned_item.quantity += 1
-    else:
-        buyer_owned_item = OwnedItem(
-            user_id=current_user.id,
-            item_id=item.id,
-            quantity=1
-        )
-        db.session.add(buyer_owned_item)
-        
-    #POST: create a completed transaction record.
+    #POST: create a transaction that is waiting for payment.
     new_transaction = Transaction(
         listing_id=listing.id,
         buyer_id=current_user.id,
         seller_id=listing.user_id,
         item_id=item.id,
         price=listing.price,
-        status="completed"
+        status="awaiting_payment"
     )
 
-    #Change the listing so it cannot be purchased again.
-    listing.status = "sold"
+    #Listing status will change to pending (when seller view my-listings)
+    listing.status = "pending"
 
-    #Save both the transaction and listing status together.
     db.session.add(new_transaction)
     db.session.commit()
 
-    return "Purchase completed successfully."
+    #Send the buyer to upload payment proof.
+    return redirect(
+        url_for(
+            "marketplace.upload_payment_proof",
+            transaction_id=new_transaction.id
+        )
+    )
+    
+#Buyer uploads payment proof for a pending transaction.
+@marketplace_bp.route(
+    "/transactions/<int:transaction_id>/payment-proof",
+    methods=["GET", "POST"]
+)
+@login_required
+def upload_payment_proof(transaction_id):
+
+    #Only the buyer of this transaction can upload proof.
+    transaction = Transaction.query.filter_by(
+        id=transaction_id,
+        buyer_id=current_user.id
+    ).first_or_404()
+
+    item = Item.query.get_or_404(
+        transaction.item_id
+    )
+
+    #Buyer may submit the proof that they paid
+    if transaction.status not in (
+        "awaiting_payment",
+        "payment_rejected"
+    ):
+        return "This payment request cannot accept a new proof."
+    
+    #Show the payment proof page again with an error.
+    def show_proof_error(message):
+        return render_template(
+            "payment_proof_upload.html",
+            transaction=transaction,
+            item=item,
+            error=message
+        )
+
+    #GET: show the upload payment proof page.
+    if request.method == "GET":
+        return render_template(
+            "payment_proof_upload.html",
+            transaction=transaction,
+            item=item
+        )
+        
+    #POST: get the payment proof selected by the buyer.
+    proof_file = request.files.get("payment_proof")
+
+    if not proof_file or not proof_file.filename:
+        return show_proof_error(
+            "Please select a payment proof image."
+        )
+
+    #Create a safe and unique filename.
+    original_filename = secure_filename(
+        proof_file.filename
+    )
+
+    proof_filename = (
+        f"{uuid4().hex}_{original_filename}"
+    )
+
+    #Save the proof image in the Marketplace static folder.
+    upload_folder = os.path.join(
+        marketplace_bp.root_path,
+        "static",
+        "uploads",
+        "payment_proofs"
+    )
+
+    os.makedirs(
+        upload_folder,
+        exist_ok=True
+    )
+
+    proof_file.save(
+        os.path.join(
+            upload_folder,
+            proof_filename
+        )
+    )
+
+    #Save the proof filename and send it to the seller for review.
+    transaction.payment_proof = proof_filename
+    transaction.status = "payment_submitted"
+
+    db.session.commit()
+    
+    return redirect(
+        url_for("marketplace.transaction_history")
+    )
+    
+#Buyer cancel purchase (after seller reject)
+@marketplace_bp.route(
+    "/transactions/<int:transaction_id>/cancel",
+    methods=["POST"]
+)
+@login_required
+def cancel_purchase(transaction_id):
+
+    #Only the buyer can cancel a transaction that is awaiting payment.
+    transaction = Transaction.query.filter(
+        Transaction.id == transaction_id,
+        Transaction.buyer_id == current_user.id,
+        Transaction.status.in_([
+            "awaiting_payment",
+            "payment_rejected"
+        ])
+    ).first_or_404()
+
+    #Make the listing visible in Marketplace again.
+    listing = Listing.query.get_or_404(
+        transaction.listing_id
+    )
+
+    transaction.status = "cancelled"
+    listing.status = "available"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.transaction_history")
+    )
+    
+#Show payment proof waiting for the current seller to review.
+@marketplace_bp.route("/payment-requests")
+@login_required
+def payment_requests():
+
+    Buyer = aliased(User)
+
+    #Get the payment proof submmitted by the buyer
+    requests = db.session.query(
+        Transaction,
+        Item,
+        Buyer
+    ).join(
+        Item,
+        Transaction.item_id == Item.id
+    ).join(
+        Buyer,
+        Transaction.buyer_id == Buyer.id
+    ).filter(
+        Transaction.seller_id == current_user.id,
+        Transaction.status == "payment_submitted"
+    ).order_by(
+        Transaction.created_at.desc()
+    ).all()
+
+    return render_template(
+        "payment_requests.html",
+        requests=requests
+    )
+
+#If seller approves a submitted payment proof.
+@marketplace_bp.route(
+    "/transactions/<int:transaction_id>/approve",
+    methods=["POST"]
+)
+@login_required
+def approve_payment(transaction_id):
+
+    #Only the seller can approve a submitted payment.
+    transaction = Transaction.query.filter_by(
+        id=transaction_id,
+        seller_id=current_user.id,
+        status="payment_submitted"
+    ).first_or_404()
+
+    listing = Listing.query.get_or_404(
+        transaction.listing_id
+    )
+
+    item = Item.query.get_or_404(
+        transaction.item_id
+    )
+
+    #Get and reduce the seller's owned quantity.
+    seller_owned_item = OwnedItem.query.filter_by(
+        user_id=transaction.seller_id,
+        item_id=item.id
+    ).first_or_404()
+
+    if seller_owned_item.quantity <= 0:
+        return "The seller no longer has this item available."
+
+    seller_owned_item.quantity -= 1
+
+    if seller_owned_item.quantity == 0:
+        db.session.delete(seller_owned_item)
+
+    #Give one copy to the buyer.
+    buyer_owned_item = OwnedItem.query.filter_by(
+        user_id=transaction.buyer_id,
+        item_id=item.id
+    ).first()
+
+    if buyer_owned_item:
+        buyer_owned_item.quantity += 1
+    else:
+        buyer_owned_item = OwnedItem(
+            user_id=transaction.buyer_id,
+            item_id=item.id,
+            quantity=1
+        )
+        db.session.add(buyer_owned_item)
+
+    #all done
+    transaction.status = "completed"
+    listing.status = "sold"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.payment_requests")
+    )
 
 
+#If seller rejects a submitted payment proof.
+@marketplace_bp.route(
+    "/transactions/<int:transaction_id>/reject",
+    methods=["POST"]
+)
+@login_required
+def reject_payment(transaction_id):
+
+    #Only the seller can reject a submitted payment.
+    transaction = Transaction.query.filter_by(
+        id=transaction_id,
+        seller_id=current_user.id,
+        status="payment_submitted"
+    ).first_or_404()
+
+    #Keep the listing reserved while the buyer uploads a new proof.
+    transaction.status = "payment_rejected"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.payment_requests")
+    )
+     
 #TRANSACTION HISTORY
 #Show transactions where the current user is the buyer or seller.
 @marketplace_bp.route("/transactions")
@@ -554,7 +763,7 @@ def transaction_history():
     ).order_by(
         Transaction.created_at.desc()
     ).all()
-
+    
     #Send all transaction information to the history page.
     return render_template(
         "marketplace_history.html",
