@@ -55,6 +55,13 @@
 
             <td>
 
+                <a
+                    href="{{ url_for('admin.user_details', user_id=user.id) }}"
+                    class="view-btn"
+                >
+                    View Details
+                </a>
+
                 {% if user.role != "admin" %}
 
                 <button

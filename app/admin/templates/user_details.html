@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}
+User Details - CollectiX
+{% endblock %}
+
+{% block content %}
+
+<h1>User Details</h1>
+
+<br>
+
+<a
+href="{{ url_for('admin.users') }}"
+class="back-btn"
+
+>
+
+Back to Users
+
+</a>
+
+<br><br>
+
+<!-- User Information -->
+
+<h2>User Information</h2>
+
+<div class="user-info">
+
+{% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
+
+    <img
+        src="{{ url_for('auth.static', filename=user.profile_picture) }}"
+        width="100"
+        height="100"
+        style="
+            object-fit: cover;
+            border-radius: 50%;
+        "
+    >
+
+{% else %}
+
+    <img
+        src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+        width="100"
+        height="100"
+        style="
+            object-fit: cover;
+            border-radius: 50%;
+        "
+    >
+
+{% endif %}
+
+<br><br>
+
+<p>
+    <strong>User ID:</strong>
+    {{ user.id }}
+</p>
+
+<p>
+    <strong>Name:</strong>
+    {{ user.name }}
+</p>
+
+<p>
+    <strong>Email:</strong>
+    {{ user.email }}
+</p>
+
+<p>
+    <strong>Role:</strong>
+    {{ user.role }}
+</p>
+
+<p>
+    <strong>Account Status:</strong>
+
+    {% if user.is_banned %}
+        Banned
+    {% else %}
+        Active
+    {% endif %}
+
+</p>
+
+<p>
+    <strong>Account Created:</strong>
+    {{ user.created_at }}
+</p>
+
+{% if user.is_banned %}
+
+    <p>
+        <strong>Ban Reason:</strong>
+        {{ user.ban_reason }}
+    </p>
+
+{% endif %}
+
+</div>
+
+<hr>
+
+<!-- Collection Activity -->
+
+<h2>Collection Activity</h2>
+
+<p>
+    <strong>Collections Created:</strong>
+    {{ collections|length }}
+</p>
+
+{% if collections %}
+
+<table class="table">
+
+<thead>
+
+    <tr>
+        <th>Collection ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Created At</th>
+    </tr>
+
+</thead>
+
+<tbody>
+
+    {% for collection in collections %}
+
+    <tr>
+
+        <td>
+            {{ collection.id }}
+        </td>
+
+        <td>
+            {{ collection.name }}
+        </td>
+
+        <td>
+            {{ collection.status }}
+        </td>
+
+        <td>
+            {{ collection.created_at }}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<p>
+    No collections created.
+</p>
+
+{% endif %}
+
+<hr>
+
+<!-- Submission History -->
+
+<h2>Submission History</h2>
+
+{% if submissions %}
+
+<table class="table">
+
+<thead>
+
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
+
+</thead>
+
+<tbody>
+
+    {% for submission in submissions %}
+
+    <tr>
+
+        <td>
+            {{ submission.id }}
+        </td>
+
+        <td>
+            {{ submission.type }}
+        </td>
+
+        <td>
+            {{ submission.name }}
+        </td>
+
+        <td>
+            {{ submission.status }}
+        </td>
+
+        <td>
+            {{ submission.created_at }}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<p>
+    No submissions.
+</p>
+
+{% endif %}
+
+<hr>
+
+<!-- Owned Items -->
+
+<h2>Owned Items</h2>
+
+<p>
+    <strong>Items Owned:</strong>
+    {{ owned_items|length }}
+</p>
+
+{% if owned_items %}
+
+<table class="table">
+
+<thead>
+
+    <tr>
+        <th>Item ID</th>
+        <th>Quantity</th>
+        <th>Added At</th>
+    </tr>
+
+</thead>
+
+<tbody>
+
+    {% for owned in owned_items %}
+
+    <tr>
+
+        <td>
+            {{ owned.item_id }}
+        </td>
+
+        <td>
+            {{ owned.quantity }}
+        </td>
+
+        <td>
+            {{ owned.added_at }}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<p>
+    No items owned.
+</p>
+
+{% endif %}
+
+<br>
+
+<a
+href="{{ url_for('admin.users') }}"
+class="back-btn"
+
+>
+
+Back to Users
+
+</a>
+
+{% endblock %}

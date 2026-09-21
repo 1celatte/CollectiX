@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.utils import normalize_text
 
 from . import admin
-from app.models import Collection,Item, Submission, User, Tag
+from app.models import Collection,Item, Submission, User, Tag, OwnedItem
 from app.extensions import db
 
 @admin.route("/admin")
@@ -284,6 +284,7 @@ def approve_submission(submission_id):
         item = Item(
             collection_id=submission.collection_id,
             name=submission.name,
+            normalized_name=normalize_text(submission.name),
             description=submission.description,
             image=submission.image,
             status="approved",
@@ -327,6 +328,37 @@ def users():
     users = User.query.filter_by(is_banned=False).all()
 
     return render_template("users.html", users=users)
+
+
+@admin.route("/admin/users/<int:user_id>")
+@login_required
+def user_details(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    collections = Collection.query.filter_by(
+        created_by=user.id
+    ).all()
+
+    submissions = Submission.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Submission.created_at.desc()
+    ).all()
+
+    owned_items = OwnedItem.query.filter_by(
+        user_id=user.id
+    ).all()
+
+    return render_template(
+        "user_details.html",
+        user=user,
+        collections=collections,
+        submissions=submissions,
+        owned_items=owned_items
+    )
 
 
 @admin.route("/admin/users/banned")
