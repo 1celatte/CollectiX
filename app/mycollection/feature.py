@@ -7,12 +7,15 @@ from . import my_collection_bp
 #=======================================================================================================================
 
 # View all collections saved by the current user
+#Track collection progress by calculating the percentage of items owned by the user in each collection
 
 #========================================================================================================================
 
 @my_collection_bp.route("/")
 @login_required
 def list_my_collections():
+
+    sort = request.args.get("sort", "recent")
 
     user_collections = UserCollection.query.filter_by(
         user_id=current_user.id
@@ -68,9 +71,24 @@ def list_my_collections():
                 "progress": progress
             })
 
+
+    # Sort collections by progress
+    if sort == "progress_asc":
+        collections.sort(
+            key=lambda data: data["progress"]
+        )
+
+    elif sort == "progress_desc":
+        collections.sort(
+            key=lambda data: data["progress"],
+            reverse=True
+        )
+
+
     return render_template(
         "my.html",
-        collections=collections
+        collections=collections,
+        sort=sort
     )
     
 #=======================================================================================================================
