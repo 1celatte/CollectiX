@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Manage Users - CollectiX</title>
+    <title>Banned Users - CollectiX</title>
 </head>
 
 <body>
 
-<h1>Manage Users</h1>
+<h1>Banned Users</h1>
 
 <table>
 
@@ -21,6 +21,7 @@
             <th>Profile Picture</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Ban Reason</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -53,66 +54,49 @@
 
             <td>{{ user.role }}</td>
 
-            <td>
+            <td>{{ user.ban_reason }}</td>
 
-                {% if user.role != "admin" %}
+            <td>
 
                 <button
                     type="button"
-                    class="remove-btn"
-                    popovertarget="banUser{{ user.id }}"
+                    class="unban-btn"
+                    popovertarget="unbanUser{{ user.id }}"
                 >
-                    Ban
+                    Unban
                 </button>
 
                 <div
-                    id="banUser{{ user.id }}"
+                    id="unbanUser{{ user.id }}"
                     popover
-                    class="delete-popup"
+                    class="unban-popup"
                 >
 
-                    <div class="delete-box">
+                    <div class="unban-box">
 
                         <p>
-                            Are you sure you want to ban this user?
+                            Are you sure you want to unban this user?
                         </p>
 
                         <form
                             action="{{ url_for(
-                                'admin.ban_user',
+                                'admin.unban_user',
                                 user_id=user.id
                             ) }}"
                             method="POST"
                         >
 
-                            <label for="banReason{{ user.id }}">
-                                Ban Reason:
-                            </label>
-                                
-                            <br><br>
-
-                            <textarea
-                                id="banReason{{ user.id }}"
-                                name="ban_reason"
-                                rows="4"
-                                cols="35"
-                                placeholder="Enter the reason for banning this user..."
-                                required
-                            ></textarea>
-
-                            <br><br>
-
                             <button
                                 type="submit"
-                                class="delete-confirm"
+                                class="unban-confirm"
                             >
-                                Ban User
+                                Yes, Unban
                             </button>
 
                             <button
                                 type="button"
                                 class="cancel-btn"
-                                popovertarget="banUser{{ user.id }}"
+                                popovertarget="unbanUser{{ user.id }}"
                                 popovertargetaction="hide"
                             >
                                 Cancel
@@ -123,13 +107,6 @@
                     </div>
 
                 </div>
-
-                {% else %}
-
-                    -
-
-                {% endif %}
-
             </td>
 
         </tr>
@@ -143,19 +120,10 @@
 <br>
 
 <a
-    href="{{ url_for('admin.banned_users') }}"
+    href="{{ url_for('admin.users') }}"
     class="back-btn"
 >
-    Banned Users
-</a>
-
-<br><br>
-
-<a
-    href="{{ url_for('admin.dashboard') }}"
-    class="back-btn"
->
-    Back to Dashboard
+    Back to Active Users
 </a>
 
 
@@ -184,36 +152,40 @@
         background-color: #f2f2f2;
     }
 
-
-    /* Ban button */
-
-    .remove-btn {
+    .unban-btn {
         display: inline-block;
         padding: 6px 12px;
-        background-color: #dc3545;
+        background-color: #198754;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
     }
 
-    .remove-btn:hover {
-        background-color: #bb2d3b;
+    .unban-btn:hover {
+        background-color: #157347;
     }
 
+    .back-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
 
-    /* Popup */
+    .back-btn:hover {
+        background-color: #5c636a;
+    }
 
-    .delete-popup {
+    .unban-popup {
         padding: 0;
         border: none;
         background: transparent;
     }
 
-
-    /* Popup box */
-
-    .delete-box {
+    .unban-box {
         background-color: white;
         padding: 25px;
         border-radius: 8px;
@@ -222,20 +194,14 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-
-    /* Yes button */
-
-    .delete-confirm {
+    .unban-confirm {
         padding: 6px 15px;
-        background-color: #dc3545;
+        background-color: #198754;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
     }
-
-
-    /* Cancel button */
 
     .cancel-btn {
         padding: 6px 15px;
@@ -251,24 +217,7 @@
         background-color: #5c636a;
     }
 
-
-    /* Back button */
-
-    .back-btn {
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-    }
-
-    .back-btn:hover {
-        background-color: #5c636a;
-    }
-
 </style>
 
 </body>
 </html>
-

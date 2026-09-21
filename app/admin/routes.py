@@ -324,14 +324,28 @@ def users():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    users = User.query.all()
+    users = User.query.filter_by(is_banned=False).all()
 
     return render_template("users.html", users=users)
 
 
-@admin.route("/admin/users/<int:user_id>/remove", methods=["POST"])
+@admin.route("/admin/users/banned")
 @login_required
-def remove_user(user_id):
+def banned_users():
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    users = User.query.filter_by(is_banned=True).all()
+
+    return render_template(
+        "banned_users.html",
+        users=users
+    )
+
+
+@admin.route("/admin/users/<int:user_id>/ban", methods=["POST"])
+@login_required
+def ban_user(user_id):
 
     if current_user.role != "admin":
         return "Access denied.", 403
@@ -339,9 +353,34 @@ def remove_user(user_id):
     user = User.query.get_or_404(user_id)
 
     if user.role == "admin":
-        return "Cannot delete admin user.", 403
+        return "Cannot ban admin user.", 403
 
-    db.session.delete(user)
+    ban_reason = request.form.get("ban_reason", "").strip()
+
+    if not ban_reason:
+        return "Ban reason is required.", 400
+
+    user.is_banned = True
+    user.ban_reason = ban_reason
+    
     db.session.commit()
 
     return redirect(url_for("admin.users"))
+
+
+@admin.route("/admin/users/<int:user_id>/unban", methods=["POST"])
+@login_required
+def unban_user(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        return "Cannot unban admin user.", 403
+
+    user.is_banned = False
+
+    db.session.commit()
+
+    return redirect(url_for("admin.banned_users"))

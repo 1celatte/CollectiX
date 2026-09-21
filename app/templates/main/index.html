@@ -1,39 +1,313 @@
 {% extends "base.html" %}
 
-<!--Page Title-->
+<!-- Page Title -->
 {% block title %}
 Home - CollectiX
 {% endblock %}
 
 {% block content %}
 
-<!--Main welcome area of the homepage-->
-<div class="text-center py-5">
+<!-- Homepage Background -->
+<div
+    style="
+        background: linear-gradient(
+            135deg,
+            #f5f7ff 0%,
+            #eef4ff 50%,
+            #f8f5ff 100%
+        );
+        min-height: 100vh;
+        margin-top: -1.5rem;
+        padding-top: 1.5rem;
+    "
+>
 
-    <!--Main heading-->
-    <h1 class="display-4 fw-bold">
-        Welcome to CollectiX
-    </h1>
+    <!-- Hero Section -->
+    <div class="container py-5">
 
-    <!--Short introduction-->
-    <p class="lead">
-        Illustrated collection system, items buy/sell and exchange platform
-    </p>
+        <div
+            class="row align-items-center py-5 px-4 rounded-4 shadow-sm bg-white"
+        >
 
-    <!--Browse collections button-->
-    <a href="{{ url_for('collection.list_collections') }}" class="btn btn-primary me-2">
-        Browse Collections
-    </a>
+            <!-- Left Side -->
+            <div class="col-lg-7">
 
-    <!--Marketplace button-->
-    <a href="{{ url_for('marketplace.marketplace_home') }}" class="btn btn-outline-primary">
-        View Marketplace
-    </a>
+                <span class="badge text-bg-primary mb-3 px-3 py-2">
+                    Your Collection Platform
+                </span>
 
-    <!--Profile action button-->
-    <a href="{{ url_for('auth.profile') }}" class="btn btn-primary">
-        View Profile
-    </a>
+                <h1 class="display-3 fw-bold mb-3">
+                    Welcome to CollectiX
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    Collect, organize, buy, sell and exchange your
+                    favourite items in one place.
+                </p>
+
+                <a
+                    href="{{ url_for('collection.list_collections') }}"
+                    class="btn btn-primary btn-lg me-2 mb-2"
+                >
+                    <i class="bi bi-collection me-2"></i>
+                    Browse Collections
+                </a>
+
+                <a
+                    href="{{ url_for('marketplace.marketplace_home') }}"
+                    class="btn btn-outline-primary btn-lg mb-2"
+                >
+                    <i class="bi bi-shop me-2"></i>
+                    View Marketplace
+                </a>
+
+            </div>
+
+
+            <!-- Right Side -->
+            <div class="col-lg-5 text-center mt-5 mt-lg-0">
+
+                <div
+                    class="p-5 rounded-4"
+                    style="
+                        background: linear-gradient(
+                            135deg,
+                            #e8f0ff,
+                            #f0e8ff
+                        );
+                    "
+                >
+
+                    <i
+                        class="bi bi-collection display-1 text-primary"
+                    ></i>
+
+                    <h2 class="fw-bold mt-4 mb-3">
+                        Collect. Organize. Trade.
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Keep track of your collections and discover
+                        items from other collectors.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Features Section -->
+    <div class="container py-5">
+
+        <div class="text-center mb-5">
+
+            <span class="badge text-bg-light border mb-2">
+                FEATURES
+            </span>
+
+            <h2 class="fw-bold">
+                What can you do with CollectiX?
+            </h2>
+
+            <p class="text-muted">
+                Everything you need to manage and enjoy your collections.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <!-- Collection Card -->
+            <div class="col-md-4">
+
+                <div
+                    class="card h-100 border-0 shadow-sm rounded-4"
+                >
+
+                    <div class="card-body text-center p-5">
+
+                        <div
+                            class="bg-primary bg-opacity-10
+                                   rounded-circle d-inline-flex
+                                   align-items-center justify-content-center
+                                   mb-3"
+                            style="width: 70px; height: 70px;"
+                        >
+                            <i
+                                class="bi bi-collection fs-2 text-primary"
+                            ></i>
+                        </div>
+
+                        <h4 class="fw-bold mb-3">
+                            Collections
+                        </h4>
+
+                        <p class="text-muted">
+                            Discover different collections and keep track
+                            of the items you own.
+                        </p>
+
+                        <a
+                            href="{{ url_for('collection.list_collections') }}"
+                            class="btn btn-primary"
+                        >
+                            Explore Collections
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Marketplace Card -->
+            <div class="col-md-4">
+
+                <div
+                    class="card h-100 border-0 shadow-sm rounded-4"
+                >
+
+                    <div class="card-body text-center p-5">
+
+                        <div
+                            class="bg-primary bg-opacity-10
+                                   rounded-circle d-inline-flex
+                                   align-items-center justify-content-center
+                                   mb-3"
+                            style="width: 70px; height: 70px;"
+                        >
+                            <i
+                                class="bi bi-shop fs-2 text-primary"
+                            ></i>
+                        </div>
+
+                        <h4 class="fw-bold mb-3">
+                            Marketplace
+                        </h4>
+
+                        <p class="text-muted">
+                            Buy, sell and exchange collectible items
+                            with other users.
+                        </p>
+
+                        <a
+                            href="{{ url_for('marketplace.marketplace_home') }}"
+                            class="btn btn-primary"
+                        >
+                            Visit Marketplace
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- My Collection Card -->
+            <div class="col-md-4">
+
+                <div
+                    class="card h-100 border-0 shadow-sm rounded-4"
+                >
+
+                    <div class="card-body text-center p-5">
+
+                        <div
+                            class="bg-primary bg-opacity-10
+                                   rounded-circle d-inline-flex
+                                   align-items-center justify-content-center
+                                   mb-3"
+                            style="width: 70px; height: 70px;"
+                        >
+                            <i
+                                class="bi bi-person-heart fs-2 text-primary"
+                            ></i>
+                        </div>
+
+                        <h4 class="fw-bold mb-3">
+                            My Collection
+                        </h4>
+
+                        <p class="text-muted">
+                            Manage your personal collections and
+                            track the items you own.
+                        </p>
+
+                        {% if current_user.is_authenticated %}
+
+                            <a
+                                href="{{ url_for('my_collection.list_my_collections') }}"
+                                class="btn btn-primary"
+                            >
+                                My Collection
+                            </a>
+
+                        {% else %}
+
+                            <a
+                                href="{{ url_for('auth.login') }}"
+                                class="btn btn-outline-primary"
+                            >
+                                Login to Start
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Call To Action -->
+    <div class="container py-5">
+
+        <div
+            class="rounded-4 p-5 text-center text-white shadow"
+            style="
+                background: linear-gradient(
+                    135deg,
+                    #0d6efd,
+                    #6f42c1
+                );
+            "
+        >
+
+            <i class="bi bi-box-seam display-5"></i>
+
+            <h2 class="fw-bold mt-3 mb-3">
+                Start Your Collection Today
+            </h2>
+
+            <p class="mb-4 opacity-75">
+                Discover new collections, manage your items
+                and connect with other collectors.
+            </p>
+
+            <a
+                href="{{ url_for('collection.list_collections') }}"
+                class="btn btn-light btn-lg"
+            >
+                Explore Collections
+            </a>
+
+        </div>
+
+    </div>
 
 </div>
+
 {% endblock %}
