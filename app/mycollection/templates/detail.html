@@ -54,11 +54,96 @@
                 {{ collection.description }}
             </p>
 
+
+            <!-- Collection Progress -->
+            <hr>
+
+            <h5 class="fw-bold mb-3">
+                Collection Progress
+            </h5>
+
+            <div class="row text-center mb-3">
+
+                <!-- Total Items -->
+                <div class="col">
+                    <div class="fw-bold">
+                        {{ total_items }}
+                    </div>
+
+                    <small class="text-muted">
+                        Total
+                    </small>
+                </div>
+
+
+                <!-- Owned Items -->
+                <div class="col">
+                    <div class="fw-bold text-success">
+                        {{ owned_count }}
+                    </div>
+
+                    <small class="text-muted">
+                        Owned
+                    </small>
+                </div>
+
+
+                <!-- Missing Items -->
+                <div class="col">
+                    <div class="fw-bold text-danger">
+                        {{ missing_items }}
+                    </div>
+
+                    <small class="text-muted">
+                        Missing
+                    </small>
+                </div>
+
+            </div>
+
+
+            <!-- Progress Percentage -->
+
+            <div class="d-flex justify-content-between mb-1">
+
+                <small class="fw-bold">
+                    Progress
+                </small>
+
+                <small class="fw-bold">
+                    {{ progress }}%
+                </small>
+
+            </div>
+
+
+            <!-- Bootstrap Progress Bar -->
+
+            <div
+                class="progress"
+                role="progressbar"
+                aria-label="Collection progress"
+                aria-valuenow="{{ progress }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="height: 20px;"
+            >
+
+                <div
+                    class="progress-bar bg-success"
+                    style="width: {{ progress }}%;"
+                >
+                    {{ progress }}%
+                </div>
+
+            </div>
+
         </div>
     </div>
 
 
     <!-- Items -->
+
     <h2 class="fw-bold mb-3">
         Items in This Collection
     </h2>
@@ -99,6 +184,7 @@
                             </div>
 
                         {% endif %}
+
 
                         <div class="card-body">
 
@@ -172,6 +258,7 @@
 
 
     <!-- Action Buttons -->
+
     <div class="d-flex flex-wrap gap-2 mt-4">
 
         <a
@@ -187,6 +274,7 @@
 
 
         <!-- Remove Button -->
+
         <button
             type="button"
             class="btn btn-danger"
@@ -212,6 +300,7 @@
 
 
     <!-- Remove Confirmation Modal -->
+
     <div
         class="modal fade"
         id="removeCollectionModal"

@@ -29,7 +29,44 @@ def list_my_collections():
         )
 
         if collection:
-            collections.append(collection)
+
+            # Get all approved items in this collection
+            total_items = Item.query.filter_by(
+                collection_id=collection.id,
+                status="approved"
+            ).count()
+
+            # Get items owned by the current user
+            owned_item_ids = {
+                owned.item_id
+                for owned in OwnedItem.query.filter_by(
+                    user_id=current_user.id
+                ).all()
+            }
+
+            # Count only owned items that belong to this collection
+            owned_items = Item.query.filter(
+                Item.collection_id == collection.id,
+                Item.status == "approved",
+                Item.id.in_(owned_item_ids)
+            ).count() if owned_item_ids else 0
+
+            missing_items = total_items - owned_items
+
+            if total_items > 0:
+                progress = round(
+                    (owned_items / total_items) * 100
+                )
+            else:
+                progress = 0
+
+            collections.append({
+                "collection": collection,
+                "total_items": total_items,
+                "owned_items": owned_items,
+                "missing_items": missing_items,
+                "progress": progress
+            })
 
     return render_template(
         "my.html",
@@ -72,12 +109,40 @@ def view_my_collection(collection_id):
         user_id=current_user.id
     ).all()
 
+    # Calculate collection progress
+    total_items = len(items)
+
+    owned_item_ids = {
+        owned.item_id
+        for owned in owned_items
+    }
+
+    owned_count = sum(
+        1
+        for item in items
+        if item.id in owned_item_ids
+    )
+
+    missing_items = total_items - owned_count
+
+    if total_items > 0:
+        progress = round(
+            (owned_count / total_items) * 100
+        )
+    else:
+        progress = 0
+
     return render_template(
         "detail.html",
         collection=collection,
         items=items,
-        owned_items=owned_items
+        owned_items=owned_items,
+        total_items=total_items,
+        owned_count=owned_count,
+        missing_items=missing_items,
+        progress=progress
     )
+
 #=======================================================================================================================
 
 # Edit my collection (let useers make items owned or not and set quantity)
@@ -213,3 +278,9 @@ def remove_from_my_collection(collection_id):
     return redirect(
         url_for("my_collection.list_my_collections")
     )
+
+#=======================================================================================================================
+
+# Track collection progress
+
+#=======================================================================================================================
