@@ -247,9 +247,20 @@ def submissions():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    submissions = Submission.query.filter_by(status="pending").all()
+    submission_type = request.args.get("type")
 
-    return render_template("submissions.html", submissions=submissions)
+    query = Submission.query.filter_by(status="pending")
+
+    if submission_type in ["new_collection", "new_item"]:
+        query = query.filter_by(type=submission_type)
+
+    submissions = query.all()
+
+    return render_template(
+        "submissions.html", 
+        submissions=submissions,
+        submission_type=submission_type
+        )
 
 
 @admin.route("/admin/submissions/<int:submission_id>/approve", methods=["POST"])
@@ -338,10 +349,6 @@ def user_details(user_id):
 
     user = User.query.get_or_404(user_id)
 
-    collections = Collection.query.filter_by(
-        created_by=user.id
-    ).all()
-
     submissions = Submission.query.filter_by(
         user_id=user.id
     ).order_by(
@@ -355,7 +362,6 @@ def user_details(user_id):
     return render_template(
         "user_details.html",
         user=user,
-        collections=collections,
         submissions=submissions,
         owned_items=owned_items
     )

@@ -12,6 +12,31 @@
 
 <h1>Manage Submissions</h1>
 
+<div style="margin-bottom: 20px;">
+
+    <a
+        href="{{ url_for('admin.submissions') }}"
+        class="view-btn"
+    >
+        All Submissions
+    </a>
+
+    <a
+        href="{{ url_for('admin.submissions', type='new_collection') }}"
+        class="view-btn"
+    >
+        Collection Submissions
+    </a>
+
+    <a
+        href="{{ url_for('admin.submissions', type='new_item') }}"
+        class="view-btn"
+    >
+        Item Submissions
+    </a>
+
+</div>
+
 {% if submissions %}
 
 <table>
@@ -228,6 +253,21 @@
         display: block;
     }
 
+    /* Submission filter buttons */
+
+    .view-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 5px;
+    }
+
+    .view-btn:hover {
+        background-color: #5c636a;
+    }
 
     /* Approve button */
 

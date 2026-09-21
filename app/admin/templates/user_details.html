@@ -105,70 +105,6 @@ Back to Users
 
 <hr>
 
-<!-- Collection Activity -->
-
-<h2>Collection Activity</h2>
-
-<p>
-    <strong>Collections Created:</strong>
-    {{ collections|length }}
-</p>
-
-{% if collections %}
-
-<table class="table">
-
-<thead>
-
-    <tr>
-        <th>Collection ID</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Created At</th>
-    </tr>
-
-</thead>
-
-<tbody>
-
-    {% for collection in collections %}
-
-    <tr>
-
-        <td>
-            {{ collection.id }}
-        </td>
-
-        <td>
-            {{ collection.name }}
-        </td>
-
-        <td>
-            {{ collection.status }}
-        </td>
-
-        <td>
-            {{ collection.created_at }}
-        </td>
-
-    </tr>
-
-    {% endfor %}
-
-</tbody>
-
-</table>
-
-{% else %}
-
-<p>
-    No collections created.
-</p>
-
-{% endif %}
-
-<hr>
-
 <!-- Submission History -->
 
 <h2>Submission History</h2>
@@ -249,7 +185,8 @@ Back to Users
 <thead>
 
     <tr>
-        <th>Item ID</th>
+        <th>Item</th>
+        <th>Collection</th>
         <th>Quantity</th>
         <th>Added At</th>
     </tr>
@@ -263,7 +200,11 @@ Back to Users
     <tr>
 
         <td>
-            {{ owned.item_id }}
+            {{ owned.item.name }}
+        </td>
+
+        <td>
+            {{ owned.item.collection.name }}
         </td>
 
         <td>

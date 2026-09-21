@@ -128,6 +128,8 @@ class Item(db.Model):
         nullable=False
     )
 
+    collection = db.relationship("Collection")
+
     name = db.Column(
         db.String(150),
         nullable=False
@@ -223,6 +225,8 @@ class OwnedItem(db.Model):
     )
 
     added_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    item = db.relationship("Item")
 
     __table_args__ = (
         db.UniqueConstraint(
