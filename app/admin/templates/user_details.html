@@ -6,241 +6,709 @@ User Details - CollectiX
 
 {% block content %}
 
-<h1>User Details</h1>
+<div class="container py-4">
 
-<br>
+<!-- Page Header -->
 
-<a
-href="{{ url_for('admin.users') }}"
-class="back-btn"
+<div class="d-flex justify-content-between align-items-center mb-4">
 
->
+    <div>
+        <h1 class="fw-bold mb-1">User Details</h1>
+        <p class="text-muted mb-0">
+            View user information and activity
+        </p>
+    </div>
 
-Back to Users
-
-</a>
-
-<br><br>
-
-<!-- User Information -->
-
-<h2>User Information</h2>
-
-<div class="user-info">
-
-{% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
-
-    <img
-        src="{{ url_for('auth.static', filename=user.profile_picture) }}"
-        width="100"
-        height="100"
-        style="
-            object-fit: cover;
-            border-radius: 50%;
-        "
+    <a
+        href="{{ url_for('admin.users') }}"
+        class="btn btn-outline-secondary"
     >
-
-{% else %}
-
-    <img
-        src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
-        width="100"
-        height="100"
-        style="
-            object-fit: cover;
-            border-radius: 50%;
-        "
-    >
-
-{% endif %}
-
-<br><br>
-
-<p>
-    <strong>User ID:</strong>
-    {{ user.id }}
-</p>
-
-<p>
-    <strong>Name:</strong>
-    {{ user.name }}
-</p>
-
-<p>
-    <strong>Email:</strong>
-    {{ user.email }}
-</p>
-
-<p>
-    <strong>Role:</strong>
-    {{ user.role }}
-</p>
-
-<p>
-    <strong>Account Status:</strong>
-
-    {% if user.is_banned %}
-        Banned
-    {% else %}
-        Active
-    {% endif %}
-
-</p>
-
-<p>
-    <strong>Account Created:</strong>
-    {{ user.created_at }}
-</p>
-
-{% if user.is_banned %}
-
-    <p>
-        <strong>Ban Reason:</strong>
-        {{ user.ban_reason }}
-    </p>
-
-{% endif %}
+        <i class="bi bi-arrow-left"></i>
+        Back to Users
+    </a>
 
 </div>
 
-<hr>
+
+<!-- User Information -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-dark text-white">
+
+        <h4 class="mb-0">
+            <i class="bi bi-person-circle"></i>
+            User Information
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+            <!-- Profile Picture -->
+
+            <div class="col-md-3 text-center mb-3 mb-md-0">
+
+                {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
+
+                    <img
+                        src="{{ url_for('auth.static', filename=user.profile_picture) }}"
+                        width="120"
+                        height="120"
+                        class="rounded-circle shadow-sm"
+                        style="object-fit: cover;"
+                    >
+
+                {% else %}
+
+                    <img
+                        src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                        width="120"
+                        height="120"
+                        class="rounded-circle shadow-sm"
+                        style="object-fit: cover;"
+                    >
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- User Details -->
+
+            <div class="col-md-9">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            User ID
+                        </small>
+
+                        <div class="fw-semibold">
+                            {{ user.id }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            Name
+                        </small>
+
+                        <div class="fw-semibold">
+                            {{ user.name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            Email
+                        </small>
+
+                        <div class="fw-semibold">
+                            {{ user.email }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            Role
+                        </small>
+
+                        <div>
+
+                            {% if user.role == "admin" %}
+
+                                <span class="badge bg-dark">
+                                    Admin
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-primary">
+                                    User
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            Account Status
+                        </small>
+
+                        <div>
+
+                            {% if user.is_banned %}
+
+                                <span class="badge bg-danger">
+                                    Banned
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+                            Account Created
+                        </small>
+
+                        <div class="fw-semibold">
+                            {{ user.created_at }}
+                        </div>
+
+                    </div>
+
+
+                    {% if user.is_banned %}
+
+                    <div class="col-12">
+
+                        <small class="text-muted">
+                            Ban Reason
+                        </small>
+
+                        <div class="alert alert-danger mt-1 mb-0">
+
+                            {{ user.ban_reason }}
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <!-- Submission History -->
 
-<h2>Submission History</h2>
+<div class="card shadow-sm border-0 mb-4">
 
-{% if submissions %}
+    <div class="card-header bg-primary text-white">
 
-<table class="table">
+        <h4 class="mb-0">
+            <i class="bi bi-file-earmark-text"></i>
+            Submission History
+        </h4>
 
-<thead>
+    </div>
 
-    <tr>
-        <th>ID</th>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Date</th>
-    </tr>
+    <div class="card-body">
 
-</thead>
+        {% if submissions %}
 
-<tbody>
+        <div class="table-responsive">
 
-    {% for submission in submissions %}
+            <table class="table table-hover align-middle mb-0">
 
-    <tr>
+                <thead class="table-light">
 
-        <td>
-            {{ submission.id }}
-        </td>
+                    <tr>
 
-        <td>
-            {{ submission.type }}
-        </td>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Date</th>
 
-        <td>
-            {{ submission.name }}
-        </td>
+                    </tr>
 
-        <td>
-            {{ submission.status }}
-        </td>
+                </thead>
 
-        <td>
-            {{ submission.created_at }}
-        </td>
+                <tbody>
 
-    </tr>
+                    {% for submission in submissions %}
 
-    {% endfor %}
+                    <tr>
 
-</tbody>
+                        <td>
+                            {{ submission.id }}
+                        </td>
 
-</table>
+                        <td>
+                            {{ submission.type }}
+                        </td>
 
-{% else %}
+                        <td class="fw-semibold">
+                            {{ submission.name }}
+                        </td>
 
-<p>
-    No submissions.
-</p>
+                        <td>
 
-{% endif %}
+                            {% if submission.status == "approved" %}
 
-<hr>
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+
+                            {% elif submission.status == "rejected" %}
+
+                                <span class="badge bg-danger">
+                                    Rejected
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ submission.created_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center text-muted py-4">
+
+            <i class="bi bi-inbox fs-2"></i>
+
+            <p class="mb-0 mt-2">
+                No submissions.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
 
 <!-- Owned Items -->
 
-<h2>Owned Items</h2>
+<div class="card shadow-sm border-0 mb-4">
 
-<p>
-    <strong>Items Owned:</strong>
-    {{ owned_items|length }}
-</p>
+    <div class="card-header bg-success text-white">
 
-{% if owned_items %}
+        <h4 class="mb-0">
+            <i class="bi bi-box-seam"></i>
+            Owned Items
+        </h4>
 
-<table class="table">
+    </div>
 
-<thead>
+    <div class="card-body">
 
-    <tr>
-        <th>Item</th>
-        <th>Collection</th>
-        <th>Quantity</th>
-        <th>Added At</th>
-    </tr>
+        <div class="mb-3">
 
-</thead>
+            <span class="text-muted">
+                Items Owned:
+            </span>
 
-<tbody>
+            <span class="badge bg-success">
+                {{ owned_items|length }}
+            </span>
 
-    {% for owned in owned_items %}
+        </div>
 
-    <tr>
+        {% if owned_items %}
 
-        <td>
-            {{ owned.item.name }}
-        </td>
+        <div class="table-responsive">
 
-        <td>
-            {{ owned.item.collection.name }}
-        </td>
+            <table class="table table-hover align-middle mb-0">
 
-        <td>
-            {{ owned.quantity }}
-        </td>
+                <thead class="table-light">
 
-        <td>
-            {{ owned.added_at }}
-        </td>
+                    <tr>
 
-    </tr>
+                        <th>Item</th>
+                        <th>Collection</th>
+                        <th>Quantity</th>
+                        <th>Added At</th>
 
-    {% endfor %}
+                    </tr>
 
-</tbody>
+                </thead>
 
-</table>
+                <tbody>
 
-{% else %}
+                    {% for owned in owned_items %}
 
-<p>
-    No items owned.
-</p>
+                    <tr>
 
-{% endif %}
+                        <td class="fw-semibold">
+                            {{ owned.item.name }}
+                        </td>
 
-<br>
+                        <td>
+                            {{ owned.item.collection.name }}
+                        </td>
 
-<a
-href="{{ url_for('admin.users') }}"
-class="back-btn"
+                        <td>
 
->
+                            <span class="badge bg-primary">
+                                {{ owned.quantity }}
+                            </span>
 
-Back to Users
+                        </td>
 
-</a>
+                        <td>
+                            {{ owned.added_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center text-muted py-4">
+
+            <i class="bi bi-box fs-2"></i>
+
+            <p class="mb-0 mt-2">
+                No items owned.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Items for Sale -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-warning">
+
+        <h4 class="mb-0">
+
+            <i class="bi bi-tag"></i>
+            Items for Sale
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        {% set sale_listings = listings | selectattr("listing_type", "equalto", "sell") | list %}
+
+        {% if sale_listings %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Condition</th>
+                        <th>Status</th>
+                        <th>Listed At</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for listing in sale_listings %}
+
+                    <tr>
+
+                        <td class="fw-semibold">
+                            {{ listing.item.name }}
+                        </td>
+
+                        <td>
+
+                            <span class="fw-bold text-success">
+
+                                RM {{ "%.2f"|format(listing.price) }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+                            {{ listing.condition }}
+                        </td>
+
+                        <td>
+
+                            {% if listing.status == "available" %}
+
+                                <span class="badge bg-success">
+                                    Available
+                                </span>
+
+                            {% elif listing.status == "sold" %}
+
+                                <span class="badge bg-secondary">
+                                    Sold
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+                                    {{ listing.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ listing.created_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center text-muted py-4">
+
+            <i class="bi bi-tag fs-2"></i>
+
+            <p class="mb-0 mt-2">
+                No items for sale.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Transaction History -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-info text-dark">
+
+        <h4 class="mb-0">
+
+            <i class="bi bi-receipt"></i>
+            Transaction History
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if transactions %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Item</th>
+                        <th>Role</th>
+                        <th>Other User</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for transaction in transactions %}
+
+                    <tr>
+
+                        <td class="fw-semibold">
+                            {{ transaction.item.name }}
+                        </td>
+
+                        <td>
+
+                            {% if transaction.buyer_id == user.id %}
+
+                                <span class="badge bg-primary">
+                                    Buyer
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+                                    Seller
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if transaction.buyer_id == user.id %}
+
+                                {{ transaction.seller.name }}
+
+                            {% else %}
+
+                                {{ transaction.buyer.name }}
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <span class="fw-bold">
+
+                                RM {{ "%.2f"|format(transaction.price) }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {% if transaction.status == "completed" %}
+
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+
+                            {% elif transaction.status == "cancelled" %}
+
+                                <span class="badge bg-danger">
+                                    Cancelled
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ transaction.created_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center text-muted py-4">
+
+            <i class="bi bi-receipt fs-2"></i>
+
+            <p class="mb-0 mt-2">
+                No transaction history.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Back Button -->
+
+<div class="text-center mt-4 mb-3">
+
+    <a
+        href="{{ url_for('admin.users') }}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Users
+    </a>
+
+</div>
+
+</div>
 
 {% endblock %}

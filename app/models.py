@@ -324,6 +324,8 @@ class Listing(db.Model):
         nullable=False
     )
 
+    item = db.relationship("Item")
+
     listing_type = db.Column(
         db.String(10),
         nullable=False
@@ -374,11 +376,23 @@ class Transaction(db.Model):
         nullable=False
     )
 
+    buyer = db.relationship(
+        "User",
+        foreign_keys=[buyer_id]
+    )
+
+    seller = db.relationship(
+        "User",
+        foreign_keys=[seller_id]
+    )
+
     item_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
         nullable=False
     )
+
+    item = db.relationship("Item")
 
     price = db.Column(db.Float, nullable=False)
 

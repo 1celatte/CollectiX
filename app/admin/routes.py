@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.utils import normalize_text
 
 from . import admin
-from app.models import Collection,Item, Submission, User, Tag, OwnedItem
+from app.models import Collection,Item, Submission, User, Tag, OwnedItem, Listing, Transaction, Trade
 from app.extensions import db
 
 @admin.route("/admin")
@@ -359,11 +359,34 @@ def user_details(user_id):
         user_id=user.id
     ).all()
 
+    listings = Listing.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    transactions = Transaction.query.filter(
+        (Transaction.buyer_id == user.id) |
+        (Transaction.seller_id == user.id)
+    ).order_by(
+        Transaction.created_at.desc()
+    ).all()
+
+    trades = Trade.query.filter(
+        (Trade.sender_id == user.id) |
+        (Trade.receiver_id == user.id)
+    ).order_by(
+        Trade.created_at.desc()
+    ).all()
+
     return render_template(
         "user_details.html",
         user=user,
         submissions=submissions,
-        owned_items=owned_items
+        owned_items=owned_items,
+        listings=listings,
+        transactions=transactions,
+        trades=trades
     )
 
 

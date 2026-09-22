@@ -8,7 +8,6 @@ from app.models import (
     UserCollection,
     OwnedItem,
     Submission,
-    CorrectionRequest,
     Listing,
     Transaction,
     Trade
@@ -31,7 +30,6 @@ with app.app_context():
     db.session.query(Trade).delete()
     db.session.query(Transaction).delete()
     db.session.query(Listing).delete()
-    db.session.query(CorrectionRequest).delete()
     db.session.query(Submission).delete()
     db.session.query(OwnedItem).delete()
     db.session.query(UserCollection).delete()
