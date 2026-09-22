@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}DuitNow QR Upload{% endblock %}
+
+{% block content %}
+<h1>DuitNow QR Upload</h1>
+
+{% if request.args.get("required") %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Please upload your DuitNow QR before creating a listing! Buyers will use this QR to make payment.</strong>
+        
+    </div>
+{% endif %}
+
+{% if error %}
+    <p style="color: red;">
+        {{ error }}
+    </p>
+{% endif %}
+
+{% if payment_qr %}
+    <p>Your current DuitNow QR:</p>
+
+    <img
+        src="{{ url_for(
+            'marketplace.static',
+            filename='uploads/payment_qrs/' ~ payment_qr.filename
+        ) }}"
+        alt="Your DuitNow QR"
+        style="width: 220px; height: 220px; object-fit: contain;"
+    >
+
+    <p>Choose another image below if you want to update your QR.</p>
+{% else %}
+    <p>You have not uploaded a payment QR yet.</p>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    <label for="payment_qr">DuitNow QR Image</label>
+
+    <input
+        type="file"
+        id="payment_qr"
+        name="payment_qr"
+        accept="image/*"
+        required
+    >
+
+    <br><br>
+
+    <button type="submit">
+        Save Payment QR
+    </button>
+</form>
+
+{% if payment_qr %}
+    <br><br>
+
+    <form
+        method="POST"
+        action="{{ url_for('marketplace.delete_payment_qr') }}"
+        onsubmit="return confirm('Are you sure you want to delete your DuitNow QR?')"
+    >
+        <button type="submit">
+            Delete DuitNow QR
+        </button>
+    </form>
+{% endif %}
+
+<br>
+
+<a href="{{ url_for('marketplace.my_listings') }}">
+    Back to My Listings
+</a>
+{% endblock %}

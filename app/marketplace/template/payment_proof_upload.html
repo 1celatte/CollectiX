@@ -36,12 +36,15 @@ Upload Payment Proof
 
     <h3 class="h5">Payment Instructions</h3>
 
-    <div
-        class="bg-light border rounded d-flex align-items-center justify-content-center text-muted mb-3"
-        style="width: 180px; height: 180px;"
+    <img
+    src="{{ url_for(
+        'marketplace.static',
+        filename='uploads/payment_qrs/' ~ payment_qr.filename
+    ) }}"
+    alt="Seller's DuitNow QR"
+    class="img-fluid border rounded mb-3"
+    style="width: 220px; height: 220px; object-fit: contain;"
     >
-        Seller QR Code<br>(Demo)
-    </div>
 
     <p class="text-muted">
         Scan the seller's DuitNow QR, make payment, then upload a screenshot as proof.

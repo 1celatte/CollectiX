@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required, current_user
-from app.models import Item, OwnedItem, Listing, Transaction, User, Collection
+from app.models import Item, OwnedItem, Listing, Transaction, User, Collection, PaymentQR
 from app.extensions import db
 from app.marketplace import marketplace_bp
 from sqlalchemy import or_
@@ -10,7 +10,10 @@ import os  #create the image folder and file path
 from uuid import uuid4  #give each uploaded image a unique filename
 from werkzeug.utils import secure_filename  #make the uploaded filename safe
 
-#Display all available marketplace listings.
+
+#======================================================================
+# DISPLAY ALL AVAILABLE MARKETPLACE LISTINGS
+#======================================================================
 @marketplace_bp.route("/")
 def marketplace_home():
     listings = Listing.query.join(
@@ -29,12 +32,27 @@ def marketplace_home():
         listings=listings
     )
     
-#Create Listing page.
-#Login is required before the user can access this page.
+#======================================================================
+# CREATE LISTING
+#======================================================================
 @marketplace_bp.route("/create", methods=["GET", "POST"])
 @login_required #(check whether user login or not; if not,system will ask user to login 1st)
 def create_listing():
-         
+    
+    #Check whether the seller has uploaded their DuitNow for buyer to pay later
+    payment_qr = PaymentQR.query.filter_by(
+        user_id=current_user.id
+    ).first()
+
+    #A seller must upload their DuitNow before creating a listing.
+    if not payment_qr:
+        return redirect(
+            url_for(
+                "marketplace.payment_qr_settings",
+                required="must_upload_qr"
+            )
+        )
+       
     #Get items owned by the currently logged-in user.
     owned_items = Item.query.join(
         OwnedItem,
@@ -69,6 +87,7 @@ def create_listing():
     #The HTML dropdown will use this filtered item list.
     owned_items = available_items
     
+    #COLLECTION ID, NAME, ITEM
     #Store available items under their collection ID.
     items_by_collection = {}
             
@@ -229,7 +248,9 @@ def create_listing():
         url_for("marketplace.my_listings")
     )
 
-#Display listings created by the current user.
+#======================================================================
+# MY LISTINGS :  display listings created by the current user
+#======================================================================
 @marketplace_bp.route("/my-listings")
 @login_required
 def my_listings():
@@ -251,8 +272,134 @@ def my_listings():
         "my_listings.html",
         listings=listings
     )
+
+#====================================================================== 
+# SHOW THE SELLER DUITNOW QR
+#======================================================================
+@marketplace_bp.route(
+    "/payment-qr",
+    methods=["GET", "POST"]
+)
+@login_required
+def payment_qr_settings():
+
+    #Find the current seller's saved DuitNow QR.
+    payment_qr = PaymentQR.query.filter_by(
+        user_id=current_user.id
+    ).first()
     
-#Mark one of the current user's listings as unavailable.
+    #Show the page when the seller opens it.
+    if request.method == "GET":
+        return render_template(
+            "payment_qr_settings.html",
+            payment_qr=payment_qr
+        )
+
+    #Get the QR image submitted through the form.
+    qr_file = request.files.get("payment_qr")
+
+    #Do not save if the seller did not choose an image.
+    if not qr_file or not qr_file.filename:
+        return render_template(
+            "payment_qr_settings.html",
+            payment_qr=payment_qr,
+            error="Please select a payment QR image."
+        )
+
+    #Make the uploaded filename safe and unique.
+    original_filename = secure_filename(qr_file.filename)
+    qr_filename = f"{uuid4().hex}_{original_filename}"
+
+    #Create the folder for seller payment QR images if needed.
+    upload_folder = os.path.join(
+        marketplace_bp.root_path,
+        "static",
+        "uploads",
+        "payment_qrs"
+    )
+    os.makedirs(upload_folder, exist_ok=True)
+
+    #Save the QR image file in the marketplace static folder.
+    qr_file.save(
+        os.path.join(upload_folder, qr_filename)
+    )
+
+    #Update an existing QR, or create the seller's first QR record.
+    if payment_qr:
+        payment_qr.filename = qr_filename
+    else:
+        payment_qr = PaymentQR(
+            user_id=current_user.id,
+            filename=qr_filename
+        )
+        db.session.add(payment_qr)
+
+    #Save the QR filename to the database.
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.my_listings")
+    )
+
+#======================================================================
+# SELLER DELETE THEIR DUITNOW QR
+#======================================================================
+@marketplace_bp.route(
+    "/payment-qr/delete",
+    methods=["POST"]
+)
+@login_required
+def delete_payment_qr():
+
+    #Seller can't delete their QR if they got active listing
+    active_listing = Listing.query.filter(
+        Listing.user_id == current_user.id,
+        Listing.status.in_(
+            ["available", "unavailable", "pending"]
+        )
+    ).first()
+
+    if active_listing:
+        payment_qr = PaymentQR.query.filter_by(
+            user_id=current_user.id
+        ).first()
+
+        return render_template(
+            "payment_qr_settings.html",
+            payment_qr=payment_qr,
+            error=(
+                "You cannot delete your DuitNow QR while you have active listings or pending purchases!"
+            )
+        )
+
+    #Find only the current seller's QR record.
+    payment_qr = PaymentQR.query.filter_by(
+        user_id=current_user.id
+    ).first_or_404()
+
+    #Delete the QR image file from the project folder.
+    qr_file_path = os.path.join(
+        marketplace_bp.root_path,
+        "static",
+        "uploads",
+        "payment_qrs",
+        payment_qr.filename
+    )
+
+    if os.path.exists(qr_file_path):
+        os.remove(qr_file_path)
+
+    #Delete the QR record from the database.
+    db.session.delete(payment_qr)
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.my_listings")
+    )
+
+#====================================================================== 
+# SELLER MARK ONE OF THE LISTING AS UNAVAILABLE
+#======================================================================
 @marketplace_bp.route(
     "/<int:listing_id>/unavailable",
     methods=["POST"]
@@ -282,7 +429,9 @@ def mark_listing_unavailable(listing_id):
         url_for("marketplace.my_listings")
     )
 
-#Make one of the current user's listings available again.
+#======================================================================
+# SELLER MAKE A LISTING AVAILABLE AGAIN
+#======================================================================
 @marketplace_bp.route(
     "/<int:listing_id>/available",
     methods=["POST"]
@@ -307,7 +456,9 @@ def mark_listing_available(listing_id):
         url_for("marketplace.my_listings")
     ) 
     
-#Delete one of the current user's listings.
+#======================================================================
+# SELLER DELETE ONE OF THEIR LISTING
+#======================================================================
 @marketplace_bp.route(
     "/<int:listing_id>/delete",
     methods=["POST"]
@@ -345,8 +496,10 @@ def delete_listing(listing_id):
     return redirect(
         url_for("marketplace.my_listings")
     )
-    
-#Show or update one listing owned by the logged-in user.
+
+#======================================================================
+# SELLER EDIT LISTING
+#======================================================================
 @marketplace_bp.route(
     "/<int:listing_id>/edit",
     methods=["GET", "POST"]
@@ -410,11 +563,13 @@ def edit_listing(listing_id):
         url_for("marketplace.my_listings")
     )
 
-
-
-
+#======================================================================
 #NOW IS FOR BUY
-#Show the details of one marketplace listing.
+#======================================================================
+
+#======================================================================
+# VIEW LISTING: show the details of the marketplace listing
+#======================================================================
 @marketplace_bp.route("/<int:listing_id>")
 def view_listing(listing_id):
 
@@ -435,7 +590,9 @@ def view_listing(listing_id):
         item=item
     )
 
-#Show the purchase confirmation page or complete the purchase
+#======================================================================
+# BUYER PURCHASE LISTING (confirm purchase)
+#======================================================================
 @marketplace_bp.route(
     "/<int:listing_id>/purchase",
     methods=["GET", "POST"]
@@ -490,8 +647,10 @@ def purchase_listing(listing_id):
             transaction_id=new_transaction.id
         )
     )
-    
-#Buyer uploads payment proof for a pending transaction.
+
+#======================================================================
+# BUYER UPLOAD PAYMENT PROOF for a pending transaction
+#======================================================================
 @marketplace_bp.route(
     "/transactions/<int:transaction_id>/payment-proof",
     methods=["GET", "POST"]
@@ -508,6 +667,11 @@ def upload_payment_proof(transaction_id):
     item = Item.query.get_or_404(
         transaction.item_id
     )
+    
+    #Get the payment QR uploaded by the seller
+    payment_qr = PaymentQR.query.filter_by(
+        user_id=transaction.seller_id
+    ).first_or_404()
 
     #Buyer may submit the proof that they paid
     if transaction.status not in (
@@ -522,6 +686,7 @@ def upload_payment_proof(transaction_id):
             "payment_proof_upload.html",
             transaction=transaction,
             item=item,
+            payment_qr=payment_qr,
             error=message
         )
 
@@ -530,7 +695,8 @@ def upload_payment_proof(transaction_id):
         return render_template(
             "payment_proof_upload.html",
             transaction=transaction,
-            item=item
+            item=item,
+            payment_qr=payment_qr,
         )
         
     #POST: get the payment proof selected by the buyer.
@@ -580,7 +746,9 @@ def upload_payment_proof(transaction_id):
         url_for("marketplace.transaction_history")
     )
     
-#Buyer cancel purchase (after seller reject)
+#======================================================================
+# BUYER CANCEL PURCHASE after seller reject
+#======================================================================
 @marketplace_bp.route(
     "/transactions/<int:transaction_id>/cancel",
     methods=["POST"]
@@ -612,7 +780,9 @@ def cancel_purchase(transaction_id):
         url_for("marketplace.transaction_history")
     )
     
-#Show payment proof waiting for the current seller to review.
+#======================================================================
+# SHOW PAYMENT REQUESTS waiting for seller to review
+#======================================================================
 @marketplace_bp.route("/payment-requests")
 @login_required
 def payment_requests():
@@ -642,7 +812,9 @@ def payment_requests():
         requests=requests
     )
 
-#If seller approves a submitted payment proof.
+#======================================================================
+# SELLER choose to APPROVE PAYMENT
+#======================================================================
 @marketplace_bp.route(
     "/transactions/<int:transaction_id>/approve",
     methods=["POST"]
@@ -705,8 +877,9 @@ def approve_payment(transaction_id):
         url_for("marketplace.payment_requests")
     )
 
-
-#If seller rejects a submitted payment proof.
+#======================================================================
+# SELLER choose to REJECT PAYMENT
+#======================================================================
 @marketplace_bp.route(
     "/transactions/<int:transaction_id>/reject",
     methods=["POST"]
@@ -730,8 +903,9 @@ def reject_payment(transaction_id):
         url_for("marketplace.payment_requests")
     )
      
-#TRANSACTION HISTORY
-#Show transactions where the current user is the buyer or seller.
+#======================================================================
+# TRANSACTION HISTORY
+#======================================================================
 @marketplace_bp.route("/transactions")
 @login_required
 def transaction_history():
