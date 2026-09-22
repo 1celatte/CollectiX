@@ -16,206 +16,279 @@
 
         {% if messages %}
 
-            <ul class="flashes">
+            {% for category, message in messages %}
 
-                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
 
-                    <li>
-                        {{ message }}
-                    </li>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+                </div>
 
-                {% endfor %}
-
-            </ul>
+            {% endfor %}
 
         {% endif %}
 
     {% endwith %}
 
+
     <!-- ===================================================== -->
     <!-- COLLECTION INFORMATION -->
     <!-- ===================================================== -->
 
-    <div class="collection">
+    <div class="card shadow-sm mb-4">
 
-        {% if collection.image %}
+        <div class="card-body">
 
-            <img
-                class="collection-image"
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + collection.image
-                ) }}"
-                alt="{{ collection.name }}"
-                width="200"
-            >
+            <div class="row align-items-center g-4">
 
-        {% else %}
+                <!-- Collection Image -->
 
-            <div
-                style="
-                    width: 150px;
-                    height: 150px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #eee;
-                "
-            >
-                No Image
-            </div>
+                <div class="col-md-4 text-center">
 
-        {% endif %}
+                    {% if collection.image %}
 
-        <h1>
-            {{ collection.name }}
-        </h1>
+                        <img
+                            src="{{ url_for(
+                                'collection.static',
+                                filename='uploads/' + collection.image
+                            ) }}"
+                            alt="{{ collection.name }}"
+                            class="img-fluid rounded"
+                            style="
+                                width: 100%;
+                                max-width: 300px;
+                                height: 250px;
+                                object-fit: contain;
+                            "
+                        >
 
-        <p class="tag">
+                    {% else %}
 
-            <strong>Tag:</strong>
+                        <div
+                            class="bg-light rounded d-flex align-items-center justify-content-center mx-auto text-muted"
+                            style="
+                                width: 100%;
+                                max-width: 300px;
+                                height: 250px;
+                            "
+                        >
+                            No Image
+                        </div>
 
-            {% if collection.tag %}
-                {{ collection.tag.name }}
-            {% else %}
-                Not assigned
-            {% endif %}
+                    {% endif %}
 
-        </p>
+                </div>
 
-        {% if collection.description %}
 
-            <p class="description">
+                <!-- Collection Information -->
 
-                <strong>Description:</strong>
+                <div class="col-md-8">
 
-                {{ collection.description }}
+                    <h1 class="fw-bold mb-3">
+                        {{ collection.name }}
+                    </h1>
 
-            </p>
+                    <div class="mb-3">
 
-        {% endif %}
+                        <strong>Tag:</strong>
 
-    </div>
+                        {% if collection.tag %}
 
-    <hr>
-
-    <!-- ===================================================== -->
-    <!-- ADD COLLECTION TO MY COLLECTION -->
-    <!-- ===================================================== -->
-
-    <div class="my-collection-section">
-
-        <h2>
-            My Collection
-        </h2>
-
-        {% if already_in_collection %}
-
-            <button
-                type="button"
-                disabled
-                style="
-                    cursor: not-allowed;
-                    opacity: 0.6;
-                "
-            >
-                ✓ Already in My Collection
-            </button>
-
-            <p style="color: #b45309;">
-                You already have this collection.
-            </p>
-
-        {% else %}
-
-            <form
-                action="{{ url_for(
-                    'collection.add_to_my_collection',
-                    collection_id=collection.id
-                ) }}"
-                method="POST"
-            >
-
-                <button type="submit">
-                    + Add to My Collection
-                </button>
-
-            </form>
-
-        {% endif %}
-
-    </div>
-
-    <hr>
-
-    <!-- ===================================================== -->
-    <!-- ITEMS -->
-    <!-- ===================================================== -->
-
-    <div class="items-section">
-
-        <h2>
-            Items in this Collection
-        </h2>
-
-        {% if items %}
-
-            <div class="item-list">
-
-                {% for item in items %}
-
-                    <div class="item-card">
-
-                        <!-- Item Image -->
-
-                        {% if item.image %}
-
-                            <img
-                                class="item-image"
-                                src="{{ url_for(
-                                    'collection.static',
-                                    filename='uploads/' + item.image
-                                ) }}"
-                                alt="{{ item.name }}"
-                                width="150"
-                            >
+                            <span class="badge bg-primary ms-1">
+                                {{ collection.tag.name }}
+                            </span>
 
                         {% else %}
 
-                            <div
-                                style="
-                                    width: 150px;
-                                    height: 150px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    background: #eee;
-                                "
-                            >
-                                No Image
-                            </div>
-
-                        {% endif %}
-
-                        <!-- Item Name -->
-
-                        <h3>
-                            {{ item.name }}
-                        </h3>
-
-                        <!-- Item Description -->
-
-                        {% if item.description %}
-
-                            <p>
-                                {{ item.description }}
-                            </p>
+                            <span class="badge bg-secondary ms-1">
+                                Not assigned
+                            </span>
 
                         {% endif %}
 
                     </div>
 
-                    <hr>
+
+                    {% if collection.description %}
+
+                        <div>
+
+                            <strong>Description:</strong>
+
+                            <p class="text-muted mt-2 mb-0">
+                                {{ collection.description }}
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ADD COLLECTION TO MY COLLECTION -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h2 class="h4 fw-bold mb-3">
+                My Collection
+            </h2>
+
+            {% if already_in_collection %}
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    disabled
+                >
+                    ✓ Already in My Collection
+                </button>
+
+                <p class="text-muted mt-2 mb-0">
+                    You already have this collection.
+                </p>
+
+            {% else %}
+
+                <form
+                    action="{{ url_for(
+                        'collection.add_to_my_collection',
+                        collection_id=collection.id
+                    ) }}"
+                    method="POST"
+                >
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        + Add to My Collection
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ITEMS -->
+    <!-- ===================================================== -->
+
+    <div class="mb-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="fw-bold mb-0">
+                Items in this Collection
+            </h2>
+
+        </div>
+
+
+        {% if items %}
+
+            <div class="row g-4">
+
+                {% for item in items %}
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <div class="card h-100 shadow-sm">
+
+                            <!-- Item Image -->
+
+                            {% if item.image %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'collection.static',
+                                        filename='uploads/' + item.image
+                                    ) }}"
+                                    alt="{{ item.name }}"
+                                    class="card-img-top"
+                                    style="
+                                        height: 220px;
+                                        object-fit: contain;
+                                    "
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="bg-light d-flex align-items-center justify-content-center text-muted"
+                                    style="height: 220px;"
+                                >
+                                    No Image
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Item Information -->
+
+                            <div class="card-body d-flex flex-column">
+
+                                <h3 class="h5 fw-bold card-title">
+                                    {{ item.name }}
+                                </h3>
+
+
+                                {% if item.description %}
+
+                                    <p class="card-text text-muted">
+                                        {{ item.description }}
+                                    </p>
+
+                                {% else %}
+
+                                    <p class="card-text text-muted">
+                                        No description provided.
+                                    </p>
+
+                                {% endif %}
+
+
+                                <!-- Access Item Button -->
+
+                                <div class="mt-auto pt-3">
+
+                                    <a
+                                        href="{{ url_for(
+                                            'collection.view_item',
+                                            collection_id=collection.id,
+                                            item_id=item.id
+                                        ) }}"
+                                        class="btn btn-outline-primary w-100"
+                                    >
+                                        View Item
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 {% endfor %}
 
@@ -223,46 +296,50 @@
 
         {% else %}
 
-            <p>
+            <div class="alert alert-light border">
                 No approved items in this collection yet.
-            </p>
+            </div>
 
         {% endif %}
+
 
         <!-- ================================================= -->
         <!-- ADD ITEM -->
         <!-- ================================================= -->
 
-        <br>
+        <div class="mt-4">
 
-        <a
-            href="{{ url_for(
-                'collection.add_item',
-                collection_id=collection.id
-            ) }}"
-        >
-            <button type="button">
+            <a
+                href="{{ url_for(
+                    'collection.add_item',
+                    collection_id=collection.id
+                ) }}"
+                class="btn btn-success"
+            >
                 + Add Item
-            </button>
-        </a>
+            </a>
+
+        </div>
 
     </div>
 
-    <hr>
 
     <!-- ===================================================== -->
     <!-- BACK BUTTON -->
     <!-- ===================================================== -->
 
-    <a
-        href="{{ url_for(
-            'collection.list_collections'
-        ) }}"
-    >
-        <button type="button">
+    <div class="border-top pt-4">
+
+        <a
+            href="{{ url_for(
+                'collection.list_collections'
+            ) }}"
+            class="btn btn-secondary"
+        >
             ← Back to Public Collections
-        </button>
-    </a>
+        </a>
+
+    </div>
 
 </div>
 

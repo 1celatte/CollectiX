@@ -6,79 +6,264 @@ My Collections
 
 {% block content %}
 
-<h1>My Collections</h1>
+<div class="container">
 
-{% if collections %}
+    <!-- Page Header + Sort -->
 
-    {% for collection in collections %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <hr>
+        <h1 class="fw-bold mb-0">
+            My Collections
+        </h1>
 
-        <h2>
-            {{ collection.name }}
-        </h2>
+        <!-- Sort Collections -->
 
-        {% if collection.image %}
+        <form method="GET">
 
-            <img
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + collection.image
-                ) }}"
-                alt="{{ collection.name }}"
-                width="150"
+            <select
+                name="sort"
+                class="form-select"
+                onchange="this.form.submit()"
             >
 
-        {% else %}
+                <option
+                    value="recent"
+                    {% if sort == "recent" %}selected{% endif %}
+                >
+                    Recently Added
+                </option>
 
-            <div
-                style="
-                    width: 150px;
-                    height: 150px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #eee;
-                "
-            >
-                No Image
-            </div>
+                <option
+                    value="progress_asc"
+                    {% if sort == "progress_asc" %}selected{% endif %}
+                >
+                    Progress: Low to High
+                </option>
 
-        {% endif %}
+                <option
+                    value="progress_desc"
+                    {% if sort == "progress_desc" %}selected{% endif %}
+                >
+                    Progress: High to Low
+                </option>
 
-        <p>
-            <strong>Tag:</strong>
+            </select>
 
-            {% if collection.tag %}
-                {{ collection.tag.name }}
-            {% else %}
-                Not assigned
-            {% endif %}
-        </p>
+        </form>
 
-        <p>
-            {{ collection.description }}
-        </p>
+    </div>
 
-        <a
-            href="{{ url_for(
-                'my_collection.view_my_collection',
-                collection_id=collection.id
-            ) }}"
-        >
-            <button type="button">
-                View Collection Details
-            </button>
-        </a>
 
-    {% endfor %}
+    {% if collections %}
 
-{% else %}
+        <div class="row g-4">
 
-    <p>
-        You have not added any collections yet.
-    </p>
+            {% for data in collections %}
 
-{% endif %}
+                {% set collection = data.collection %}
+
+                <div class="col-12 col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <!-- Collection Image -->
+
+                        {% if collection.image %}
+
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + collection.image
+                                ) }}"
+                                alt="{{ collection.name }}"
+                                class="card-img-top"
+                                style="
+                                    height: 220px;
+                                    object-fit: contain;
+                                    background-color: #f8f9fa;
+                                "
+                            >
+
+                        {% else %}
+
+                            <div
+                                class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                style="height: 220px;"
+                            >
+                                No Image
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Collection Information -->
+
+                        <div class="card-body">
+
+                            <h5 class="card-title fw-bold">
+                                {{ collection.name }}
+                            </h5>
+
+
+                            <!-- Tag -->
+
+                            <p class="mb-2">
+
+                                <strong>Tag:</strong>
+
+                                {% if collection.tag %}
+
+                                    <span class="badge bg-primary">
+                                        {{ collection.tag.name }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        Not assigned
+                                    </span>
+
+                                {% endif %}
+
+                            </p>
+
+
+                            <!-- Description -->
+
+                            <p class="card-text text-muted">
+                                {{ collection.description }}
+                            </p>
+
+
+                            <hr>
+
+
+                            <!-- Collection Progress -->
+
+                            <h6 class="fw-bold mb-3">
+                                Collection Progress
+                            </h6>
+
+
+                            <div class="row text-center mb-3">
+
+                                <div class="col">
+
+                                    <div class="fw-bold">
+                                        {{ data.total_items }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        Total
+                                    </small>
+
+                                </div>
+
+
+                                <div class="col">
+
+                                    <div class="fw-bold text-success">
+                                        {{ data.owned_items }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        Owned
+                                    </small>
+
+                                </div>
+
+
+                                <div class="col">
+
+                                    <div class="fw-bold text-danger">
+                                        {{ data.missing_items }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        Missing
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Progress Percentage -->
+
+                            <div class="d-flex justify-content-between mb-1">
+
+                                <small class="fw-bold">
+                                    Progress
+                                </small>
+
+                                <small class="fw-bold">
+                                    {{ data.progress }}%
+                                </small>
+
+                            </div>
+
+
+                            <!-- Bootstrap Progress Bar -->
+
+                            <div
+                                class="progress"
+                                role="progressbar"
+                                aria-label="Collection progress"
+                                aria-valuenow="{{ data.progress }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                style="height: 20px;"
+                            >
+
+                                <div
+                                    class="progress-bar bg-success"
+                                    style="width: {{ data.progress }}%;"
+                                >
+                                    {{ data.progress }}%
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Card Footer -->
+
+                        <div class="card-footer bg-white border-0">
+
+                            <a
+                                href="{{ url_for(
+                                    'my_collection.view_my_collection',
+                                    collection_id=collection.id
+                                ) }}"
+                                class="btn btn-primary w-100"
+                            >
+                                <i class="bi bi-collection"></i>
+                                View Collection Details
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-info">
+
+            <i class="bi bi-info-circle"></i>
+
+            You have not added any collections yet.
+
+        </div>
+
+    {% endif %}
+
+</div>
 
 {% endblock %}
