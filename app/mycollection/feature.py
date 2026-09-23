@@ -1,7 +1,7 @@
 from flask import render_template, abort, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app import db
-from app.models import Collection, UserCollection,OwnedItem, Item,User
+from app.models import Collection, UserCollection,OwnedItem, Item, User
 from . import my_collection_bp
 
 #=======================================================================================================================
