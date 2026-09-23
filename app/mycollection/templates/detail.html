@@ -1,28 +1,40 @@
 {% extends "base.html" %}
 
+
 {% block title %}
+
 {{ collection.name }}
+
 {% endblock %}
+
 
 {% block content %}
 
+
 <div class="container">
+
 
     <!-- ===================================================== -->
     <!-- FLASH MESSAGES -->
     <!-- ===================================================== -->
 
+
     {% with messages = get_flashed_messages(with_categories=true) %}
+
 
         {% if messages %}
 
+
             {% for category, message in messages %}
+
 
                 <div
                     class="alert alert-{{ category }} alert-dismissible fade show"
                     role="alert"
                 >
+
                     {{ message }}
+
 
                     <button
                         type="button"
@@ -31,25 +43,38 @@
                         aria-label="Close"
                     ></button>
 
+
                 </div>
+
 
             {% endfor %}
 
+
         {% endif %}
+
 
     {% endwith %}
 
 
+
+
     <!-- Collection Header -->
 
+
     <div class="card shadow-sm mb-4">
+
         <div class="card-body">
 
+
             <h1 class="card-title fw-bold mb-3">
+
                 {{ collection.name }}
+
             </h1>
 
+
             {% if collection.image %}
+
 
                 <img
                     src="{{ url_for(
@@ -66,91 +91,153 @@
                     "
                 >
 
+
             {% endif %}
 
+
             <p class="mb-2">
+
                 <strong>Tag:</strong>
 
+
                 {% if collection.tag %}
+
                     <span class="badge bg-primary">
+
                         {{ collection.tag.name }}
+
                     </span>
+
                 {% else %}
+
                     <span class="badge bg-secondary">
+
                         Not assigned
+
                     </span>
+
                 {% endif %}
+
             </p>
 
+
             <p class="mb-0">
+
                 <strong>Description:</strong>
+
                 {{ collection.description }}
+
             </p>
+
 
 
             <!-- Collection Progress -->
+
             <hr>
 
+
             <h5 class="fw-bold mb-3">
+
                 Collection Progress
+
             </h5>
+
 
             <div class="row text-center mb-3">
 
+
                 <!-- Total Items -->
+
                 <div class="col">
+
                     <div class="fw-bold">
+
                         {{ total_items }}
+
                     </div>
 
+
                     <small class="text-muted">
+
                         Total
+
                     </small>
+
                 </div>
+
 
 
                 <!-- Owned Items -->
+
                 <div class="col">
+
                     <div class="fw-bold text-success">
+
                         {{ owned_count }}
+
                     </div>
 
+
                     <small class="text-muted">
+
                         Owned
+
                     </small>
+
                 </div>
+
 
 
                 <!-- Missing Items -->
+
                 <div class="col">
+
                     <div class="fw-bold text-danger">
+
                         {{ missing_items }}
+
                     </div>
 
+
                     <small class="text-muted">
+
                         Missing
+
                     </small>
+
                 </div>
 
+
             </div>
+
 
 
             <!-- Progress Percentage -->
 
+
             <div class="d-flex justify-content-between mb-1">
 
-                <small class="fw-bold">
-                    Progress
-                </small>
 
                 <small class="fw-bold">
-                    {{ progress }}%
+
+                    Progress
+
                 </small>
+
+
+                <small class="fw-bold">
+
+                    {{ progress }}%
+
+                </small>
+
 
             </div>
 
 
+
             <!-- Bootstrap Progress Bar -->
+
 
             <div
                 class="progress"
@@ -162,36 +249,54 @@
                 style="height: 20px;"
             >
 
+
                 <div
                     class="progress-bar bg-success"
                     style="width: {{ progress }}%;"
                 >
+
                     {{ progress }}%
+
                 </div>
+
 
             </div>
 
+
         </div>
+
     </div>
+
+
 
 
     <!-- Items -->
 
+
     <h2 class="fw-bold mb-3">
+
         Items in This Collection
+
     </h2>
+
 
     {% if items %}
 
+
         <div class="row g-4">
+
 
             {% for item in items %}
 
+
                 <div class="col-12 col-md-6 col-lg-4">
+
 
                     <div class="card h-100 shadow-sm">
 
+
                         {% if item.image %}
+
 
                             <img
                                 src="{{ url_for(
@@ -207,30 +312,44 @@
                                 "
                             >
 
+
                         {% else %}
+
 
                             <div
                                 class="d-flex align-items-center justify-content-center bg-light text-muted"
                                 style="height: 220px;"
                             >
+
                                 No Image
+
                             </div>
+
 
                         {% endif %}
 
 
+
                         <div class="card-body">
 
+
                             <h5 class="card-title fw-bold">
+
                                 {{ item.name }}
+
                             </h5>
 
+
                             <p class="card-text">
+
                                 {{ item.description }}
+
                             </p>
 
 
+
                             <!-- Check whether current user owns this item -->
+
 
                             {% set owned = owned_items
                                 |selectattr("item_id", "equalto", item.id)
@@ -239,60 +358,141 @@
                             %}
 
 
+
                             {% if owned %}
 
+
                                 <div class="mb-2">
+
                                     <strong>Status:</strong>
 
+
                                     <span class="badge bg-success">
+
                                         Owned
+
                                     </span>
+
                                 </div>
 
+
                                 <div>
+
                                     <strong>Quantity:</strong>
+
                                     {{ owned.quantity }}
+
                                 </div>
+
 
                             {% else %}
 
+
                                 <div class="mb-2">
+
                                     <strong>Status:</strong>
 
+
                                     <span class="badge bg-secondary">
+
                                         Unowned
+
                                     </span>
+
                                 </div>
 
+
                                 <div>
+
                                     <strong>Quantity:</strong>
+
                                     0
+
                                 </div>
+
 
                             {% endif %}
 
+
                         </div>
+
 
                     </div>
 
+
                 </div>
+
 
             {% endfor %}
 
+
         </div>
+
 
     {% else %}
 
+
         <div class="alert alert-info">
+
             No approved items are available in this collection yet.
+
         </div>
+
 
     {% endif %}
 
 
+
+
     <!-- Action Buttons -->
 
+
     <div class="d-flex flex-wrap gap-2 mt-4">
+
+
+        <!-- Find Missing Items Button -->
+
+
+        {% if missing_items > 0 %}
+
+
+            <a
+                href="{{ url_for(
+                    'my_collection.view_missing_items',
+                    collection_id=collection.id
+                ) }}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-search"></i>
+
+                Find Missing Items
+
+            </a>
+
+
+        {% else %}
+
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                disabled
+            >
+
+                <i class="bi bi-check-circle"></i>
+
+                No Missing Items
+
+            </button>
+
+
+        {% endif %}
+
+
+
+        <!-- Edit My Collection -->
+
 
         <a
             href="{{ url_for(
@@ -301,12 +501,17 @@
             ) }}"
             class="btn btn-primary"
         >
+
             <i class="bi bi-pencil-square"></i>
+
             Edit My Collection
+
         </a>
 
 
+
         <!-- Remove Button -->
+
 
         <button
             type="button"
@@ -314,9 +519,16 @@
             data-bs-toggle="modal"
             data-bs-target="#removeCollectionModal"
         >
+
             <i class="bi bi-trash"></i>
+
             Remove From My Collection
+
         </button>
+
+
+
+        <!-- Back Button -->
 
 
         <a
@@ -325,14 +537,21 @@
             ) }}"
             class="btn btn-secondary"
         >
+
             <i class="bi bi-arrow-left"></i>
+
             Back to My Collections
+
         </a>
+
 
     </div>
 
 
+
+
     <!-- Remove Confirmation Modal -->
+
 
     <div
         class="modal fade"
@@ -342,18 +561,25 @@
         aria-hidden="true"
     >
 
+
         <div class="modal-dialog modal-dialog-centered">
+
 
             <div class="modal-content">
 
+
                 <div class="modal-header">
+
 
                     <h5
                         class="modal-title fw-bold"
                         id="removeCollectionModalLabel"
                     >
+
                         Remove From My Collection
+
                     </h5>
+
 
                     <button
                         type="button"
@@ -362,29 +588,42 @@
                         aria-label="Close"
                     ></button>
 
+
                 </div>
+
 
 
                 <div class="modal-body">
 
+
                     <p class="mb-0">
+
                         Are you sure you want to remove
+
                         <strong>{{ collection.name }}</strong>
+
                         from My Collection?
+
                     </p>
+
 
                 </div>
 
 
+
                 <div class="modal-footer">
+
 
                     <button
                         type="button"
                         class="btn btn-secondary"
                         data-bs-dismiss="modal"
                     >
+
                         Cancel
+
                     </button>
+
 
 
                     <form
@@ -395,24 +634,36 @@
                         ) }}"
                     >
 
+
                         <button
                             type="submit"
                             class="btn btn-danger"
                         >
+
                             <i class="bi bi-trash"></i>
+
                             Yes
+
                         </button>
+
 
                     </form>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
+
 
     </div>
 
+
+
 </div>
+
 
 {% endblock %}

@@ -93,6 +93,59 @@ def list_my_collections():
     
 #=======================================================================================================================
 
+# View missing items from one collection
+
+#=======================================================================================================================
+
+@my_collection_bp.route(
+    "/<int:collection_id>/missing-items"
+)
+@login_required
+def view_missing_items(collection_id):
+
+    # Check that this collection belongs to the logged-in user
+    user_collection = UserCollection.query.filter_by(
+        user_id=current_user.id,
+        collection_id=collection_id
+    ).first()
+
+    if not user_collection:
+        abort(404)
+
+    # Get the collection
+    collection = Collection.query.get_or_404(
+        collection_id
+    )
+
+    # Get all approved items in this collection
+    items = Item.query.filter_by(
+        collection_id=collection_id,
+        status="approved"
+    ).all()
+
+    missing_items = []
+
+    for item in items:
+
+        # Check whether the user owns this item
+        owned_item = OwnedItem.query.filter_by(
+            user_id=current_user.id,
+            item_id=item.id
+        ).first()
+
+        # Item is missing when it is not owned
+        # with quantity >= 1
+        if not owned_item or owned_item.quantity < 1:
+            missing_items.append(item)
+
+    return render_template(
+        "missing_items.html",
+        collection=collection,
+        missing_items=missing_items
+    )
+    
+#=======================================================================================================================
+
 # View collection's details
 
 #=======================================================================================================================
@@ -296,3 +349,4 @@ def remove_from_my_collection(collection_id):
     return redirect(
         url_for("my_collection.list_my_collections")
     )
+
