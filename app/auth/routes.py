@@ -231,6 +231,14 @@ def login():
                 email=email
             )
 
+        # User is banned
+        if user.is_banned:
+            return render_template(
+                "login.html",
+                login_error=f"Your account has been banned. Reason: {user.ban_reason}",
+                email=email
+            )
+
         login_user(user)
 
         if user.role == "admin":
