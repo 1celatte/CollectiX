@@ -6,6 +6,7 @@ Upload Payment Proof
 
 {% block content %}
 
+<!--Page heading-->
 <h1>Complete Payment</h1>
 
 <p>
@@ -13,11 +14,13 @@ Upload Payment Proof
 </p>
 
 {% if error %}
-<div class="alert alert-danger">
-    {{ error }}
-</div>
+    <!--Show payment proof upload error-->
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
 {% endif %}
 
+<!--Show transaction information and payment instructions-->
 <div class="card p-4 mt-4">
 
     <h2 class="h4">{{ item.name }}</h2>
@@ -36,23 +39,31 @@ Upload Payment Proof
 
     <h3 class="h5">Payment Instructions</h3>
 
+    <!--Show the seller's DuitNow QR-->
     <img
-    src="{{ url_for(
-        'marketplace.static',
-        filename='uploads/payment_qrs/' ~ payment_qr.filename
-    ) }}"
-    alt="Seller's DuitNow QR"
-    class="img-fluid border rounded mb-3"
-    style="width: 220px; height: 220px; object-fit: contain;"
+        src="{{ url_for(
+            'marketplace.static',
+            filename='uploads/payment_qrs/' ~ payment_qr.filename
+        ) }}"
+        alt="Seller's DuitNow QR"
+        class="img-fluid border rounded mb-3"
+        style="width: 220px; height: 220px; object-fit: contain;"
     >
 
     <p class="text-muted">
         Scan the seller's DuitNow QR, make payment, then upload a screenshot as proof.
     </p>
 
-    <form method="POST" enctype="multipart/form-data">
+    <!--Upload payment proof after making payment-->
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
 
-        <label for="payment_proof" class="form-label">
+        <label
+            for="payment_proof"
+            class="form-label"
+        >
             Payment Proof Image
         </label>
 
@@ -65,7 +76,10 @@ Upload Payment Proof
             required
         >
 
-        <button type="submit" class="btn btn-primary mt-3">
+        <button
+            type="submit"
+            class="btn btn-primary mt-3"
+        >
             Submit Payment Proof
         </button>
 

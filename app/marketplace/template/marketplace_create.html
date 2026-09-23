@@ -11,29 +11,35 @@ Create Marketplace Listing
 
 <!--Show validation error without leaving this page-->
 {% if error %}
-<div class="alert alert-danger" role="alert">
-    {{ error }}
-</div>
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
 {% endif %}
 
 <!--Form for creating a new marketplace listing-->
-<form method="POST" enctype="multipart/form-data">
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
 
     <!--User selects the item to list-->
     <label for="item_id">Item:</label>
 
-    <select id="item_id" name="item_id">
+    <select
+        id="item_id"
+        name="item_id"
+    >
         <option value="">Select an item</option>
 
         <!--Show collection, follow by all the items-->
         {% for collection in collections %}
-        <optgroup label="{{ collection.name }}">
+            <optgroup label="{{ collection.name }}">
             {% for item in items_by_collection[collection.id] %}
-            <option value="{{ item.id }}">
-                {{ item.name }}
-            </option>
+                <option value="{{ item.id }}">
+                    {{ item.name }}
+                </option>
             {% endfor %}
-        </optgroup>
+            </optgroup>
         {% endfor %}
     </select>
 
@@ -42,14 +48,22 @@ Create Marketplace Listing
     <!--User uploads photo of the item-->
     <label for="image">Image:</label>
 
-    <input type="file" id="image" name="image" accept="image/*">
+    <input
+        type="file"
+        id="image"
+        name="image"
+        accept="image/*"
+    >
 
     <br><br>
 
     <!--User selects the item's condition-->
     <label for="condition">Condition:</label>
 
-    <select id="condition" name="condition">
+    <select
+        id="condition"
+        name="condition"
+    >
         <option value="Brand New">Brand New</option>
         <option value="Like New">Like New</option>
         <option value="Good">Good</option>
@@ -62,7 +76,10 @@ Create Marketplace Listing
     <!--User chooses whether to sell or trade the item-->
     <label for="listing_type">Listing Type:</label>
 
-    <select id="listing_type" name="listing_type">
+    <select
+        id="listing_type"
+        name="listing_type"
+    >
         <option value="sell">Sell</option>
         <option value="trade">Trade</option>
     </select>
@@ -72,14 +89,25 @@ Create Marketplace Listing
     <!--User describes the item-->
     <label for="description">Description:</label><br>
 
-    <textarea id="description" name="description" rows="5" cols="40"></textarea>
+    <textarea
+        id="description"
+        name="description"
+        rows="5"
+        cols="40"
+    ></textarea>
 
     <br><br>
 
     <!--User enters the price; trade listings may leave this empty-->
     <label for="price">Price:</label>
 
-    <input type="number" id="price" name="price" min="0" step="0.01">
+    <input
+        type="number"
+        id="price"
+        name="price"
+        min="0"
+        step="0.01"
+    >
 
     <br><br>
 

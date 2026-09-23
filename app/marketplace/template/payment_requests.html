@@ -6,79 +6,91 @@ Payment Requests
 
 {% block content %}
 
+<!--Page heading-->
 <h1>Payment Requests</h1>
 
 {% if requests %}
+    <!--Show payment proofs waiting for the current seller's review-->
+    {% for transaction, item, buyer in requests %}
+        <div class="card p-4 mt-4">
+            <h2 class="h4">{{ item.name }}</h2>
 
-{% for transaction, item, buyer in requests %}
+            <p>
+                Buyer:
+                <strong>{{ buyer.name }}</strong>
+            </p>
 
-<div class="card p-4 mt-4">
+            <p>
+                Price:
+                <strong>RM {{ "%.2f"|format(transaction.price) }}</strong>
+            </p>
 
-    <h2 class="h4">{{ item.name }}</h2>
+            <p>
+                Transaction status:
+                <strong>
+                    {{ transaction.status|replace("_", " ")|title }}
+                </strong>
+            </p>
 
-    <p>
-        Buyer:
-        <strong>{{ buyer.name }}</strong>
-    </p>
+            <h3 class="h5 mt-4">Payment Proof</h3>
 
-    <p>
-        Price:
-        <strong>RM {{ "%.2f"|format(transaction.price) }}</strong>
-    </p>
+            <!--Show the payment proof uploaded by the buyer-->
+            {% if transaction.payment_proof %}
+                <img
+                    src="{{ url_for(
+                        'marketplace.static',
+                        filename='uploads/payment_proofs/' ~ transaction.payment_proof
+                    ) }}"
+                    alt="Payment proof uploaded by {{ buyer.name }}"
+                    class="img-fluid border rounded"
+                    style="max-width: 500px; max-height: 500px; object-fit: contain;"
+                >
+            {% else %}
+                <p class="text-muted">
+                    No payment proof was uploaded.
+                </p>
+            {% endif %}
 
-    <p>
-        Transaction status:
-        <strong>
-            {{ transaction.status|replace("_", " ")|title }}
-        </strong>
-    </p>
+            <!--Allow the seller to approve or reject payment-->
+            <div class="d-flex gap-2 mt-4">
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'marketplace.approve_payment',
+                        transaction_id=transaction.id
+                    ) }}"
+                >
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                    >
+                        Approve Payment
+                    </button>
+                </form>
 
-    <h3 class="h5 mt-4">Payment Proof</h3>
-
-    {% if transaction.payment_proof %}
-    <img src="{{ url_for(
-            'marketplace.static',
-            filename='uploads/payment_proofs/' ~ transaction.payment_proof
-        ) }}" alt="Payment proof uploaded by {{ buyer.name }}" class="img-fluid border rounded"
-        style="max-width: 500px; max-height: 500px; object-fit: contain;">
-    {% else %}
-    <p class="text-muted">
-        No payment proof was uploaded.
-    </p>
-    {% endif %}
-
-    <div class="d-flex gap-2 mt-4">
-
-        <form method="POST" action="{{ url_for(
-            'marketplace.approve_payment',
-            transaction_id=transaction.id
-        ) }}">
-            <button type="submit" class="btn btn-success">
-                Approve Payment
-            </button>
-        </form>
-
-        <form method="POST" action="{{ url_for(
-            'marketplace.reject_payment',
-            transaction_id=transaction.id
-        ) }}">
-            <button type="submit" class="btn btn-danger">
-                Reject Payment
-            </button>
-        </form>
-
-    </div>
-
-</div>
-
-{% endfor %}
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'marketplace.reject_payment',
+                        transaction_id=transaction.id
+                    ) }}"
+                >
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                    >
+                        Reject Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
 
 {% else %}
-
-<div class="alert alert-info mt-4">
-    You have no payment proofs waiting for review.
-</div>
-
+    <!--Show message when no payment proof requires review-->
+    <div class="alert alert-info mt-4">
+        You have no payment proofs waiting for review.
+    </div>
 {% endif %}
 
 {% endblock %}

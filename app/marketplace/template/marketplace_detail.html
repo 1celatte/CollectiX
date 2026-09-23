@@ -13,16 +13,16 @@ Marketplace Listing
 <h2>{{ item.name }}</h2>
 
 {% if listing.image %}
-<img
-    src="{{ url_for(
-        'marketplace.static',
-        filename='uploads/listings/' ~ listing.image
-    ) }}"
-    alt="{{ item.name }}"
-    style="max-width: 400px; max-height: 400px; object-fit: contain;"
->
+    <img
+        src="{{ url_for(
+            'marketplace.static',
+            filename='uploads/listings/' ~ listing.image
+        ) }}"
+        alt="{{ item.name }}"
+        style="max-width: 400px; max-height: 400px; object-fit: contain;"
+    >
 {% else %}
-<p>No image available.</p>
+    <p>No image available.</p>
 {% endif %}
 
 <!--Show the type of listing: Sell or Trade-->
@@ -43,13 +43,13 @@ Marketplace Listing
 
 <!--Show the price (Trade will be empty)-->
 {% if listing.price is not none %}
-<p>
-    Price: <strong>RM {{ "%.2f"|format(listing.price) }}</strong>
-</p>
+    <p>
+        Price: <strong>RM {{ "%.2f"|format(listing.price) }}</strong>
+    </p>
 {% else %}
-<p>
-    Price: <strong>Trade only</strong>
-</p>
+    <p>
+        Price: <strong>Trade only</strong>
+    </p>
 {% endif %}
 
 <!--Show the current listing status-->
@@ -61,18 +61,18 @@ Marketplace Listing
 {% if listing.status == "available" and listing.listing_type == "sell" %}
 
 <!--Open the purchase confirmation page-->
-<a href="{{ url_for(
+    <a href="{{ url_for(
             'marketplace.purchase_listing',
             listing_id=listing.id
         ) }}">
-    Buy Now
-</a>
+        Buy Now
+    </a>
 
 {% elif listing.status == "available" and listing.listing_type == "trade" %}
-<p>This item is available for trade.</p>
+    <p>This item is available for trade.</p>
 
 {% else %}
-<p>This listing is no longer available.</p>
+    <p>This listing is no longer available.</p>
 
 {% endif %}
 

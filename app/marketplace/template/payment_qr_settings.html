@@ -3,21 +3,24 @@
 {% block title %}DuitNow QR Upload{% endblock %}
 
 {% block content %}
+<!--Page heading-->
 <h1>DuitNow QR Upload</h1>
 
+<!--Explain why a QR is required before creating a listing-->
 {% if request.args.get("required") %}
     <div class="alert alert-warning" role="alert">
         <strong>Please upload your DuitNow QR before creating a listing! Buyers will use this QR to make payment.</strong>
-        
     </div>
 {% endif %}
 
+<!--Show QR upload or deletion error-->
 {% if error %}
-    <p style="color: red;">
+    <p style="color: rgb(255, 21, 21);">
         {{ error }}
     </p>
 {% endif %}
 
+<!--Show the seller's current QR when one exists-->
 {% if payment_qr %}
     <p>Your current DuitNow QR:</p>
 
@@ -32,10 +35,15 @@
 
     <p>Choose another image below if you want to update your QR.</p>
 {% else %}
+    <!--Show message when the seller has not uploaded a QR-->
     <p>You have not uploaded a payment QR yet.</p>
 {% endif %}
 
-<form method="POST" enctype="multipart/form-data">
+<!--Upload a new QR or update the existing QR-->
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
     <label for="payment_qr">DuitNow QR Image</label>
 
     <input
@@ -54,6 +62,7 @@
 </form>
 
 {% if payment_qr %}
+    <!--Allow the seller to delete the QR when it is safe-->
     <br><br>
 
     <form
@@ -69,6 +78,7 @@
 
 <br>
 
+<!--Return to the seller's listings-->
 <a href="{{ url_for('marketplace.my_listings') }}">
     Back to My Listings
 </a>

@@ -829,15 +829,38 @@ def approve_payment(transaction_id):
         status="payment_submitted"
     ).first_or_404()
 
-    listing = Listing.query.get_or_404(
-        transaction.listing_id
+    #Seller confirmed they received payment
+    #Keep the listing reserved until the buyer confirms they receive the item
+    transaction.status = "payment_confirmed"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.payment_requests")
     )
+
+#======================================================================
+# BUYER CONFIRM THEY RECEIVED THE ITEM
+#======================================================================
+@marketplace_bp.route(
+    "/transactions/<int:transaction_id>/confirm-item-received",
+    methods=["POST"]
+)
+@login_required
+def confirm_item_received(transaction_id):
+
+    #Only the buyer can confirm the item was received after seller comfirmed payment.
+    transaction = Transaction.query.filter_by(
+        id=transaction_id,
+        buyer_id=current_user.id,
+        status="payment_confirmed"
+    ).first_or_404()
 
     item = Item.query.get_or_404(
         transaction.item_id
     )
 
-    #Get and reduce the seller's owned quantity.
+    #Get the seller's item and reduce their quantity by one.
     seller_owned_item = OwnedItem.query.filter_by(
         user_id=transaction.seller_id,
         item_id=item.id
@@ -851,7 +874,7 @@ def approve_payment(transaction_id):
     if seller_owned_item.quantity == 0:
         db.session.delete(seller_owned_item)
 
-    #Give one copy to the buyer.
+    #Give one copy of the item to the buyer.
     buyer_owned_item = OwnedItem.query.filter_by(
         user_id=transaction.buyer_id,
         item_id=item.id
@@ -867,14 +890,17 @@ def approve_payment(transaction_id):
         )
         db.session.add(buyer_owned_item)
 
-    #all done
+    #Complete the transaction and close the listing.
     transaction.status = "completed"
+    listing = Listing.query.get_or_404(
+        transaction.listing_id
+    )
     listing.status = "sold"
 
     db.session.commit()
 
     return redirect(
-        url_for("marketplace.payment_requests")
+        url_for("marketplace.transaction_history")
     )
 
 #======================================================================
