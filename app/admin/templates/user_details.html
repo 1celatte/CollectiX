@@ -1,27 +1,49 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
 
-{% block title %}
-User Details - CollectiX
-{% endblock %}
+<html lang="en">
 
-{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="container py-4">
+<title>User Details - CollectiX</title>
+
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
+<link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+>
+
+</head>
+
+<body>
+
+<div class="page-container">
 
 <!-- Page Header -->
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header">
 
     <div>
-        <h1 class="fw-bold mb-1">User Details</h1>
-        <p class="text-muted mb-0">
-            View user information and activity
+
+        <h1>
+            User Details
+        </h1>
+
+        <p>
+            View user information and activity.
         </p>
+
     </div>
+
 
     <a
         href="{{ url_for('admin.users') }}"
-        class="btn btn-outline-secondary"
+        class="back-btn"
     >
         <i class="bi bi-arrow-left"></i>
         Back to Users
@@ -30,183 +52,187 @@ User Details - CollectiX
 </div>
 
 
+
 <!-- User Information -->
 
-<div class="card shadow-sm border-0 mb-4">
+<div class="section-card">
 
-    <div class="card-header bg-dark text-white">
+    <div class="section-header">
 
-        <h4 class="mb-0">
+        <h2>
             <i class="bi bi-person-circle"></i>
             User Information
-        </h4>
+        </h2>
+
+
+        {% if user.role != "admin" %}
+
+            {% if user.is_banned %}
+
+                <button
+                    type="button"
+                    class="unban-btn"
+                    popovertarget="unbanUser"
+                >
+                    <i class="bi bi-person-check"></i>
+                    Unban User
+                </button>
+
+            {% else %}
+
+                <button
+                    type="button"
+                    class="ban-btn"
+                    popovertarget="banUser"
+                >
+                    <i class="bi bi-person-x"></i>
+                    Ban User
+                </button>
+
+            {% endif %}
+
+        {% endif %}
 
     </div>
 
-    <div class="card-body">
 
-        <div class="row align-items-center">
 
-            <!-- Profile Picture -->
+    <div class="user-info">
 
-            <div class="col-md-3 text-center mb-3 mb-md-0">
 
-                {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
+        <!-- Profile Picture -->
 
-                    <img
-                        src="{{ url_for('auth.static', filename=user.profile_picture) }}"
-                        width="120"
-                        height="120"
-                        class="rounded-circle shadow-sm"
-                        style="object-fit: cover;"
-                    >
+        <div class="profile-section">
 
-                {% else %}
+            {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
 
-                    <img
-                        src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
-                        width="120"
-                        height="120"
-                        class="rounded-circle shadow-sm"
-                        style="object-fit: cover;"
-                    >
+                <img
+                    src="{{ url_for('auth.static', filename=user.profile_picture) }}"
+                    class="profile-picture"
+                    alt="Profile Picture"
+                >
 
-                {% endif %}
+            {% else %}
+
+                <img
+                    src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                    class="profile-picture"
+                    alt="Default Profile Picture"
+                >
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- User Details -->
+
+        <div class="details-grid">
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    User ID
+                </span>
+
+                <span class="detail-value">
+                    {{ user.id }}
+                </span>
 
             </div>
 
 
-            <!-- User Details -->
+            <div class="detail-item">
 
-            <div class="col-md-9">
+                <span class="detail-label">
+                    Name
+                </span>
 
-                <div class="row">
+                <span class="detail-value">
+                    {{ user.name }}
+                </span>
 
-                    <div class="col-md-6 mb-3">
-
-                        <small class="text-muted">
-                            User ID
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ user.id }}
-                        </div>
-
-                    </div>
+            </div>
 
 
-                    <div class="col-md-6 mb-3">
+            <div class="detail-item">
 
-                        <small class="text-muted">
-                            Name
-                        </small>
+                <span class="detail-label">
+                    Email
+                </span>
 
-                        <div class="fw-semibold">
-                            {{ user.name }}
-                        </div>
+                <span class="detail-value">
+                    {{ user.email }}
+                </span>
 
-                    </div>
-
-
-                    <div class="col-md-6 mb-3">
-
-                        <small class="text-muted">
-                            Email
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ user.email }}
-                        </div>
-
-                    </div>
+            </div>
 
 
-                    <div class="col-md-6 mb-3">
+            <div class="detail-item">
 
-                        <small class="text-muted">
-                            Role
-                        </small>
+                <span class="detail-label">
+                    Role
+                </span>
 
-                        <div>
+                <span class="detail-value">
 
-                            {% if user.role == "admin" %}
+                    {% if user.role == "admin" %}
 
-                                <span class="badge bg-dark">
-                                    Admin
-                                </span>
+                        <span class="status-badge admin-badge">
+                            Admin
+                        </span>
 
-                            {% else %}
+                    {% else %}
 
-                                <span class="badge bg-primary">
-                                    User
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-md-6 mb-3">
-
-                        <small class="text-muted">
-                            Account Status
-                        </small>
-
-                        <div>
-
-                            {% if user.is_banned %}
-
-                                <span class="badge bg-danger">
-                                    Banned
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-success">
-                                    Active
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-md-6 mb-3">
-
-                        <small class="text-muted">
-                            Account Created
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ user.created_at }}
-                        </div>
-
-                    </div>
-
-
-                    {% if user.is_banned %}
-
-                    <div class="col-12">
-
-                        <small class="text-muted">
-                            Ban Reason
-                        </small>
-
-                        <div class="alert alert-danger mt-1 mb-0">
-
-                            {{ user.ban_reason }}
-
-                        </div>
-
-                    </div>
+                        <span class="status-badge user-badge">
+                            User
+                        </span>
 
                     {% endif %}
 
-                </div>
+                </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Account Status
+                </span>
+
+                <span class="detail-value">
+
+                    {% if user.is_banned %}
+
+                        <span class="status-badge banned-badge">
+                            Banned
+                        </span>
+
+                    {% else %}
+
+                        <span class="status-badge active-badge">
+                            Active
+                        </span>
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Account Created
+                </span>
+
+                <span class="detail-value">
+                    {{ user.created_at }}
+                </span>
 
             </div>
 
@@ -214,91 +240,112 @@ User Details - CollectiX
 
     </div>
 
+
+
+    {% if user.is_banned %}
+
+        <div class="ban-reason">
+
+            <div class="detail-label">
+                Ban Reason
+            </div>
+
+            <div class="reason-text">
+                {{ user.ban_reason }}
+            </div>
+
+        </div>
+
+    {% endif %}
+
 </div>
+
 
 
 <!-- Submission History -->
 
-<div class="card shadow-sm border-0 mb-4">
+<div class="section-card">
 
-    <div class="card-header bg-primary text-white">
+    <div class="section-title">
 
-        <h4 class="mb-0">
+        <h2>
             <i class="bi bi-file-earmark-text"></i>
             Submission History
-        </h4>
+        </h2>
+
+        <span class="count-badge">
+            {{ submissions|length }}
+        </span>
 
     </div>
 
-    <div class="card-body">
 
-        {% if submissions %}
+    {% if submissions %}
 
-        <div class="table-responsive">
+        <div class="table-wrapper">
 
-            <table class="table table-hover align-middle mb-0">
+            <table>
 
-                <thead class="table-light">
+                <thead>
 
                     <tr>
-
                         <th>ID</th>
                         <th>Type</th>
                         <th>Name</th>
                         <th>Status</th>
                         <th>Date</th>
-
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
                     {% for submission in submissions %}
 
-                    <tr>
+                        <tr>
 
-                        <td>
-                            {{ submission.id }}
-                        </td>
+                            <td>
+                                {{ submission.id }}
+                            </td>
 
-                        <td>
-                            {{ submission.type }}
-                        </td>
+                            <td>
+                                {{ submission.type }}
+                            </td>
 
-                        <td class="fw-semibold">
-                            {{ submission.name }}
-                        </td>
+                            <td class="strong">
+                                {{ submission.name }}
+                            </td>
 
-                        <td>
+                            <td>
 
-                            {% if submission.status == "approved" %}
+                                {% if submission.status == "approved" %}
 
-                                <span class="badge bg-success">
-                                    Approved
-                                </span>
+                                    <span class="status-badge active-badge">
+                                        Approved
+                                    </span>
 
-                            {% elif submission.status == "rejected" %}
+                                {% elif submission.status == "rejected" %}
 
-                                <span class="badge bg-danger">
-                                    Rejected
-                                </span>
+                                    <span class="status-badge banned-badge">
+                                        Rejected
+                                    </span>
 
-                            {% else %}
+                                {% else %}
 
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
+                                    <span class="status-badge pending-badge">
+                                        Pending
+                                    </span>
 
-                            {% endif %}
+                                {% endif %}
 
-                        </td>
+                            </td>
 
-                        <td>
-                            {{ submission.created_at }}
-                        </td>
+                            <td>
+                                {{ submission.created_at }}
+                            </td>
 
-                    </tr>
+                        </tr>
 
                     {% endfor %}
 
@@ -308,98 +355,87 @@ User Details - CollectiX
 
         </div>
 
-        {% else %}
+    {% else %}
 
-        <div class="text-center text-muted py-4">
+        <div class="empty-state">
 
-            <i class="bi bi-inbox fs-2"></i>
+            <i class="bi bi-inbox"></i>
 
-            <p class="mb-0 mt-2">
+            <p>
                 No submissions.
             </p>
 
         </div>
 
-        {% endif %}
-
-    </div>
+    {% endif %}
 
 </div>
 
 
+
 <!-- Owned Items -->
 
-<div class="card shadow-sm border-0 mb-4">
+<div class="section-card">
 
-    <div class="card-header bg-success text-white">
+    <div class="section-title">
 
-        <h4 class="mb-0">
+        <h2>
             <i class="bi bi-box-seam"></i>
             Owned Items
-        </h4>
+        </h2>
+
+        <span class="count-badge">
+            {{ owned_items|length }}
+        </span>
 
     </div>
 
-    <div class="card-body">
 
-        <div class="mb-3">
+    {% if owned_items %}
 
-            <span class="text-muted">
-                Items Owned:
-            </span>
+        <div class="table-wrapper">
 
-            <span class="badge bg-success">
-                {{ owned_items|length }}
-            </span>
+            <table>
 
-        </div>
-
-        {% if owned_items %}
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
+                <thead>
 
                     <tr>
-
                         <th>Item</th>
                         <th>Collection</th>
                         <th>Quantity</th>
                         <th>Added At</th>
-
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
                     {% for owned in owned_items %}
 
-                    <tr>
+                        <tr>
 
-                        <td class="fw-semibold">
-                            {{ owned.item.name }}
-                        </td>
+                            <td class="strong">
+                                {{ owned.item.name }}
+                            </td>
 
-                        <td>
-                            {{ owned.item.collection.name }}
-                        </td>
+                            <td>
+                                {{ owned.item.collection.name }}
+                            </td>
 
-                        <td>
+                            <td>
 
-                            <span class="badge bg-primary">
-                                {{ owned.quantity }}
-                            </span>
+                                <span class="quantity-badge">
+                                    {{ owned.quantity }}
+                                </span>
 
-                        </td>
+                            </td>
 
-                        <td>
-                            {{ owned.added_at }}
-                        </td>
+                            <td>
+                                {{ owned.added_at }}
+                            </td>
 
-                    </tr>
+                        </tr>
 
                     {% endfor %}
 
@@ -409,117 +445,111 @@ User Details - CollectiX
 
         </div>
 
-        {% else %}
+    {% else %}
 
-        <div class="text-center text-muted py-4">
+        <div class="empty-state">
 
-            <i class="bi bi-box fs-2"></i>
+            <i class="bi bi-box"></i>
 
-            <p class="mb-0 mt-2">
+            <p>
                 No items owned.
             </p>
 
         </div>
 
-        {% endif %}
-
-    </div>
+    {% endif %}
 
 </div>
 
 
+
 <!-- Items for Sale -->
 
-<div class="card shadow-sm border-0 mb-4">
+<div class="section-card">
 
-    <div class="card-header bg-warning">
+    <div class="section-title">
 
-        <h4 class="mb-0">
-
+        <h2>
             <i class="bi bi-tag"></i>
             Items for Sale
+        </h2>
 
-        </h4>
-
-    </div>
-
-    <div class="card-body">
 
         {% set sale_listings = listings | selectattr("listing_type", "equalto", "sell") | list %}
 
-        {% if sale_listings %}
+        <span class="count-badge">
+            {{ sale_listings|length }}
+        </span>
 
-        <div class="table-responsive">
+    </div>
 
-            <table class="table table-hover align-middle mb-0">
 
-                <thead class="table-light">
+    {% if sale_listings %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
 
                     <tr>
-
                         <th>Item</th>
                         <th>Price</th>
                         <th>Condition</th>
                         <th>Status</th>
                         <th>Listed At</th>
-
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
                     {% for listing in sale_listings %}
 
-                    <tr>
+                        <tr>
 
-                        <td class="fw-semibold">
-                            {{ listing.item.name }}
-                        </td>
+                            <td class="strong">
+                                {{ listing.item.name }}
+                            </td>
 
-                        <td>
-
-                            <span class="fw-bold text-success">
-
+                            <td class="price">
                                 RM {{ "%.2f"|format(listing.price) }}
+                            </td>
 
-                            </span>
+                            <td>
+                                {{ listing.condition }}
+                            </td>
 
-                        </td>
+                            <td>
 
-                        <td>
-                            {{ listing.condition }}
-                        </td>
+                                {% if listing.status == "available" %}
 
-                        <td>
+                                    <span class="status-badge active-badge">
+                                        Available
+                                    </span>
 
-                            {% if listing.status == "available" %}
+                                {% elif listing.status == "sold" %}
 
-                                <span class="badge bg-success">
-                                    Available
-                                </span>
+                                    <span class="status-badge sold-badge">
+                                        Sold
+                                    </span>
 
-                            {% elif listing.status == "sold" %}
+                                {% else %}
 
-                                <span class="badge bg-secondary">
-                                    Sold
-                                </span>
+                                    <span class="status-badge pending-badge">
+                                        {{ listing.status }}
+                                    </span>
 
-                            {% else %}
+                                {% endif %}
 
-                                <span class="badge bg-warning text-dark">
-                                    {{ listing.status }}
-                                </span>
+                            </td>
 
-                            {% endif %}
+                            <td>
+                                {{ listing.created_at }}
+                            </td>
 
-                        </td>
-
-                        <td>
-                            {{ listing.created_at }}
-                        </td>
-
-                    </tr>
+                        </tr>
 
                     {% endfor %}
 
@@ -529,144 +559,142 @@ User Details - CollectiX
 
         </div>
 
-        {% else %}
+    {% else %}
 
-        <div class="text-center text-muted py-4">
+        <div class="empty-state">
 
-            <i class="bi bi-tag fs-2"></i>
+            <i class="bi bi-tag"></i>
 
-            <p class="mb-0 mt-2">
+            <p>
                 No items for sale.
             </p>
 
         </div>
 
-        {% endif %}
-
-    </div>
+    {% endif %}
 
 </div>
 
 
+
 <!-- Transaction History -->
 
-<div class="card shadow-sm border-0 mb-4">
+<div class="section-card">
 
-    <div class="card-header bg-info text-dark">
+    <div class="section-title">
 
-        <h4 class="mb-0">
-
+        <h2>
             <i class="bi bi-receipt"></i>
             Transaction History
+        </h2>
 
-        </h4>
+        <span class="count-badge">
+            {{ transactions|length }}
+        </span>
 
     </div>
 
-    <div class="card-body">
 
-        {% if transactions %}
+    {% if transactions %}
 
-        <div class="table-responsive">
+        <div class="table-wrapper">
 
-            <table class="table table-hover align-middle mb-0">
+            <table>
 
-                <thead class="table-light">
+                <thead>
 
                     <tr>
-
                         <th>Item</th>
                         <th>Role</th>
                         <th>Other User</th>
                         <th>Price</th>
                         <th>Status</th>
                         <th>Date</th>
-
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
                     {% for transaction in transactions %}
 
-                    <tr>
+                        <tr>
 
-                        <td class="fw-semibold">
-                            {{ transaction.item.name }}
-                        </td>
+                            <td class="strong">
+                                {{ transaction.item.name }}
+                            </td>
 
-                        <td>
 
-                            {% if transaction.buyer_id == user.id %}
+                            <td>
 
-                                <span class="badge bg-primary">
-                                    Buyer
-                                </span>
+                                {% if transaction.buyer_id == user.id %}
 
-                            {% else %}
+                                    <span class="role-badge buyer-badge">
+                                        Buyer
+                                    </span>
 
-                                <span class="badge bg-secondary">
-                                    Seller
-                                </span>
+                                {% else %}
 
-                            {% endif %}
+                                    <span class="role-badge seller-badge">
+                                        Seller
+                                    </span>
 
-                        </td>
+                                {% endif %}
 
-                        <td>
+                            </td>
 
-                            {% if transaction.buyer_id == user.id %}
 
-                                {{ transaction.seller.name }}
+                            <td>
 
-                            {% else %}
+                                {% if transaction.buyer_id == user.id %}
 
-                                {{ transaction.buyer.name }}
+                                    {{ transaction.seller.name }}
 
-                            {% endif %}
+                                {% else %}
 
-                        </td>
+                                    {{ transaction.buyer.name }}
 
-                        <td>
+                                {% endif %}
 
-                            <span class="fw-bold">
+                            </td>
 
+
+                            <td class="price">
                                 RM {{ "%.2f"|format(transaction.price) }}
+                            </td>
 
-                            </span>
 
-                        </td>
+                            <td>
 
-                        <td>
+                                {% if transaction.status == "completed" %}
 
-                            {% if transaction.status == "completed" %}
+                                    <span class="status-badge active-badge">
+                                        Completed
+                                    </span>
 
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
+                                {% elif transaction.status == "cancelled" %}
 
-                            {% elif transaction.status == "cancelled" %}
+                                    <span class="status-badge banned-badge">
+                                        Cancelled
+                                    </span>
 
-                                <span class="badge bg-danger">
-                                    Cancelled
-                                </span>
+                                {% else %}
 
-                            {% else %}
+                                    <span class="status-badge pending-badge">
+                                        Pending
+                                    </span>
 
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
+                                {% endif %}
 
-                            {% endif %}
+                            </td>
 
-                        </td>
 
-                        <td>
-                            {{ transaction.created_at }}
-                        </td>
+                            <td>
+                                {{ transaction.created_at }}
+                            </td>
 
-                    </tr>
+                        </tr>
 
                     {% endfor %}
 
@@ -676,32 +704,31 @@ User Details - CollectiX
 
         </div>
 
-        {% else %}
+    {% else %}
 
-        <div class="text-center text-muted py-4">
+        <div class="empty-state">
 
-            <i class="bi bi-receipt fs-2"></i>
+            <i class="bi bi-receipt"></i>
 
-            <p class="mb-0 mt-2">
+            <p>
                 No transaction history.
             </p>
 
         </div>
 
-        {% endif %}
-
-    </div>
+    {% endif %}
 
 </div>
 
 
-<!-- Back Button -->
 
-<div class="text-center mt-4 mb-3">
+<!-- Bottom Back Button -->
+
+<div class="bottom-back">
 
     <a
         href="{{ url_for('admin.users') }}"
-        class="btn btn-outline-secondary"
+        class="back-btn"
     >
         <i class="bi bi-arrow-left"></i>
         Back to Users
@@ -711,4 +738,718 @@ User Details - CollectiX
 
 </div>
 
-{% endblock %}
+<!-- Ban Popup -->
+
+<div
+    id="banUser"
+    popover
+    class="action-popup"
+>
+
+<div class="popup-box">
+
+    <div class="popup-icon danger-icon">
+
+        <i class="bi bi-person-x"></i>
+
+    </div>
+
+
+    <h3>
+        Ban User?
+    </h3>
+
+
+    <p>
+        This user will no longer be able to access their account.
+    </p>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('admin.ban_user', user_id=user.id) }}"
+    >
+
+        <label for="ban_reason">
+            Ban Reason
+        </label>
+
+
+        <textarea
+            id="ban_reason"
+            name="ban_reason"
+            required
+            placeholder="Enter the reason for banning this user..."
+        ></textarea>
+
+
+        <div class="popup-actions">
+
+            <button
+                type="submit"
+                class="confirm-ban"
+            >
+                Ban User
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-btn"
+                popovertarget="banUser"
+                popovertargetaction="hide"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</div>
+
+<!-- Unban Popup -->
+
+<div
+    id="unbanUser"
+    popover
+    class="action-popup"
+>
+
+<div class="popup-box">
+
+    <div class="popup-icon success-icon">
+
+        <i class="bi bi-person-check"></i>
+
+    </div>
+
+
+    <h3>
+        Unban User?
+    </h3>
+
+
+    <p>
+        Are you sure you want to unban this user?
+    </p>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('admin.unban_user', user_id=user.id) }}"
+    >
+
+        <div class="popup-actions">
+
+            <button
+                type="submit"
+                class="confirm-unban"
+            >
+                Unban User
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-btn"
+                popovertarget="unbanUser"
+                popovertargetaction="hide"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</div>
+
+<style>
+
+/* =========================
+   Page
+   ========================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f3f8fc;
+    color: #212529;
+    font-family: Arial, sans-serif;
+}
+
+.page-container {
+    width: 100%;
+    padding: 35px 40px;
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   Header
+   ========================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.page-header p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 15px;
+}
+
+
+/* =========================
+   Buttons
+   ========================= */
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+
+    background-color: white;
+    color: #495057;
+
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.ban-btn,
+.unban-btn {
+    border: none;
+    border-radius: 5px;
+
+    padding: 8px 14px;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ban-btn {
+    background-color: #dc3545;
+}
+
+.ban-btn:hover {
+    background-color: #bb2d3b;
+}
+
+.unban-btn {
+    background-color: #198754;
+}
+
+.unban-btn:hover {
+    background-color: #157347;
+}
+
+
+/* =========================
+   Section
+   ========================= */
+
+.section-card {
+    background-color: white;
+
+    border: 1px solid #e1e5e8;
+    border-radius: 8px;
+
+    margin-bottom: 24px;
+
+    overflow: hidden;
+}
+
+.section-header,
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.section-header h2,
+.section-title h2 {
+    margin: 0;
+
+    font-size: 19px;
+    font-weight: 600;
+
+    color: #212529;
+}
+
+.section-header h2 i,
+.section-title h2 i {
+    margin-right: 8px;
+    color: #6c757d;
+}
+
+
+/* =========================
+   User Information
+   ========================= */
+
+.user-info {
+    display: flex;
+    gap: 30px;
+
+    padding: 25px 22px;
+}
+
+.profile-section {
+    width: 130px;
+    flex-shrink: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.profile-picture {
+    width: 120px;
+    height: 120px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+}
+
+.details-grid {
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    column-gap: 40px;
+    row-gap: 22px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.detail-value {
+    font-size: 15px;
+    color: #212529;
+    font-weight: 600;
+}
+
+.ban-reason {
+    margin: 0 22px 22px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #f1b0b7;
+    border-radius: 6px;
+
+    background-color: #fff5f5;
+}
+
+.reason-text {
+    margin-top: 5px;
+
+    color: #842029;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   Badges
+   ========================= */
+
+.status-badge,
+.role-badge,
+.quantity-badge,
+.count-badge {
+    display: inline-block;
+
+    padding: 4px 9px;
+
+    border-radius: 4px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.count-badge {
+    background-color: #f1f3f5;
+    color: #495057;
+}
+
+.active-badge {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.banned-badge {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.pending-badge {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.admin-badge {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+.user-badge {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.sold-badge {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+.buyer-badge {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.seller-badge {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+.quantity-badge {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+
+/* =========================
+   Tables
+   ========================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f8f9fa;
+
+    color: #495057;
+
+    padding: 12px 18px;
+
+    border-bottom: 1px solid #dee2e6;
+
+    text-align: left;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+td {
+    padding: 13px 18px;
+
+    border-bottom: 1px solid #edf0f2;
+
+    font-size: 14px;
+
+    color: #495057;
+
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.strong {
+    font-weight: 600;
+    color: #212529;
+}
+
+.price {
+    font-weight: 600;
+    color: #198754;
+}
+
+
+/* =========================
+   Empty State
+   ========================= */
+
+.empty-state {
+    text-align: center;
+
+    padding: 40px 20px;
+
+    color: #6c757d;
+}
+
+.empty-state i {
+    display: block;
+
+    font-size: 30px;
+
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   Popup
+   ========================= */
+
+.action-popup {
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+}
+
+.popup-box {
+    width: 380px;
+
+    padding: 25px;
+
+    background-color: white;
+
+    border-radius: 8px;
+
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+}
+
+.popup-icon {
+    width: 44px;
+    height: 44px;
+
+    margin: 0 auto 12px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+}
+
+.danger-icon {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+.success-icon {
+    background-color: #d1e7dd;
+    color: #198754;
+}
+
+.popup-box h3 {
+    margin: 0 0 8px;
+
+    text-align: center;
+
+    font-size: 20px;
+}
+
+.popup-box p {
+    margin: 0 0 20px;
+
+    text-align: center;
+
+    color: #6c757d;
+
+    font-size: 14px;
+}
+
+.popup-box label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #343a40;
+}
+
+.popup-box textarea {
+    width: 100%;
+    min-height: 100px;
+
+    padding: 10px;
+
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+
+    resize: vertical;
+
+    box-sizing: border-box;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.popup-box textarea:focus {
+    outline: none;
+
+    border-color: #86b7fe;
+}
+
+.popup-actions {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 18px;
+}
+
+.confirm-ban,
+.confirm-unban,
+.cancel-btn {
+    padding: 8px 15px;
+
+    border: none;
+    border-radius: 5px;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.confirm-ban {
+    background-color: #dc3545;
+}
+
+.confirm-ban:hover {
+    background-color: #bb2d3b;
+}
+
+.confirm-unban {
+    background-color: #198754;
+}
+
+.confirm-unban:hover {
+    background-color: #157347;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+}
+
+.cancel-btn:hover {
+    background-color: #5c636a;
+}
+
+
+/* =========================
+   Bottom
+   ========================= */
+
+.bottom-back {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .page-container {
+        padding: 25px 20px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .user-info {
+        flex-direction: column;
+    }
+
+    .profile-section {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header,
+    .section-title {
+        gap: 10px;
+    }
+
+}
+
+</style>
+
+</body>
+
+</html>

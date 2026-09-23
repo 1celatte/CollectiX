@@ -8,6 +8,11 @@
 
 <title>Banned Users - CollectiX</title>
 
+<link
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+>
+
 </head>
 
 <body>
@@ -180,7 +185,8 @@
                             class="unban-btn"
                             popovertarget="unbanUser{{ user.id }}"
                         >
-                            Unban
+                            <i class="bi bi-person-check"></i>
+                            Unban User
                         </button>
 
                     </div>
@@ -190,14 +196,15 @@
                     <div
                         id="unbanUser{{ user.id }}"
                         popover
-                        class="unban-popup"
+                        class="action-popup"
                     >
 
-                        <div class="unban-box">
+                        <div class="popup-box">
 
+                            <div class="popup-icon success-icon">
 
-                            <div class="warning-icon">
-                                !
+                                <i class="bi bi-person-check"></i>
+
                             </div>
 
 
@@ -219,27 +226,28 @@
                                 method="POST"
                             >
 
+                                <div class="popup-actions">
 
-                                <button
-                                    type="submit"
-                                    class="unban-confirm"
-                                >
-                                    Yes, Unban
-                                </button>
+                                    <button
+                                        type="submit"
+                                        class="confirm-unban"
+                                    >
+                                        Unban User
+                                    </button>
 
 
-                                <button
-                                    type="button"
-                                    class="cancel-btn"
-                                    popovertarget="unbanUser{{ user.id }}"
-                                    popovertargetaction="hide"
-                                >
-                                    Cancel
-                                </button>
+                                    <button
+                                        type="button"
+                                        class="cancel-btn"
+                                        popovertarget="unbanUser{{ user.id }}"
+                                        popovertargetaction="hide"
+                                    >
+                                        Cancel
+                                    </button>
 
+                                </div>
 
                             </form>
-
 
                         </div>
 
@@ -538,7 +546,7 @@
 
     /* Popup */
 
-    .unban-popup {
+    .action-popup {
 
         padding: 0;
 
@@ -549,88 +557,107 @@
     }
 
 
-    .unban-box {
+    .popup-box {
 
-        background-color: white;
+        width: 380px;
 
         padding: 25px;
 
+        background-color: white;
+
         border-radius: 8px;
 
-        width: 350px;
-
-        text-align: center;
-
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
 
     }
 
 
-    .warning-icon {
+    .popup-icon {
 
-        width: 45px;
+        width: 44px;
+        height: 44px;
 
-        height: 45px;
-
-        margin: 0 auto 15px auto;
+        margin: 0 auto 12px;
 
         border-radius: 50%;
 
-        background-color: #fff3cd;
-
-        color: #856404;
-
-        font-size: 25px;
-
-        font-weight: bold;
-
         display: flex;
-
         align-items: center;
-
         justify-content: center;
+
+        font-size: 21px;
 
     }
 
 
-    .unban-box h3 {
+    .success-icon {
 
-        margin: 0 0 10px 0;
+        background-color: #d1e7dd;
+
+        color: #198754;
+
+    }
+
+
+    .popup-box h3 {
+
+        margin: 0 0 8px;
+
+        text-align: center;
 
         font-size: 20px;
 
     }
 
 
-    .unban-box p {
+    .popup-box p {
 
-        margin: 0 0 20px 0;
+        margin: 0 0 20px;
+
+        text-align: center;
 
         color: #6c757d;
+
+        font-size: 14px;
 
     }
 
 
     /* Popup Buttons */
 
-    .unban-confirm {
+    .popup-actions {
 
-        padding: 6px 15px;
+        display: flex;
+
+        justify-content: center;
+
+        gap: 8px;
+
+        margin-top: 18px;
+
+    }
+
+
+    .confirm-unban {
+
+        padding: 8px 15px;
+
+        border: none;
+
+        border-radius: 5px;
 
         background-color: #198754;
 
         color: white;
 
-        border: none;
-
-        border-radius: 4px;
-
         cursor: pointer;
+
+        font-size: 14px;
 
     }
 
 
-    .unban-confirm:hover {
+    .confirm-unban:hover {
 
         background-color: #157347;
 
@@ -639,19 +666,21 @@
 
     .cancel-btn {
 
-        padding: 6px 15px;
+        padding: 8px 15px;
+
+        border: none;
+
+        border-radius: 5px;
 
         background-color: #6c757d;
 
         color: white;
 
-        border: none;
-
-        border-radius: 4px;
-
         cursor: pointer;
 
-        margin-left: 5px;
+        font-size: 14px;
+
+        margin-left: 0;
 
     }
 

@@ -57,10 +57,7 @@ def register():
         # Check whether email already exists
         existing_user = User.query.filter_by(email=email).first()
 
-        if existing_user and existing_user.is_banned:
-            email_error = "This account has been banned and cannot be registered again."
-
-        elif existing_user and existing_user.email_verified:
+        if existing_user and existing_user.email_verified:
             email_error = "Email already exists."
 
         # Check password requirements

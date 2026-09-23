@@ -66,7 +66,7 @@
 
                 <tr>
                     <th>ID</th>
-                    <th>User ID</th>
+                    <th>Submitted By</th>
                     <th>Type</th>
                     <th>Collection</th>
                     <th>Tag</th>
@@ -89,14 +89,18 @@
                         {{ submission.id }}
                     </td>
 
-
                     <td>
-                        {{ submission.user_id }}
+                        {{ submission.user_id }} -
+                        <a
+                            href="{{ url_for('admin.user_details', user_id=submission.user_id) }}"
+                            class="user-name"
+                        >
+                            {{ submission.user.name }}
+                        </a>
                     </td>
 
-
                     <td>
-
+                        
                         {% if submission.type == "new_collection" %}
 
                             <span class="type-badge collection-badge">
@@ -481,6 +485,21 @@ td {
 
 tbody tr:hover {
     background-color: #f8f9fa;
+}
+
+/* =========================
+   Submited BY
+   ========================= */
+
+.user-name {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.user-name:hover {
+    color: #0a58ca;
+    text-decoration: underline;
 }
 
 
