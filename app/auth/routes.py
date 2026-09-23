@@ -148,14 +148,19 @@ def verify_email(token):
 
     # Token does not exist
     if user is None:
-        return "Invalid verification link."
+        return render_template(
+            "invalid_verification.html"
+        )
 
     # Check whether token has expired
     if (
         user.email_verification_expires_at is None
         or datetime.utcnow() > user.email_verification_expires_at
     ):
-        return "Verification link has expired."
+         return render_template(
+            "invalid_verification.html"
+        )
+
 
     return render_template(
         "confirm_email.html",
@@ -172,14 +177,18 @@ def confirm_email(token):
 
     # Token does not exist
     if user is None:
-        return "Invalid verification link."
+        return render_template(
+            "invalid_verification.html"
+        )
 
     # Check whether token has expired
     if (
         user.email_verification_expires_at is None
         or datetime.utcnow() > user.email_verification_expires_at
     ):
-        return "Verification link has expired."
+        return render_template(
+            "invalid_verification.html"
+        )
 
     # Verify email
     user.email_verified = True
@@ -225,9 +234,43 @@ def login():
 
         # Email not verified
         if not user.email_verified:
+
+            # Generate a new verification token
+            verification_token = secrets.token_urlsafe(32)
+
+            # Token expires after 30 minutes
+            verification_expires_at = datetime.utcnow() + timedelta(minutes=30)
+
+            # Save new verification token
+            user.email_verification_token = verification_token
+            user.email_verification_expires_at = verification_expires_at
+
+            db.session.commit()
+
+            # Create new verification link
+            verification_link = url_for(
+                "auth.verify_email",
+                token=verification_token,
+                _external=True
+            )
+
+            # Send new verification email
+            msg = Message(
+                subject="Verify your CollectiX account",
+                recipients=[user.email]
+            )
+
+            msg.html = render_template(
+                "verify_email.html",
+                name=user.name,
+                verification_link=verification_link
+            )
+
+            mail.send(msg)
+
             return render_template(
                 "login.html",
-                login_error="Please verify your email before logging in. Check your inbox for the verification email.",
+                login_error="Please verify your email before logging in. A new verification link has been sent to your email.",
                 email=email
             )
 
