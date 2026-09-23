@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Payment Proof
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>Complete Payment</h1>
+
+<p>
+    Upload your payment proof after making payment.
+</p>
+
+{% if error %}
+    <!--Show payment proof upload error-->
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+{% endif %}
+
+<!--Show transaction information and payment instructions-->
+<div class="card p-4 mt-4">
+
+    <h2 class="h4">{{ item.name }}</h2>
+
+    <p>
+        Price:
+        <strong>RM {{ "%.2f"|format(transaction.price) }}</strong>
+    </p>
+
+    <p>
+        Transaction status:
+        <strong>{{ transaction.status|replace("_", " ")|title }}</strong>
+    </p>
+
+    <hr>
+
+    <h3 class="h5">Payment Instructions</h3>
+
+    <!--Show the seller's DuitNow QR-->
+    <img
+        src="{{ url_for(
+            'marketplace.static',
+            filename='uploads/payment_qrs/' ~ payment_qr.filename
+        ) }}"
+        alt="Seller's DuitNow QR"
+        class="img-fluid border rounded mb-3"
+        style="width: 220px; height: 220px; object-fit: contain;"
+    >
+
+    <p class="text-muted">
+        Scan the seller's DuitNow QR, make payment, then upload a screenshot as proof.
+    </p>
+
+    <!--Upload payment proof after making payment-->
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <label
+            for="payment_proof"
+            class="form-label"
+        >
+            Payment Proof Image
+        </label>
+
+        <input
+            type="file"
+            id="payment_proof"
+            name="payment_proof"
+            accept="image/*"
+            class="form-control"
+            required
+        >
+
+        <button
+            type="submit"
+            class="btn btn-primary mt-3"
+        >
+            Submit Payment Proof
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

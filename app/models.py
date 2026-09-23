@@ -339,6 +339,8 @@ class Listing(db.Model):
     )
 
     description = db.Column(db.Text)
+    
+    image = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),
@@ -348,6 +350,39 @@ class Listing(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Payment QR
+# ==========================================
+
+class PaymentQR(db.Model):
+    __tablename__ = "payment_qrs"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # Each seller can have one payment QR.
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        unique=True,
+        nullable=False
+    )
+
+    # Store only the QR image filename.
+    filename = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    # Record when the seller last updated the QR.
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
 # ==========================================
 # Transaction
@@ -395,6 +430,8 @@ class Transaction(db.Model):
     item = db.relationship("Item")
 
     price = db.Column(db.Float, nullable=False)
+    
+    payment_proof = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),
