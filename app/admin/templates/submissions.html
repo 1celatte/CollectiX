@@ -10,324 +10,823 @@
 
 <body>
 
-<h1>Manage Submissions</h1>
+<div class="page-container">
 
-{% if submissions %}
+    <!-- Page Header -->
 
-<table>
+    <div class="page-header">
 
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>User ID</th>
-            <th>Type</th>
-            <th>Collection</th>
-            <th>Tag</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Description</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+        <h1>Manage Submissions</h1>
 
-    <tbody>
+        <p>
+            Review and manage user submissions.
+        </p>
 
-        {% for submission in submissions %}
-
-        <tr>
-
-            <td>{{ submission.id }}</td>
-
-            <td>{{ submission.user_id }}</td>
-
-            <td>{{ submission.type }}</td>
-
-            <td>
-                {% if submission.collection %}
-                    {{ submission.collection.name }}
-                {% else %}
-                    --
-                {% endif %}
-            </td>
-
-            <td>
-                {% if submission.new_tag %}
-                    {{ submission.new_tag }}
-                {% elif submission.collection and submission.collection.tag %}
-                    {{ submission.collection.tag.name }}
-                {% elif submission.tag %}
-                    {{ submission.tag.name }}
-                {% else %}
-                    --
-                {% endif %}
-            </td>
-
-            <td>{{ submission.name }}</td>
-
-            <td>
-                {% if submission.image %}
-
-                    <img
-                        src="{{ url_for(
-                            'collection.static',
-                            filename='uploads/' + submission.image
-                        ) }}"
-                        alt="{{ submission.name }}"
-                        style="
-                            width: 100px;
-                            height: 100px;
-                            object-fit: cover;
-                        "
-                    >
-
-                {% else %}
-
-                    --
-
-                {% endif %}
-            </td>
-
-            <td>
-                {% if submission.description %}
-                    {{ submission.description }}
-                {% else %}
-                    --
-                {% endif %}
-            </td>
-
-            <td>
-
-                <!-- Approve -->
-
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'admin.approve_submission',
-                        submission_id=submission.id
-                    ) }}"
-                    style="display: inline;"
-                >
-
-                    <button
-                        type="submit"
-                        class="approve-btn"
-                    >
-                        Approve
-                    </button>
-
-                </form>
+    </div>
 
 
-                <!-- Reject Button -->
+    <!-- Submission Filters -->
 
-                <button
-                    type="button"
-                    class="reject-btn"
-                    popovertarget="rejectSubmission{{ submission.id }}"
-                >
-                    Reject
-                </button>
+    <div class="filter-buttons">
+
+        <a
+            href="{{ url_for('admin.submissions') }}"
+            class="view-btn"
+        >
+            All Submissions
+        </a>
+
+        <a
+            href="{{ url_for('admin.submissions', type='new_collection') }}"
+            class="view-btn"
+        >
+            Collection Submissions
+        </a>
+
+        <a
+            href="{{ url_for('admin.submissions', type='new_item') }}"
+            class="view-btn"
+        >
+            Item Submissions
+        </a>
+
+    </div>
 
 
-                <!-- Reject Popup -->
+    {% if submissions %}
 
-                <div
-                    id="rejectSubmission{{ submission.id }}"
-                    popover
-                    class="reject-popup"
-                >
 
-                    <div class="reject-box">
+    <!-- Submission Table -->
 
-                        <p>
-                            Are you sure you want to reject this submission?
-                        </p>
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Type</th>
+                    <th>Collection</th>
+                    <th>Tag</th>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for submission in submissions %}
+
+                <tr>
+
+                    <td>
+                        {{ submission.id }}
+                    </td>
+
+
+                    <td>
+                        {{ submission.user_id }}
+                    </td>
+
+
+                    <td>
+
+                        {% if submission.type == "new_collection" %}
+
+                            <span class="type-badge collection-badge">
+                                Collection
+                            </span>
+
+                        {% elif submission.type == "new_item" %}
+
+                            <span class="type-badge item-badge">
+                                Item
+                            </span>
+
+                        {% else %}
+
+                            <span class="type-badge">
+                                {{ submission.type }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if submission.collection %}
+
+                            {{ submission.collection.name }}
+
+                        {% else %}
+
+                            <span class="empty-text">--</span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if submission.new_tag %}
+
+                            <span class="tag-badge">
+                                {{ submission.new_tag }}
+                            </span>
+
+                        {% elif submission.collection and submission.collection.tag %}
+
+                            <span class="tag-badge">
+                                {{ submission.collection.tag.name }}
+                            </span>
+
+                        {% elif submission.tag %}
+
+                            <span class="tag-badge">
+                                {{ submission.tag.name }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="empty-text">--</span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="name-cell">
+                        {{ submission.name }}
+                    </td>
+
+
+                    <td>
+
+                        {% if submission.image %}
+
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + submission.image
+                                ) }}"
+                                alt="{{ submission.name }}"
+                                class="submission-image"
+                            >
+
+                        {% else %}
+
+                            <span class="empty-text">--</span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="description-cell">
+
+                        {% if submission.description %}
+
+                            {{ submission.description }}
+
+                        {% else %}
+
+                            <span class="empty-text">--</span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="action-cell">
+
+
+                        <!-- Approve -->
 
                         <form
                             method="POST"
                             action="{{ url_for(
-                                'admin.reject_submission',
+                                'admin.approve_submission',
                                 submission_id=submission.id
                             ) }}"
+                            class="action-form"
                         >
 
                             <button
                                 type="submit"
-                                class="reject-confirm"
+                                class="approve-btn"
                             >
-                                Yes
-                            </button>
-
-                            <button
-                                type="button"
-                                class="cancel-btn"
-                                popovertarget="rejectSubmission{{ submission.id }}"
-                                popovertargetaction="hide"
-                            >
-                                Cancel
+                                Approve
                             </button>
 
                         </form>
 
-                    </div>
 
-                </div>
+                        <!-- Reject -->
 
-            </td>
+                        <button
+                            type="button"
+                            class="reject-btn"
+                            popovertarget="rejectSubmission{{ submission.id }}"
+                        >
+                            Reject
+                        </button>
 
-        </tr>
 
-        {% endfor %}
+                        <!-- Reject Popup -->
 
-    </tbody>
+                        <div
+                            id="rejectSubmission{{ submission.id }}"
+                            popover
+                            class="reject-popup"
+                        >
 
-</table>
+                            <div class="reject-box">
 
-{% else %}
+                                <div class="warning-icon">
+                                    !
+                                </div>
 
-<p>No pending submissions.</p>
+                                <h3>
+                                    Reject Submission?
+                                </h3>
 
-{% endif %}
+                                <p>
+                                    Are you sure you want to reject
+                                    this submission?
+                                </p>
 
-<br>
 
-<a
-    href="{{ url_for('admin.dashboard') }}"
-    class="back-btn"
->
-    Back to Dashboard
-</a>
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'admin.reject_submission',
+                                        submission_id=submission.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="reject-confirm"
+                                    >
+                                        Yes, Reject
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="cancel-btn"
+                                        popovertarget="rejectSubmission{{ submission.id }}"
+                                        popovertargetaction="hide"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- No Submissions -->
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            📥
+        </div>
+
+        <h2>
+            No Pending Submissions
+        </h2>
+
+        <p>
+            There are currently no submissions waiting for review.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- Back to Dashboard -->
+
+    <div class="back-section">
+
+        <a
+            href="{{ url_for('admin.dashboard') }}"
+            class="back-btn"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
 
 
 <style>
 
-    body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-    }
+/* =========================
+   Page
+   ========================= */
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #212529;
+}
 
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: left;
-        vertical-align: middle;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    td img {
-        display: block;
-    }
+.page-container {
+    width: 100%;
+    padding: 35px 40px;
+    box-sizing: border-box;
+}
 
 
-    /* Approve button */
+/* =========================
+   Header
+   ========================= */
 
-    .approve-btn {
-        display: inline-block;
-        padding: 6px 12px;
-        background-color: #198754;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
+.page-header {
+    margin-bottom: 25px;
+}
 
-    .approve-btn:hover {
-        background-color: #157347;
-    }
+.page-header h1 {
+    margin: 0 0 8px 0;
+    font-size: 30px;
+}
 
-
-    /* Reject button */
-
-    .reject-btn {
-        display: inline-block;
-        padding: 6px 12px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
-
-    .reject-btn:hover {
-        background-color: #bb2d3b;
-    }
+.page-header p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 15px;
+}
 
 
-    /* Popup */
+/* =========================
+   Filter Buttons
+   ========================= */
 
-    .reject-popup {
-        padding: 0;
-        border: none;
-        background: transparent;
-    }
+.filter-buttons {
+    margin-bottom: 25px;
+}
 
+.view-btn {
+    display: inline-block;
+    padding: 9px 16px;
+    margin-right: 6px;
+    margin-bottom: 5px;
 
-    /* Popup box */
+    background-color: #6c757d;
+    color: white;
 
-    .reject-box {
-        background-color: white;
-        padding: 25px;
-        border-radius: 8px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
+    text-decoration: none;
+    border-radius: 5px;
 
+    font-size: 14px;
 
-    /* Yes button */
+    transition: background-color 0.2s;
+}
 
-    .reject-confirm {
-        padding: 6px 15px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
+.view-btn:hover {
+    background-color: #5c636a;
+}
 
 
-    /* Cancel button */
+/* =========================
+   Table
+   ========================= */
 
-    .cancel-btn {
-        padding: 6px 15px;
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
 
-    .cancel-btn:hover {
-        background-color: #5c636a;
-    }
+table {
+    width: 100%;
+    min-width: 1100px;
+
+    border-collapse: collapse;
+
+    background-color: white;
+
+    border: 1px solid #d9d9d9;
+}
 
 
-    /* Back button */
+/* Table Header */
 
-    .back-btn {
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-    }
+th {
+    background-color: #f1f3f5;
 
-    .back-btn:hover {
-        background-color: #5c636a;
-    }
+    color: #343a40;
+
+    border: 1px solid #d9d9d9;
+
+    padding: 13px 12px;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* Table Cells */
+
+td {
+    border: 1px solid #e0e0e0;
+
+    padding: 12px;
+
+    text-align: left;
+
+    vertical-align: middle;
+
+    font-size: 14px;
+}
+
+
+/* Row Hover */
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+
+/* =========================
+   Type Badges
+   ========================= */
+
+.type-badge {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 4px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    background-color: #6c757d;
+
+    color: white;
+}
+
+.collection-badge {
+    background-color: #0d6efd;
+}
+
+.item-badge {
+    background-color: #198754;
+}
+
+
+/* =========================
+   Tag
+   ========================= */
+
+.tag-badge {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 12px;
+
+    background-color: #fff3cd;
+
+    color: #856404;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   Name
+   ========================= */
+
+.name-cell {
+    font-weight: 600;
+}
+
+
+/* =========================
+   Image
+   ========================= */
+
+.submission-image {
+    display: block;
+
+    width: 90px;
+    height: 90px;
+
+    object-fit: cover;
+
+    border: 1px solid #d9d9d9;
+
+    border-radius: 6px;
+
+    background-color: #f8f9fa;
+}
+
+
+/* =========================
+   Description
+   ========================= */
+
+.description-cell {
+    min-width: 250px;
+    max-width: 400px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   Empty Text
+   ========================= */
+
+.empty-text {
+    color: #999;
+}
+
+
+/* =========================
+   Action
+   ========================= */
+
+.action-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.action-form {
+    display: inline;
+}
+
+
+/* =========================
+   Approve
+   ========================= */
+
+.approve-btn {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    background-color: #198754;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+.approve-btn:hover {
+    background-color: #157347;
+}
+
+
+/* =========================
+   Reject
+   ========================= */
+
+.reject-btn {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    background-color: #dc3545;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    margin-left: 4px;
+}
+
+.reject-btn:hover {
+    background-color: #bb2d3b;
+}
+
+
+/* =========================
+   Reject Popup
+   ========================= */
+
+.reject-popup {
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+}
+
+
+/* Popup Box */
+
+.reject-box {
+    width: 350px;
+
+    padding: 25px;
+
+    background-color: white;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+
+/* Warning Icon */
+
+.warning-icon {
+    width: 42px;
+    height: 42px;
+
+    margin: 0 auto 12px auto;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background-color: #f8d7da;
+
+    color: #dc3545;
+
+    border-radius: 50%;
+
+    font-size: 24px;
+
+    font-weight: bold;
+}
+
+
+.reject-box h3 {
+    margin: 5px 0 10px 0;
+
+    font-size: 20px;
+}
+
+
+.reject-box p {
+    color: #6c757d;
+
+    margin-bottom: 22px;
+}
+
+
+/* Confirm Reject */
+
+.reject-confirm {
+    padding: 7px 15px;
+
+    background-color: #dc3545;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+}
+
+.reject-confirm:hover {
+    background-color: #bb2d3b;
+}
+
+
+/* Cancel */
+
+.cancel-btn {
+    padding: 7px 15px;
+
+    background-color: #6c757d;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    margin-left: 5px;
+}
+
+.cancel-btn:hover {
+    background-color: #5c636a;
+}
+
+
+/* =========================
+   Empty State
+   ========================= */
+
+.empty-state {
+    padding: 60px 20px;
+
+    text-align: center;
+
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 42px;
+
+    margin-bottom: 10px;
+}
+
+.empty-state h2 {
+    color: #343a40;
+
+    font-size: 22px;
+
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+}
+
+
+/* =========================
+   Back Button
+   ========================= */
+
+.back-section {
+    margin-top: 25px;
+}
+
+.back-btn {
+    display: inline-block;
+
+    padding: 9px 16px;
+
+    background-color: #6c757d;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    font-size: 14px;
+
+    transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+    background-color: #5c636a;
+}
 
 </style>
 

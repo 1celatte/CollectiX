@@ -6,160 +6,380 @@
 
 {% block content %}
 
-<h1>
-    {{ collection.name }}
-</h1>
+<div class="container">
 
-{% if collection.image %}
+    <!-- Collection Header -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
 
-    <img
-        src="{{ url_for(
-            'collection.static',
-            filename='uploads/' + collection.image
-        ) }}"
-        alt="{{ collection.name }}"
-        width="200"
-    >
+            <h1 class="card-title fw-bold mb-3">
+                {{ collection.name }}
+            </h1>
 
-{% endif %}
+            {% if collection.image %}
 
-<p>
-    <strong>Tag:</strong>
+                <img
+                    src="{{ url_for(
+                        'collection.static',
+                        filename='uploads/' + collection.image
+                    ) }}"
+                    alt="{{ collection.name }}"
+                    class="img-fluid rounded mb-3"
+                    style="
+                        max-width: 300px;
+                        height: 250px;
+                        object-fit: contain;
+                        background-color: #f8f9fa;
+                    "
+                >
 
-    {% if collection.tag %}
-        {{ collection.tag.name }}
-    {% else %}
-        Not assigned
-    {% endif %}
-</p>
+            {% endif %}
 
-<p>
-    <strong>Description:</strong>
-    {{ collection.description }}
-</p>
+            <p class="mb-2">
+                <strong>Tag:</strong>
 
-<hr>
+                {% if collection.tag %}
+                    <span class="badge bg-primary">
+                        {{ collection.tag.name }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary">
+                        Not assigned
+                    </span>
+                {% endif %}
+            </p>
 
-<h2>
-    Items in This Collection
-</h2>
+            <p class="mb-0">
+                <strong>Description:</strong>
+                {{ collection.description }}
+            </p>
 
-{% if items %}
 
-    {% for item in items %}
+            <!-- Collection Progress -->
+            <hr>
 
-        <hr>
+            <h5 class="fw-bold mb-3">
+                Collection Progress
+            </h5>
 
-        <h3>
-            {{ item.name }}
-        </h3>
+            <div class="row text-center mb-3">
 
-        {% if item.image %}
+                <!-- Total Items -->
+                <div class="col">
+                    <div class="fw-bold">
+                        {{ total_items }}
+                    </div>
 
-            <img
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + item.image
-                ) }}"
-                alt="{{ item.name }}"
-                width="150"
-            >
-         {% else %}
+                    <small class="text-muted">
+                        Total
+                    </small>
+                </div>
+
+
+                <!-- Owned Items -->
+                <div class="col">
+                    <div class="fw-bold text-success">
+                        {{ owned_count }}
+                    </div>
+
+                    <small class="text-muted">
+                        Owned
+                    </small>
+                </div>
+
+
+                <!-- Missing Items -->
+                <div class="col">
+                    <div class="fw-bold text-danger">
+                        {{ missing_items }}
+                    </div>
+
+                    <small class="text-muted">
+                        Missing
+                    </small>
+                </div>
+
+            </div>
+
+
+            <!-- Progress Percentage -->
+
+            <div class="d-flex justify-content-between mb-1">
+
+                <small class="fw-bold">
+                    Progress
+                </small>
+
+                <small class="fw-bold">
+                    {{ progress }}%
+                </small>
+
+            </div>
+
+
+            <!-- Bootstrap Progress Bar -->
 
             <div
-                style="
-                    width: 150px;
-                    height: 150px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #eee;
-                "
+                class="progress"
+                role="progressbar"
+                aria-label="Collection progress"
+                aria-valuenow="{{ progress }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="height: 20px;"
             >
-                No Image
-            </div>    
 
-        {% endif %}
+                <div
+                    class="progress-bar bg-success"
+                    style="width: {{ progress }}%;"
+                >
+                    {{ progress }}%
+                </div>
 
-        <p>
-            {{ item.description }}
-        </p>
+            </div>
 
-        <!-- Check whether current user owns this item -->
+        </div>
+    </div>
 
-        {% set owned = owned_items
-            |selectattr("item_id", "equalto", item.id)
-            |list
-            |first
-        %}
 
-        {% if owned %}
+    <!-- Items -->
 
-            <p>
-                <strong>Status:</strong>
-                Owned
-            </p>
+    <h2 class="fw-bold mb-3">
+        Items in This Collection
+    </h2>
 
-            <p>
-                <strong>Quantity:</strong>
-                {{ owned.quantity }}
-            </p>
+    {% if items %}
 
-        {% else %}
+        <div class="row g-4">
 
-            <p>
-                <strong>Status:</strong>
-                Unowned
-            </p>
+            {% for item in items %}
 
-            <p>
-                <strong>Quantity:</strong>
-                0
-            </p>
+                <div class="col-12 col-md-6 col-lg-4">
 
-        {% endif %}
+                    <div class="card h-100 shadow-sm">
 
-    {% endfor %}
+                        {% if item.image %}
 
-{% else %}
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                class="card-img-top"
+                                style="
+                                    height: 220px;
+                                    object-fit: contain;
+                                    background-color: #f8f9fa;
+                                "
+                            >
 
-    <p>
-        No approved items are available in this collection yet.
-    </p>
+                        {% else %}
 
-{% endif %}
+                            <div
+                                class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                style="height: 220px;"
+                            >
+                                No Image
+                            </div>
 
-<br>
-<a href="{{ url_for(
-    'my_collection.edit_my_collection',
-    collection_id=collection.id
-) }}">
-    <button type="button">Edit My Collection</button>
-</a>
+                        {% endif %}
 
-<br>
-<br>
-<form
-    method="POST"
-    action="{{ url_for(
-        'my_collection.remove_from_my_collection',
-        collection_id=collection.id
-    ) }}"
->
-    <button type="submit">
-        Remove Collection from My Collection
-    </button>
-</form>
-<br>
-<br>
-<a
-    href="{{ url_for(
-        'my_collection.list_my_collections'
-    ) }}"
->
-    <button type="button">
-        ← Back to My Collections
-    </button>
-</a>
+
+                        <div class="card-body">
+
+                            <h5 class="card-title fw-bold">
+                                {{ item.name }}
+                            </h5>
+
+                            <p class="card-text">
+                                {{ item.description }}
+                            </p>
+
+
+                            <!-- Check whether current user owns this item -->
+
+                            {% set owned = owned_items
+                                |selectattr("item_id", "equalto", item.id)
+                                |list
+                                |first
+                            %}
+
+
+                            {% if owned %}
+
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+
+                                    <span class="badge bg-success">
+                                        Owned
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <strong>Quantity:</strong>
+                                    {{ owned.quantity }}
+                                </div>
+
+                            {% else %}
+
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+
+                                    <span class="badge bg-secondary">
+                                        Unowned
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <strong>Quantity:</strong>
+                                    0
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No approved items are available in this collection yet.
+        </div>
+
+    {% endif %}
+
+
+    <!-- Action Buttons -->
+
+    <div class="d-flex flex-wrap gap-2 mt-4">
+
+        <a
+            href="{{ url_for(
+                'my_collection.edit_my_collection',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-primary"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit My Collection
+        </a>
+
+
+        <!-- Remove Button -->
+
+        <button
+            type="button"
+            class="btn btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#removeCollectionModal"
+        >
+            <i class="bi bi-trash"></i>
+            Remove Collection
+        </button>
+
+
+        <a
+            href="{{ url_for(
+                'my_collection.list_my_collections'
+            ) }}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Back to My Collections
+        </a>
+
+    </div>
+
+
+    <!-- Remove Confirmation Modal -->
+
+    <div
+        class="modal fade"
+        id="removeCollectionModal"
+        tabindex="-1"
+        aria-labelledby="removeCollectionModalLabel"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="removeCollectionModalLabel"
+                    >
+                        Remove Collection
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <p class="mb-0">
+                        Are you sure you want to remove
+                        <strong>{{ collection.name }}</strong>
+                        from My Collection?
+                    </p>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'my_collection.remove_from_my_collection',
+                            collection_id=collection.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                        >
+                            <i class="bi bi-trash"></i>
+                            Yes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

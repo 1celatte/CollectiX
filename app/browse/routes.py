@@ -4,7 +4,10 @@ from app.models import Collection, Item, Listing, Tag
 from datetime import datetime
 from app.utils import normalize_text
 
-#Browse all public collections
+
+#======================================================================
+# BROWSE ALL PUBLIC COLLECTIONS     
+#======================================================================
 @browse_bp.route("/")
 def browse_page():
     #Read user's search and filter choices
@@ -189,7 +192,7 @@ def browse_page():
         tags=tags
     )
     
-#Display available marketplace listings
+    
 @browse_bp.route("/marketplace")
 def browse_marketplace():
     #Get selected sorting option

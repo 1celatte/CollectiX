@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Manage Users - CollectiX</title>
+<title>Banned Users - CollectiX</title>
 
 </head>
 
@@ -19,11 +19,11 @@
 <div class="page-header">
 
     <h1>
-        Manage Users
+        Banned Users
     </h1>
 
     <p>
-        View and manage registered users in CollectiX.
+        View users who are currently banned from CollectiX.
     </p>
 
 </div>
@@ -51,6 +51,8 @@
                 <th>Email</th>
 
                 <th>Role</th>
+
+                <th>Ban Reason</th>
 
                 <th>Action</th>
 
@@ -143,128 +145,105 @@
                 </td>
 
 
+                <!-- Ban Reason -->
+
+                <td class="ban-reason">
+
+                    {% if user.ban_reason %}
+
+                        {{ user.ban_reason }}
+
+                    {% else %}
+
+                        --
+
+                    {% endif %}
+
+                </td>
+
+
                 <!-- Action -->
 
                 <td>
 
-                    {% if user.role != "admin" %}
-
-
-                        <!-- View Details -->
+                    <div class="action-buttons">
 
                         <a
-                            href="{{ url_for(
-                                'admin.user_details',
-                                user_id=user.id
-                            ) }}"
+                            href="{{ url_for('admin.user_details', user_id=user.id) }}"
                             class="view-btn"
                         >
                             View Details
                         </a>
 
-
-                        <!-- Ban -->
-
                         <button
                             type="button"
-                            class="ban-btn"
-                            popovertarget="banUser{{ user.id }}"
+                            class="unban-btn"
+                            popovertarget="unbanUser{{ user.id }}"
                         >
-                            Ban
+                            Unban
                         </button>
 
+                    </div>
 
-                        <!-- Ban Popup -->
+                    <!-- Unban Popup -->
 
-                        <div
-                            id="banUser{{ user.id }}"
-                            popover
-                            class="delete-popup"
-                        >
+                    <div
+                        id="unbanUser{{ user.id }}"
+                        popover
+                        class="unban-popup"
+                    >
 
-                            <div class="delete-box">
-
-
-                                <div class="warning-icon">
-                                    !
-                                </div>
+                        <div class="unban-box">
 
 
-                                <h3>
-                                    Ban User?
-                                </h3>
-
-
-                                <p>
-                                    Are you sure you want to ban this user?
-                                </p>
-
-
-                                <form
-                                    action="{{ url_for(
-                                        'admin.ban_user',
-                                        user_id=user.id
-                                    ) }}"
-                                    method="POST"
-                                >
-
-
-                                    <label
-                                        for="banReason{{ user.id }}"
-                                        class="reason-label"
-                                    >
-                                        Ban Reason
-                                    </label>
-
-
-                                    <textarea
-                                        id="banReason{{ user.id }}"
-                                        name="ban_reason"
-                                        rows="4"
-                                        placeholder="Enter the reason for banning this user..."
-                                        required
-                                    ></textarea>
-
-
-                                    <div class="popup-actions">
-
-
-                                        <button
-                                            type="submit"
-                                            class="delete-confirm"
-                                        >
-                                            Ban User
-                                        </button>
-
-
-                                        <button
-                                            type="button"
-                                            class="cancel-btn"
-                                            popovertarget="banUser{{ user.id }}"
-                                            popovertargetaction="hide"
-                                        >
-                                            Cancel
-                                        </button>
-
-
-                                    </div>
-
-
-                                </form>
-
-
+                            <div class="warning-icon">
+                                !
                             </div>
+
+
+                            <h3>
+                                Unban User?
+                            </h3>
+
+
+                            <p>
+                                Are you sure you want to unban this user?
+                            </p>
+
+
+                            <form
+                                action="{{ url_for(
+                                    'admin.unban_user',
+                                    user_id=user.id
+                                ) }}"
+                                method="POST"
+                            >
+
+
+                                <button
+                                    type="submit"
+                                    class="unban-confirm"
+                                >
+                                    Yes, Unban
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="cancel-btn"
+                                    popovertarget="unbanUser{{ user.id }}"
+                                    popovertargetaction="hide"
+                                >
+                                    Cancel
+                                </button>
+
+
+                            </form>
+
 
                         </div>
 
-
-                    {% else %}
-
-                        <span class="admin-label">
-                            -
-                        </span>
-
-                    {% endif %}
+                    </div>
 
                 </td>
 
@@ -292,11 +271,11 @@
     </div>
 
     <h2>
-        No Users
+        No Banned Users
     </h2>
 
     <p>
-        There are currently no active users.
+        There are currently no banned users.
     </p>
 
 </div>
@@ -304,26 +283,14 @@
 {% endif %}
 
 
-<!-- Bottom Buttons -->
+<!-- Back Button -->
 
-<div class="bottom-actions">
-
-    <a
-        href="{{ url_for('admin.banned_users') }}"
-        class="back-btn"
-    >
-        Banned Users
-    </a>
-
-
-    <a
-        href="{{ url_for('admin.dashboard') }}"
-        class="back-btn"
-    >
-        ← Back to Dashboard
-    </a>
-
-</div>
+<a
+    href="{{ url_for('admin.users') }}"
+    class="back-btn"
+>
+    ← Back to Active Users
+</a>
 
 </div>
 
@@ -500,56 +467,54 @@
     }
 
 
-    .admin-label {
+    /* Ban Reason */
 
-        color: #6c757d;
+    .ban-reason {
+
+        max-width: 350px;
+
+        line-height: 1.5;
 
     }
 
+    /* Action Buttons */
 
-    /* View Details */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* View Details Button */
 
     .view-btn {
-
         display: inline-block;
-
-        min-width: 90px;
-
         padding: 6px 12px;
-
         background-color: #0d6efd;
-
         color: white;
-
-        text-decoration: none;
-
-        text-align: center;
-
+        border: none;
         border-radius: 4px;
-
+        text-decoration: none;
         font-size: 14px;
-
+        font-weight: 500;
     }
-
 
     .view-btn:hover {
-
-        background-color: #0b5ed7;
-
+        background-color: #0a58ca;
+        color: white;
     }
 
+    /* Unban Button */
 
-    /* Ban Button */
-
-    .ban-btn {
+    .unban-btn {
 
         display: inline-block;
 
-        min-width: 60px;
+        min-width: 70px;
 
         padding: 6px 12px;
 
-        background-color: #dc3545;
+        background-color: #198754;
 
         color: white;
 
@@ -561,21 +526,19 @@
 
         font-size: 14px;
 
-        margin-left: 5px;
-
     }
 
 
-    .ban-btn:hover {
+    .unban-btn:hover {
 
-        background-color: #bb2d3b;
+        background-color: #157347;
 
     }
 
 
     /* Popup */
 
-    .delete-popup {
+    .unban-popup {
 
         padding: 0;
 
@@ -586,7 +549,7 @@
     }
 
 
-    .delete-box {
+    .unban-box {
 
         background-color: white;
 
@@ -602,8 +565,6 @@
 
     }
 
-
-    /* Warning Icon */
 
     .warning-icon {
 
@@ -632,7 +593,7 @@
     }
 
 
-    .delete-box h3 {
+    .unban-box h3 {
 
         margin: 0 0 10px 0;
 
@@ -641,7 +602,7 @@
     }
 
 
-    .delete-box p {
+    .unban-box p {
 
         margin: 0 0 20px 0;
 
@@ -650,73 +611,13 @@
     }
 
 
-    /* Ban Reason */
-
-    .reason-label {
-
-        display: block;
-
-        text-align: left;
-
-        font-weight: 600;
-
-        margin-bottom: 8px;
-
-    }
-
-
-    textarea {
-
-        width: 100%;
-
-        min-height: 100px;
-
-        box-sizing: border-box;
-
-        padding: 10px;
-
-        border: 1px solid #adb5bd;
-
-        border-radius: 4px;
-
-        resize: vertical;
-
-        font-family: Arial, sans-serif;
-
-        font-size: 14px;
-
-        background-color: #f8f9fa;
-
-    }
-
-
-    textarea:focus {
-
-        outline: none;
-
-        background-color: white;
-
-        border-color: #86b7fe;
-
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-
-    }
-
-
     /* Popup Buttons */
 
-    .popup-actions {
-
-        margin-top: 20px;
-
-    }
-
-
-    .delete-confirm {
+    .unban-confirm {
 
         padding: 6px 15px;
 
-        background-color: #dc3545;
+        background-color: #198754;
 
         color: white;
 
@@ -729,9 +630,9 @@
     }
 
 
-    .delete-confirm:hover {
+    .unban-confirm:hover {
 
-        background-color: #bb2d3b;
+        background-color: #157347;
 
     }
 
@@ -806,22 +707,13 @@
     }
 
 
-    /* Bottom Buttons */
-
-    .bottom-actions {
-
-        display: flex;
-
-        gap: 10px;
-
-        margin-top: 25px;
-
-    }
-
+    /* Back Button */
 
     .back-btn {
 
         display: inline-block;
+
+        margin-top: 25px;
 
         padding: 8px 15px;
 
