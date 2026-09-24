@@ -6,134 +6,301 @@ Edit Profile - CollectiX
 
 {% block content %}
 
-<style>
-    .error-input {
-        border: 2px solid red;
-    }
+<div class="container-fluid py-4 px-4 px-md-5">
 
-    .error-message {
-        color: red;
-        font-size: 14px;
-    }
-</style>
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">Edit Profile</h1>
+        <p class="text-muted mb-0">
+            Update your profile information and account settings.
+        </p>
+    </div>
 
-<h1>Edit Profile</h1>
 
-<!-- Edit Profile Form -->
-<form method="POST" enctype="multipart/form-data">
+    <!-- Edit Profile -->
+    <div class="card border-0 shadow-sm mb-4">
 
-    <label>Name:</label>
-    <input type="text"
-           name="Name"
-           value="{{ name or current_user.name }}"
-           required>
+        <div class="card-body p-4 p-md-5">
 
-    <br><br>
+            <h4 class="fw-bold mb-1">
+                <i class="bi bi-person-circle me-2"></i>
+                Profile Information
+            </h4>
 
-    <label>Email:</label>
-    <input type="email"
-           name="email"
-           value="{{ current_user.email }}"
-           disabled>
+            <p class="text-muted mb-4">
+                Update your personal information and profile picture.
+            </p>
 
-    <br><br>
 
-    <!-- Display Current Profile Picture -->
-    {% if current_user.profile_picture %}
-        <img src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
-             alt="Profile Picture"
-             width="150"
-             height="150">
-    {% else %}
-        <img src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
-             alt="Default Profile Picture"
-             width="150"
-             height="150">
-    {% endif %}
+            <form method="POST" enctype="multipart/form-data">
 
-    <br><br>
+                <!-- Name -->
+                <div class="mb-4">
 
-    <!-- Upload New Profile Picture -->
-    <label>Profile Picture:</label>
-    <input type="file"
-           name="profile_picture"
-           accept="image/*">
+                    <label for="name" class="form-label fw-semibold">
+                        Name
+                    </label>
 
-    <br><br>
+                    <input
+                        type="text"
+                        id="name"
+                        name="Name"
+                        value="{{ name or current_user.name }}"
+                        class="form-control"
+                        required
+                    >
 
-    <!-- Remove Current Profile Picture -->
-    <label>
-        <input type="checkbox"
-               name="remove_profile_picture"
-               value="1">
-        Remove Profile Picture
-    </label>
+                </div>
 
-    <br><br>
 
-    <button type="submit">Save Changes</button>
+                <!-- Email -->
+                <div class="mb-4">
 
-</form>
+                    <label for="email" class="form-label fw-semibold">
+                        Email
+                    </label>
 
-<hr>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ current_user.email }}"
+                        class="form-control"
+                        disabled
+                    >
 
-<!-- Change Password -->
-<h2>Change Password</h2>
+                    <div class="form-text">
+                        Email address cannot be changed.
+                    </div>
 
-<form method="POST"
-      action="{{ url_for('auth.change_password') }}">
+                </div>
 
-    <label>Current Password:</label>
-    <input type="password"
-           name="current_password"
-           class="{% if current_password_error %}error-input{% endif %}" 
-           required>
 
-    {% if current_password_error %} 
-        <div class="error-message"> 
-            ⚠ {{ current_password_error }} 
-        </div> 
-    {% endif %}       
+                <!-- Current Profile Picture -->
+                <div class="mb-4">
 
-    <br><br>
+                    <label class="form-label fw-semibold d-block">
+                        Current Profile Picture
+                    </label>
 
-    <label>New Password:</label> 
-    <input type="password" 
-        name="new_password" 
-        class="{% if password_error %}error-input{% endif %}"  
-        required>
+                    {% if current_user.profile_picture %}
 
-    {% if password_error %}
-        <div class="error-message">
-            ⚠ {{ password_error }}
+                        <img
+                            src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+                            alt="Profile Picture"
+                            width="150"
+                            height="150"
+                            class="rounded-circle object-fit-cover border shadow-sm"
+                        >
+
+                    {% else %}
+
+                        <img
+                            src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                            alt="Default Profile Picture"
+                            width="150"
+                            height="150"
+                            class="rounded-circle object-fit-cover border shadow-sm"
+                        >
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Upload New Picture -->
+                <div class="mb-4">
+
+                    <label for="profile_picture"
+                           class="form-label fw-semibold">
+                        Upload New Profile Picture
+                    </label>
+
+                    <input
+                        type="file"
+                        id="profile_picture"
+                        name="profile_picture"
+                        accept="image/*"
+                        class="form-control"
+                    >
+
+                </div>
+
+
+                <!-- Remove Picture -->
+                <div class="form-check mb-4">
+
+                    <input
+                        type="checkbox"
+                        id="remove_profile_picture"
+                        name="remove_profile_picture"
+                        value="1"
+                        class="form-check-input"
+                    >
+
+                    <label
+                        for="remove_profile_picture"
+                        class="form-check-label"
+                    >
+                        Remove Profile Picture
+                    </label>
+
+                </div>
+
+
+                <!-- Save -->
+                <button
+                    type="submit"
+                    class="btn btn-primary px-4"
+                >
+                    <i class="bi bi-check-lg me-2"></i>
+                    Save Changes
+                </button>
+
+            </form>
+
         </div>
-    {% endif %}
 
-    <br><br>
+    </div>
 
-    <label>Confirm New Password:</label>
-    <input type="password"
-           name="confirm_password"
-           class="{% if confirm_password_error %}error-input{% endif %}"
-           required>
 
-    {% if confirm_password_error %} 
-        <div class="error-message"> 
-            ⚠ {{ confirm_password_error }} 
-        </div> 
-    {% endif %}
+    <!-- Change Password -->
+    <div class="card border-0 shadow-sm mb-4">
 
-    <br><br>
+        <div class="card-body p-4 p-md-5">
 
-    <button type="submit">Change Password</button>
+            <h4 class="fw-bold mb-1">
+                <i class="bi bi-shield-lock me-2"></i>
+                Change Password
+            </h4>
 
-</form>
+            <p class="text-muted mb-4">
+                Update your password to keep your account secure.
+            </p>
 
-<br>
 
-<!-- Cancel -->
-<a href="{{ url_for('auth.profile') }}">
-    <button type="button">Cancel</button>
-</a>
+            <form
+                method="POST"
+                action="{{ url_for('auth.change_password') }}"
+            >
+
+                <!-- Current Password -->
+                <div class="mb-4">
+
+                    <label
+                        for="current_password"
+                        class="form-label fw-semibold"
+                    >
+                        Current Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="current_password"
+                        name="current_password"
+                        class="form-control {% if current_password_error %}is-invalid{% endif %}"
+                        required
+                    >
+
+                    {% if current_password_error %}
+
+                        <div class="invalid-feedback">
+                            ⚠ {{ current_password_error }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- New Password -->
+                <div class="mb-4">
+
+                    <label
+                        for="new_password"
+                        class="form-label fw-semibold"
+                    >
+                        New Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="new_password"
+                        name="new_password"
+                        class="form-control {% if password_error %}is-invalid{% endif %}"
+                        required
+                    >
+
+                    {% if password_error %}
+
+                        <div class="invalid-feedback">
+                            ⚠ {{ password_error }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+
+                    <label
+                        for="confirm_password"
+                        class="form-label fw-semibold"
+                    >
+                        Confirm New Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        class="form-control {% if confirm_password_error %}is-invalid{% endif %}"
+                        required
+                    >
+
+                    {% if confirm_password_error %}
+
+                        <div class="invalid-feedback">
+                            ⚠ {{ confirm_password_error }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Change Password Button -->
+                <button
+                    type="submit"
+                    class="btn btn-primary px-4"
+                >
+                    <i class="bi bi-key me-2"></i>
+                    Change Password
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Cancel -->
+    <div class="mb-4">
+
+        <a
+            href="{{ url_for('auth.profile') }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left me-2"></i>
+            Cancel
+        </a>
+
+    </div>
+
+</div>
 
 {% endblock %}
+

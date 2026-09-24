@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ item.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Item Header -->
+    <div class="mb-4">
+
+        <h1 class="fw-bold">
+            {{ item.name }}
+        </h1>
+
+        <p class="text-muted">
+            In Collection:
+            <strong>{{ collection.name }}</strong>
+        </p>
+
+    </div>
+
+
+    <!-- Item Details Card -->
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <!-- Item Image -->
+                <div class="col-md-5 text-center">
+
+                    {% if item.image %}
+
+                        <img
+                            src="{{ url_for(
+                                'collection.static',
+                                filename='uploads/' + item.image
+                            ) }}"
+                            class="img-fluid rounded"
+                            alt="{{ item.name }}"
+                            style="
+                                max-height: 400px;
+                                object-fit: contain;
+                            "
+                        >
+
+                    {% else %}
+
+                        <div
+                            class="bg-light rounded d-flex align-items-center justify-content-center text-muted"
+                            style="height: 300px;"
+                        >
+                            No Image
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Item Information -->
+                <div class="col-md-7">
+
+                    <h2 class="h4 fw-bold mb-4">
+                        Item Information
+                    </h2>
+
+
+                    <!-- Description -->
+                    <div class="mb-4">
+
+                        <h3 class="h6 fw-bold">
+                            Description
+                        </h3>
+
+                        {% if item.description %}
+
+                            <p class="text-muted">
+                                {{ item.description }}
+                            </p>
+
+                        {% else %}
+
+                            <p class="text-muted">
+                                No description provided.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Collection -->
+                    <div class="mb-4">
+
+                        <h3 class="h6 fw-bold">
+                            Collection
+                        </h3>
+
+                        <p>
+                            {{ collection.name }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- Tag -->
+                    <div class="mb-4">
+
+                        <h3 class="h6 fw-bold">
+                            Tag
+                        </h3>
+
+                        {% if collection.tag %}
+
+                            <span class="badge bg-primary">
+                                {{ collection.tag.name }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Not assigned
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="mb-4">
+
+                        <h3 class="h6 fw-bold">
+                            Status
+                        </h3>
+
+                        <span class="badge bg-success">
+                            Approved
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Back Button -->
+    <div class="mt-4">
+
+        <a
+            href="{{ url_for(
+                'collection.view_collection',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-secondary"
+        >
+            ← Back to Collection
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

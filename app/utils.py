@@ -5,6 +5,12 @@ from flask_login import current_user
 from app.extensions import mail
 from app.models import User
 
+#==============================================================================================================================
+
+#Normalize text for consistent searching and comparison (for prevent duplicates item and collection)
+
+#==============================================================================================================================
+
 def normalize_text(text):
     text = text or ""
     text = text.strip()
@@ -16,6 +22,7 @@ def normalize_text(text):
         for character in normalized
         if not unicodedata.combining(character)
     ).casefold()
+
 
 
 def notify_admin_new_submission(submission):
@@ -42,4 +49,5 @@ Name: {submission.name}
 Please log in to the Admin Dashboard to review this submission.
 """
 
+    
     mail.send(msg)
