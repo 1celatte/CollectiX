@@ -463,6 +463,12 @@ class Trade(db.Model):
         nullable=False
     )
 
+    listing_id = db.Column(
+        db.Integer,
+        db.ForeignKey("listings.id"),
+        nullable=False
+    )
+
     offered_item_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
@@ -475,10 +481,33 @@ class Trade(db.Model):
         nullable=False
     )
 
+    offered_condition = db.Column(
+    db.String(50),
+    nullable=False,
+    server_default="Good"
+    )
+    
+    offered_image = db.Column(
+        db.String(255),
+        nullable=True
+    )
+    
     status = db.Column(
         db.String(20),
         default="pending",
         nullable=False
     )  # pending / accepted / rejected / completed
+
+    sender_received = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
+    receiver_received = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}
+Trade Requests
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>Trade Requests</h1>
+
+{% if trade_details %}
+
+    {% for detail in trade_details %}
+
+        <h2>
+            Trade Request from {{ detail.sender.name }}
+        </h2>
+
+        <p>
+            They offer:
+            {{ detail.offered_item.name }}
+        </p>
+
+        <p>
+            Offered item condition:
+            {{ detail.trade.offered_condition }}
+        </p>
+
+
+        {% if detail.trade.offered_image %}
+            <p>
+                Image of offered item:
+            </p>
+
+            <img
+                src="{{ url_for(
+                    'marketplace.static',
+                    filename='uploads/trades/' ~ detail.trade.offered_image
+                ) }}"
+                alt="{{ detail.offered_item.name }}"
+                style="max-width: 300px; max-height: 300px; object-fit: contain;"
+            >
+
+        {% else %}
+
+            <p>
+                No image was uploaded for the offered item.
+            </p>
+
+        {% endif %}
+
+        <p>
+            They want:
+            {{ detail.requested_item.name }}
+        </p>
+
+        <p>
+            Status:
+            {{ detail.trade.status|title }}
+        </p>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'marketplace.accept_trade_request',
+                trade_id=detail.trade.id
+            )}}"
+            style="display: inline;"
+        >
+            <button type="submit">
+                Accept Trade
+            </button>
+        </form>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'marketplace.reject_trade_request',
+                trade_id=detail.trade.id
+            ) }}"
+            style="display: inline;"
+        >
+            <button type="submit">
+                Reject Trade
+            </button>
+        </form>
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        You have no pending Trade Requests.
+    </p>
+
+{% endif %}
+
+{% endblock %}

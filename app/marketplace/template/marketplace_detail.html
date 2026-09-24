@@ -69,7 +69,16 @@ Marketplace Listing
     </a>
 
 {% elif listing.status == "available" and listing.listing_type == "trade" %}
-    <p>This item is available for trade.</p>
+    <!--Open the Trade request form-->
+    <a
+        href="{{ url_for(
+            'marketplace.send_trade_request',
+            listing_id=listing.id
+        ) }}"
+        class="btn btn-primary"
+    >
+        Send Trade Request
+    </a>
 
 {% else %}
     <p>This listing is no longer available.</p>

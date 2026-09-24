@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}
+Trade History
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>Trade History</h1>
+
+{% if trade_details %}
+
+    {% for detail in trade_details %}
+
+        <!--Show both users involved in this Trade-->
+        <h2>
+            Trade between
+            {{ detail.sender.name }}
+            and
+            {{ detail.receiver.name }}
+        </h2>
+
+        <!--Show the item offered by the sender-->
+        <p>
+            {{ detail.sender.name }} offered:
+            {{ detail.offered_item.name }}
+        </p>
+
+        <!--Show the offered item's condition-->
+        <p>
+            Offered item condition:
+            {{ detail.trade.offered_condition }}
+        </p>
+
+        <!--Show the sender's uploaded item image when available-->
+        {% if detail.trade.offered_image %}
+
+            <img
+                src="{{ url_for(
+                    'marketplace.static',
+                    filename='uploads/trades/' ~ detail.trade.offered_image
+                ) }}"
+                alt="{{ detail.offered_item.name }}"
+                style="max-width: 300px; max-height: 300px; object-fit: contain;"
+            >
+        
+        {% else %}
+            <p>
+                No image was uploaded for the offered item.
+            </p>
+        {% endif %}
+
+        <!--Show the item requested from the receiver-->
+        <p>
+            {{ detail.sender.name }} requested:
+            {{ detail.requested_item.name }}
+        </p>
+
+        <!--Show the current Trade status-->
+        <p>
+            Status:
+            {{ detail.trade.status|title }}
+        </p>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        You have no Trade History yet.
+    </p>
+
+{% endif %}
+
+{% endblock %}

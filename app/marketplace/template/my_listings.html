@@ -30,6 +30,13 @@ My Listings
 
 <br><br>
 
+<!--Open Trade History-->
+<a href="{{ url_for('marketplace.trade_history') }}">
+    View Trade History
+</a>
+
+<br><br>
+
 <!--Open seller payment requests-->
 <a
     href="{{ url_for('marketplace.payment_requests') }}"
@@ -37,6 +44,18 @@ My Listings
 >
     Confirm Payments
 </a>
+
+<br><br>
+
+<!--Open received Trade Requests-->
+<a 
+    href="{{ url_for('marketplace.view_trade_requests') }}"
+    class="btn btn-outline-primary"
+>
+    Trade Requests
+</a>
+
+<br><br>
 
 {% if listings %}
     <!--Show all listings owned by the current seller-->

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}
+Send Trade Request
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1>Send Trade Request</h1>
+
+<!--Show the requested Trade listing item-->
+<div>
+    <h2>
+        You are requesting {{ requested_item.name }}
+    </h2>
+
+    <p>
+        Owner:
+        {{ seller.name }}
+    </p>
+
+    <p>
+        Condition:
+        {{ listing.condition }}
+    </p>
+</div>
+
+<!--Choose an owned item to offer-->
+{% if offered_items %}
+    <form
+        method="POST"
+        action="{{ url_for(
+            'marketplace.send_trade_request',
+            listing_id=listing.id
+        ) }}"
+        enctype="multipart/form-data"
+    >
+        <label
+            for="offered_item_id"
+        >
+            Choose an item to offer
+        </label>
+
+        <br>
+
+        <select
+            id="offered_item_id"
+            name="offered_item_id"
+            required
+        >
+            <option value="">
+                Select an item
+            </option>
+
+            {% for offered_item in offered_items %}
+                <option
+                    value="{{ offered_item.id }}"
+                >
+                    {{ offered_item.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <label for="offered_condition">
+            Condition of your item
+        </label>
+
+        <br>
+
+        <select
+            id="offered_condition"
+            name="offered_condition"
+            required
+        >
+            <option value="">
+                Select condition
+            </option>
+
+            <option value="Brand New">
+                Brand New
+            </option>
+
+            <option value="Like New">
+                Like New
+            </option>
+
+            <option value="Good">
+                Good
+            </option>
+
+            <option value="Fair">
+                Fair
+            </option>
+
+            <option value="Poor">
+                Poor
+            </option>
+        </select>
+
+        <br><br>
+
+        <label for="offered_image">
+            Image of your item
+        </label>
+
+        <br>
+
+        <input
+            type="file"
+            id="offered_image"
+            name="offered_image"
+            accept="image/*"
+        >
+
+        <br><br>
+
+        <button
+            type="submit"
+        >
+            Send Trade Request
+        </button>
+    </form>
+{% else %}
+    <div>
+        You do not have any items available to offer for this Trade.
+    </div>
+{% endif %}
+
+<!--Return to the Trade listing details-->
+<a
+    href="{{ url_for(
+        'marketplace.view_listing',
+        listing_id=listing.id
+    ) }}"
+>
+    Back to Listing
+</a>
+
+{% endblock %}

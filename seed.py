@@ -393,12 +393,6 @@ with app.app_context():
         ),
 
         OwnedItem(
-            user_id=bob.id,
-            item_id=sasuke.id,
-            quantity=1
-        ),
-
-        OwnedItem(
             user_id=charlie.id,
             item_id=pikachu.id,
             quantity=1
@@ -461,24 +455,6 @@ with app.app_context():
     ])
 
     db.session.commit()
-
-
-    # =========================
-    # TRADE
-    # =========================
-
-    trade = Trade(
-        sender_id=alice.id,
-        receiver_id=bob.id,
-        offered_item_id=pikachu.id,
-        requested_item_id=sasuke.id,
-        status="pending"
-    )
-
-    db.session.add(trade)
-
-    db.session.commit()
-
 
     # =========================
     # SUBMISSION
