@@ -19,6 +19,8 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), default="user", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_picture = db.Column(db.String(255), nullable=True)
+    is_banned = db.Column(db.Boolean, default=False, nullable=False)
+    ban_reason = db.Column(db.Text, nullable=True)
 
 
 # ==========================================
@@ -126,6 +128,8 @@ class Item(db.Model):
         nullable=False
     )
 
+    collection = db.relationship("Collection")
+
     name = db.Column(
         db.String(150),
         nullable=False
@@ -222,6 +226,8 @@ class OwnedItem(db.Model):
 
     added_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    item = db.relationship("Item")
+
     __table_args__ = (
         db.UniqueConstraint(
             "user_id",
@@ -298,57 +304,6 @@ class Submission(db.Model):
 
 
 # ==========================================
-# Correction Request
-# ==========================================
-
-class CorrectionRequest(db.Model):
-    __tablename__ = "correction_requests"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id"),
-        nullable=False
-    )
-
-    item_id = db.Column(
-        db.Integer,
-        db.ForeignKey("items.id"),
-        nullable=False
-    )
-
-    type = db.Column(
-        db.String(20),
-        nullable=False
-    )  # text / image / both
-
-    description = db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    image = db.Column(
-        db.String(255),
-        nullable=True
-    )
-
-    status = db.Column(
-        db.String(20),
-        default="pending",
-        nullable=False
-    )  # pending / approved / rejected
-
-    reviewed_by = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id"),
-        nullable=True
-    )
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-# ==========================================
 # Listing
 # ==========================================
 
@@ -369,6 +324,8 @@ class Listing(db.Model):
         nullable=False
     )
 
+    item = db.relationship("Item")
+
     listing_type = db.Column(
         db.String(10),
         nullable=False
@@ -382,6 +339,8 @@ class Listing(db.Model):
     )
 
     description = db.Column(db.Text)
+    
+    image = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),
@@ -391,6 +350,39 @@ class Listing(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ==========================================
+# Payment QR
+# ==========================================
+
+class PaymentQR(db.Model):
+    __tablename__ = "payment_qrs"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # Each seller can have one payment QR.
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        unique=True,
+        nullable=False
+    )
+
+    # Store only the QR image filename.
+    filename = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    # Record when the seller last updated the QR.
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
 # ==========================================
 # Transaction
@@ -419,13 +411,27 @@ class Transaction(db.Model):
         nullable=False
     )
 
+    buyer = db.relationship(
+        "User",
+        foreign_keys=[buyer_id]
+    )
+
+    seller = db.relationship(
+        "User",
+        foreign_keys=[seller_id]
+    )
+
     item_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
         nullable=False
     )
 
+    item = db.relationship("Item")
+
     price = db.Column(db.Float, nullable=False)
+    
+    payment_proof = db.Column(db.String(255))
 
     status = db.Column(
         db.String(20),

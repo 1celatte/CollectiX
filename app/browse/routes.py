@@ -4,7 +4,10 @@ from app.models import Collection, Item, Listing, Tag
 from datetime import datetime
 from app.utils import normalize_text
 
-#Browse all public collections
+
+#======================================================================
+# BROWSE ALL PUBLIC COLLECTIONS     
+#======================================================================
 @browse_bp.route("/")
 def browse_page():
     #Read user's search and filter choices
@@ -59,6 +62,7 @@ def browse_page():
                 "category": tag_record.name,
                 "description": collection.description,
                 "image": collection.image,
+                "image_source": "collection",
                 "collection_name": collection.name,
                 "price": None,
                 "created_at": collection.created_at,
@@ -99,6 +103,7 @@ def browse_page():
                 "category": tag_record.name,
                 "description": item.description,
                 "image": item.image,
+                "image_source": "collection",
                 "collection_name": collection.name,
                 "price": None,
                 "created_at": item.created_at,
@@ -143,7 +148,8 @@ def browse_page():
                 "name": item.name,
                 "category": tag_record.name,
                 "description": listing.description or item.description,
-                "image": item.image,
+                "image": listing.image or item.image,
+                "image_source": "marketplace" if listing.image else "collection",
                 "collection_name": collection.name,
                 "price": listing.price,
                 "created_at": listing.created_at,
@@ -189,7 +195,7 @@ def browse_page():
         tags=tags
     )
     
-#Display available marketplace listings
+    
 @browse_bp.route("/marketplace")
 def browse_marketplace():
     #Get selected sorting option

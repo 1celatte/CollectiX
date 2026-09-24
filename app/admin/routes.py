@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.utils import normalize_text
 
 from . import admin
-from app.models import Collection,Item, Submission, User, Tag
+from app.models import Collection,Item, Submission, User, Tag, OwnedItem, Listing, Transaction, Trade
 from app.extensions import db
 
 @admin.route("/admin")
@@ -247,9 +247,20 @@ def submissions():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    submissions = Submission.query.filter_by(status="pending").all()
+    submission_type = request.args.get("type")
 
-    return render_template("submissions.html", submissions=submissions)
+    query = Submission.query.filter_by(status="pending")
+
+    if submission_type in ["new_collection", "new_item"]:
+        query = query.filter_by(type=submission_type)
+
+    submissions = query.all()
+
+    return render_template(
+        "submissions.html", 
+        submissions=submissions,
+        submission_type=submission_type
+        )
 
 
 @admin.route("/admin/submissions/<int:submission_id>/approve", methods=["POST"])
@@ -284,6 +295,7 @@ def approve_submission(submission_id):
         item = Item(
             collection_id=submission.collection_id,
             name=submission.name,
+            normalized_name=normalize_text(submission.name),
             description=submission.description,
             image=submission.image,
             status="approved",
@@ -324,14 +336,77 @@ def users():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    users = User.query.all()
+    users = User.query.filter_by(is_banned=False).all()
 
     return render_template("users.html", users=users)
 
 
-@admin.route("/admin/users/<int:user_id>/remove", methods=["POST"])
+@admin.route("/admin/users/<int:user_id>")
 @login_required
-def remove_user(user_id):
+def user_details(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    submissions = Submission.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Submission.created_at.desc()
+    ).all()
+
+    owned_items = OwnedItem.query.filter_by(
+        user_id=user.id
+    ).all()
+
+    listings = Listing.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    transactions = Transaction.query.filter(
+        (Transaction.buyer_id == user.id) |
+        (Transaction.seller_id == user.id)
+    ).order_by(
+        Transaction.created_at.desc()
+    ).all()
+
+    trades = Trade.query.filter(
+        (Trade.sender_id == user.id) |
+        (Trade.receiver_id == user.id)
+    ).order_by(
+        Trade.created_at.desc()
+    ).all()
+
+    return render_template(
+        "user_details.html",
+        user=user,
+        submissions=submissions,
+        owned_items=owned_items,
+        listings=listings,
+        transactions=transactions,
+        trades=trades
+    )
+
+
+@admin.route("/admin/users/banned")
+@login_required
+def banned_users():
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    users = User.query.filter_by(is_banned=True).all()
+
+    return render_template(
+        "banned_users.html",
+        users=users
+    )
+
+
+@admin.route("/admin/users/<int:user_id>/ban", methods=["POST"])
+@login_required
+def ban_user(user_id):
 
     if current_user.role != "admin":
         return "Access denied.", 403
@@ -339,9 +414,34 @@ def remove_user(user_id):
     user = User.query.get_or_404(user_id)
 
     if user.role == "admin":
-        return "Cannot delete admin user.", 403
+        return "Cannot ban admin user.", 403
 
-    db.session.delete(user)
+    ban_reason = request.form.get("ban_reason", "").strip()
+
+    if not ban_reason:
+        return "Ban reason is required.", 400
+
+    user.is_banned = True
+    user.ban_reason = ban_reason
+    
     db.session.commit()
 
     return redirect(url_for("admin.users"))
+
+
+@admin.route("/admin/users/<int:user_id>/unban", methods=["POST"])
+@login_required
+def unban_user(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        return "Cannot unban admin user.", 403
+
+    user.is_banned = False
+
+    db.session.commit()
+
+    return redirect(url_for("admin.banned_users"))

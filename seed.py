@@ -8,10 +8,10 @@ from app.models import (
     UserCollection,
     OwnedItem,
     Submission,
-    CorrectionRequest,
     Listing,
     Transaction,
-    Trade
+    Trade,
+    PaymentQR
 )
 from werkzeug.security import generate_password_hash
 from app.utils import normalize_text
@@ -28,10 +28,10 @@ with app.app_context():
     # CLEAR EXISTING DATA
     # =========================
 
+    db.session.query(PaymentQR).delete()
     db.session.query(Trade).delete()
     db.session.query(Transaction).delete()
     db.session.query(Listing).delete()
-    db.session.query(CorrectionRequest).delete()
     db.session.query(Submission).delete()
     db.session.query(OwnedItem).delete()
     db.session.query(UserCollection).delete()
@@ -329,12 +329,22 @@ with app.app_context():
 
         UserCollection(
             user_id=bob.id,
+            collection_id=pokemon.id
+        ),
+
+        UserCollection(
+            user_id=bob.id,
             collection_id=crybaby.id
         ),
 
         UserCollection(
             user_id=charlie.id,
             collection_id=pokemon.id
+        ),
+
+        UserCollection(
+            user_id=charlie.id,
+            collection_id=naruto.id
         )
     ])
 
@@ -371,6 +381,24 @@ with app.app_context():
         ),
 
         OwnedItem(
+            user_id=bob.id,
+            item_id=charizard.id,
+            quantity=1
+        ),
+
+        OwnedItem(
+            user_id=bob.id,
+            item_id=sakura.id,
+            quantity=1
+        ),
+
+        OwnedItem(
+            user_id=bob.id,
+            item_id=sasuke.id,
+            quantity=1
+        ),
+
+        OwnedItem(
             user_id=charlie.id,
             item_id=pikachu.id,
             quantity=1
@@ -379,6 +407,12 @@ with app.app_context():
         OwnedItem(
             user_id=charlie.id,
             item_id=charizard.id,
+            quantity=1
+        ),
+
+        OwnedItem(
+            user_id=charlie.id,
+            item_id=sasuke.id,
             quantity=1
         )
     ])
@@ -450,10 +484,25 @@ with app.app_context():
     # SUBMISSION
     # =========================
 
+    pending_collection = Collection(
+        name="One Piece Figures",
+        normalized_name=normalize_text("One Piece Figures"),
+        tag_id=anime_figure.id,
+        description="One Piece collectible figures.",
+        image=None,
+        status="pending",
+        created_by=charlie.id
+    )
+
+    db.session.add(pending_collection)
+
+    db.session.flush()
+
+
     submission = Submission(
         user_id=charlie.id,
         type="new_collection",
-        collection_id=None,
+        collection_id=pending_collection.id,
         name="One Piece Figures",
         description="One Piece collectible figures.",
         image=None,
@@ -464,25 +513,6 @@ with app.app_context():
     )
 
     db.session.add(submission)
-
-    db.session.commit()
-
-
-    # =========================
-    # CORRECTION REQUEST
-    # =========================
-
-    correction = CorrectionRequest(
-        user_id=alice.id,
-        item_id=pikachu.id,
-        type="text",
-        description="The description of this item needs to be corrected.",
-        image=None,
-        status="pending",
-        reviewed_by=None
-    )
-
-    db.session.add(correction)
 
     db.session.commit()
 

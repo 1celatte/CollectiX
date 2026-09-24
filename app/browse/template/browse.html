@@ -15,66 +15,123 @@ Browse & Search - CollectiX
 </p>
 
 <!--Search form-->
-<form method="GET" action="{{ url_for('browse.browse_page') }}" class="card p-3 mb-4">
+<form
+    method="GET"
+    action="{{ url_for('browse.browse_page') }}"
+    class="card p-3 mb-4"
+>
 
     <!--Search by keyword-->
     <div class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ query }}">
+        <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Search by keyword..."
+            value="{{ query }}"
+        >
 
-        <button type="submit" class="btn btn-primary">
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
             Search
         </button>
     </div>
 
     <!--Button to show or hide filters-->
-    <details class="mt-3">
-        <summary class="btn btn-outline-secondary">
+    <details
+        class="mt-3"
+    >
+        <summary
+            class="btn btn-outline-secondary"
+        >
             <i class="bi bi-sliders"></i>
             Filters
         </summary>
 
-        <div class="card card-body mt-3">
+        <div
+            class="card card-body mt-3"
+        >
 
-            <div class="row g-3">
+            <div
+                class="row g-3"
+            >
 
                 <!--Show type-->
-                <div class="col-md-3">
-                    <label for="show" class="form-label">
+                <div
+                    class="col-md-3"
+                >
+                    <label
+                        for="show"
+                        class="form-label"
+                    >
                         Show
                     </label>
 
-                    <select id="show" name="show" class="form-select">
-                        <option value="all" {% if show=="all" %}selected{% endif %}>
+                    <select
+                        id="show"
+                        name="show"
+                        class="form-select"
+                    >
+                        <option
+                            value="all"
+                            {% if show=="all" %}selected{% endif %}
+                        >
                             Everything
                         </option>
 
-                        <option value="collections" {% if show=="collections" %}selected{% endif %}>
+                        <option
+                            value="collections"
+                            {% if show=="collections" %}selected{% endif %}
+                        >
                             Collections
                         </option>
 
-                        <option value="items" {% if show=="items" %}selected{% endif %}>
+                        <option
+                            value="items"
+                            {% if show=="items" %}selected{% endif %}
+                        >
                             Items
                         </option>
 
-                        <option value="marketplace" {% if show=="marketplace" %}selected{% endif %}>
+                        <option
+                            value="marketplace"
+                            {% if show=="marketplace" %}selected{% endif %}
+                        >
                             Marketplace Listings
                         </option>
                     </select>
                 </div>
 
                 <!--Tag-->
-                <div class="col-md-3">
-                    <label for="tag" class="form-label">
+                <div
+                    class="col-md-3"
+                >
+                    <label
+                        for="tag"
+                        class="form-label"
+                    >
                         Tag
                     </label>
 
-                    <select id="tag" name="tag" class="form-select">
-                        <option value="" {% if not tag %}selected{% endif %}>
+                    <select
+                        id="tag"
+                        name="tag"
+                        class="form-select"
+                    >
+                        <option
+                            value=""
+                            {% if not tag %}selected{% endif %}
+                        >
                             All tags
                         </option>
 
                         {% for tag_option in tags %}
-                        <option value="{{ tag_option }}" {% if tag==tag_option %}selected{% endif %}>
+                        <option
+                            value="{{ tag_option }}"
+                            {% if tag==tag_option %}selected{% endif %}
+                        >
                             {{ tag_option }}
                         </option>
                         {% endfor %}
@@ -83,29 +140,53 @@ Browse & Search - CollectiX
 
 
                 <!--Sort-->
-                <div class="col-md-3">
-                    <label for="sort" class="form-label">
+                <div
+                    class="col-md-3"
+                >
+                    <label
+                        for="sort"
+                        class="form-label"
+                    >
                         Sort results
                     </label>
 
-                    <select id="sort" name="sort" class="form-select">
-                        <option value="newest" {% if sort=="newest" %}selected{% endif %}>
+                    <select
+                        id="sort"
+                        name="sort"
+                        class="form-select"
+                    >
+                        <option
+                            value="newest"
+                            {% if sort=="newest" %}selected{% endif %}
+                        >
                             Newest
                         </option>
 
-                        <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>
+                        <option
+                            value="oldest"
+                            {% if sort=="oldest" %}selected{% endif %}
+                        >
                             Oldest
                         </option>
 
-                        <option value="name" {% if sort=="name" %}selected{% endif %}>
+                        <option
+                            value="name"
+                            {% if sort=="name" %}selected{% endif %}
+                        >
                             Name A-Z
                         </option>
 
-                        <option value="lowest" {% if sort=="lowest" %}selected{% endif %}>
+                        <option
+                            value="lowest"
+                            {% if sort=="lowest" %}selected{% endif %}
+                        >
                             Lowest Price
                         </option>
 
-                        <option value="highest" {% if sort=="highest" %}selected{% endif %}>
+                        <option
+                            value="highest"
+                            {% if sort=="highest" %}selected{% endif %}
+                        >
                             Highest Price
                         </option>
                     </select>
@@ -119,76 +200,145 @@ Browse & Search - CollectiX
 <!--Search results-->
 <div class="row g-4">
 
-    <!--Check whether collections exist or not-->
+<!--Check whether search results exist-->
     {% if results %}
 
-    <!--Display every collection-->
+<!--Display every search result-->
     {% for result in results %}
 
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm">
+    <div
+        class="col-md-6 col-lg-4"
+    >
+        <div
+            class="card h-100 shadow-sm"
+        >
 
-            <div class="card-body">
+            <!--Show the image for this search result-->
+            {% if result.image %}
+                {% if result.image_source == "marketplace" %}
+                    <img
+                        src="{{ url_for(
+                            'marketplace.static',
+                            filename='uploads/listings/' ~ result.image
+                        ) }}"
+                        alt="{{ result.name }}"
+                        class="card-img-top"
+                        style="height: 220px; object-fit: contain;"
+                    >
+                {% else %}
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' ~ result.image
+                        ) }}"
+                        alt="{{ result.name }}"
+                        class="card-img-top"
+                        style="height: 220px; object-fit: contain;"
+                    >
+                {% endif %}
+            {% else %}
+                <div
+                    class="bg-light d-flex align-items-center justify-content-center text-muted"
+                    style="height: 220px;"
+                >
+                    No image available
+                </div>
+            {% endif %}
+
+            <div
+                class="card-body"
+            >
 
                 <!--Result type-->
                 {% if result.type == "collection" %}
-                <span class="badge bg-primary">
+                <span
+                    class="badge bg-primary"
+                >
                     Collection
                 </span>
                 {% elif result.type == "item" %}
-                <span class="badge bg-success">
+                <span
+                    class="badge bg-success"
+                >
                     Item
                 </span>
                 {% else %}
-                <span class="badge bg-warning text-dark">
+                <span
+                    class="badge bg-warning text-dark"
+                >
                     Marketplace Listing
                 </span>
                 {% endif %}
 
                 <!--Result name-->
-                <h5 class="card-title mt-2">
+                <h5
+                    class="card-title mt-2"
+                >
                     {{ result.name }}
                 </h5>
 
                 <!--Tag-->
-                <p class="text-muted">
+                <p
+                    class="text-muted"
+                >
                     Tag: {{ result.category }}
                 </p>
 
                 <!--Collection name for items and listings-->
                 {% if result.type != "collection" %}
-                <p class="text-muted">
+                <p
+                    class="text-muted"
+                >
                     Collection: {{ result.collection_name }}
                 </p>
                 {% endif %}
 
                 <!--Description-->
-                <p class="card-text">
+                <p
+                    class="card-text"
+                >
                     {{ result.description or
                     "No description available." }}
                 </p>
 
                 <!--Price for marketplace listing-->
                 {% if result.price is not none %}
-                <p class="fw-bold text-success">
+                <p
+                    class="fw-bold text-success"
+                >
                     Price: RM
                     {{ "%.2f"|format(result.price) }}
                 </p>
                 {% endif %}
 
                 {% if result.type == "marketplace" %}
-                <a href="{{ url_for('marketplace.view_listing', listing_id=result.id) }}" class="btn btn-primary">
+                <!--Open the marketplace listing details-->
+                <a
+                    href="{{ url_for('marketplace.view_listing', listing_id=result.id) }}"
+                    class="btn btn-primary"
+                >
                     View Details
                 </a>
 
                 {% elif result.type == "collection" %}
-                <a href="{{ url_for('collection.view_collection', collection_id=result.id) }}" class="btn btn-primary">
+                <!--Open the collection details-->
+                <a
+                    href="{{ url_for('collection.view_collection', collection_id=result.id) }}"
+                    class="btn btn-primary"
+                >
                     View Details
                 </a>
 
                 {% elif result.type == "item" %}
-                <a href="{{ url_for('collection.view_collection', collection_id=result.collection_id) }}"
-                    class="btn btn-primary">
+                <!--Open the item details-->
+                <a
+                    href="{{ url_for(
+                        'collection.view_item',
+                        collection_id=result.collection_id,
+                        item_id=result.id
+                    ) }}"
+                    class="btn btn-primary"
+                >
                     View Details
                 </a>
                 {% endif %}
@@ -204,8 +354,12 @@ Browse & Search - CollectiX
     {% else %}
 
     <!--Message when no collections exist-->
-    <div class="col-12">
-        <div class="alert alert-info">
+    <div
+        class="col-12"
+    >
+        <div
+            class="alert alert-info"
+        >
             No results match your search or filters.
         </div>
     </div>
@@ -215,11 +369,22 @@ Browse & Search - CollectiX
 </div>
 
 <!--Reference links for users who cannot find what they need-->
-<div class="card bg-light border-0 mt-5">
-    <div class="card-body text-center">
+<div
+    class="card bg-light border-0 mt-5"
+>
+    <div
+        class="card-body text-center"
+    >
 
-        <h5>Can't find what you are looking for?</h5>
-        <a href="{{ url_for('collection.create_collection') }}" class="link-primary me-3">
+        <h5>
+            Can't find what you are looking for?
+        </h5>
+
+        <!--Open the Create Collection page-->
+        <a
+            href="{{ url_for('collection.create_collection') }}"
+            class="link-primary me-3"
+        >
             Create Collection
         </a>
 
