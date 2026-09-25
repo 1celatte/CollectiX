@@ -119,7 +119,27 @@ def create_collection():
             return redirect(
                 url_for("collection.list_collections")
             )
-
+    
+        # Check if this collection is already waiting for admin approval.
+        pending_collection_submissions = Submission.query.filter_by(
+                status="pending",
+                type="new_collection"
+        ).all()
+            
+        for pending_submission in pending_collection_submissions:
+            
+                if normalize_text(pending_submission.name) == normalized_name:
+            
+                    flash(
+                        "This collection is already waiting for admin approval.",
+                        "error"
+                    )
+            
+                    return redirect(
+                        url_for("collection.list_collections")
+                    )
+           
+        
         selected_tag_id = None
         requested_new_tag = None
 
