@@ -5,3 +5,4 @@ instance/*.db
 app/auth/static/uploads/avatars/
 .env
 app/marketplace/static/uploads/
+app/collection/static/uploads/
