@@ -286,23 +286,40 @@ def approve_submission(submission_id):
     submission = Submission.query.get_or_404(submission_id)
 
     if submission.type == "new_collection":
-        collection = submission.collection
+
+        tag_id = submission.tag_id
 
         if submission.new_tag:
+
             new_tag = Tag(
                 name=submission.new_tag,
-                normalized_name=normalize_text(submission.new_tag)
+                normalized_name=normalize_text(
+                    submission.new_tag
+                )
             )
 
             db.session.add(new_tag)
             db.session.flush()
 
-            collection.tag_id = new_tag.id
+            tag_id = new_tag.id
 
-        else:
-            collection.tag_id = submission.tag_id
+        collection = Collection(
+            name=submission.name,
+            normalized_name=normalize_text(
+                submission.name
+            ),
+            tag_id=tag_id,
+            description=submission.description,
+            image=submission.image,
+            status="approved",
+            created_by=submission.user_id
+        )
 
-        collection.status = "approved"
+        db.session.add(collection)
+
+        db.session.flush()
+
+        submission.collection_id = collection.id
        
     elif submission.type == "new_item":
         item = Item(
@@ -443,7 +460,9 @@ def ban_user(user_id):
     ).all()
 
     for submission in pending_submissions:
+
         submission.status = "rejected"
+        submission.reviewed_by = current_user.id
 
     db.session.commit()
 

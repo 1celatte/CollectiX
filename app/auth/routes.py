@@ -285,7 +285,7 @@ def login():
         login_user(user)
 
         if user.role == "admin":
-            return redirect(url_for("admin.dashboard"))
+            return redirect(url_for("admin.admin_home"))
 
         next_page = request.args.get("next")
 
