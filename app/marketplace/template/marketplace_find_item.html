@@ -1,62 +1,52 @@
 {% extends "base.html" %}
 
-
 {% block title %}
-
-Missing Items - {{ collection.name }}
-
+Find {{ item.name }}
 {% endblock %}
-
 
 {% block content %}
 
-
 <div class="container py-4">
-
 
     <!-- Page Header -->
 
     <div class="mb-4">
 
         <h1 class="fw-bold">
-            Missing Items
+            Find Item
         </h1>
 
         <p class="text-muted mb-0">
-            Items you do not own from
+            Marketplace listings for
+            <strong>{{ item.name }}</strong>
+            from
             <strong>{{ collection.name }}</strong>
         </p>
 
     </div>
 
 
-    <!-- Missing Items -->
+    <!-- Marketplace Listings -->
 
-    {% if missing_items %}
-
+    {% if listings %}
 
         <div class="row g-4">
 
-
-            {% for item in missing_items %}
-
+            {% for listing in listings %}
 
                 <div class="col-12 col-md-6 col-lg-4">
-
 
                     <div class="card h-100 shadow-sm">
 
 
-                        <!-- Item Image -->
+                        <!-- Listing Image -->
 
-
-                        {% if item.image %}
-
+                        {% if listing.image %}
 
                             <img
                                 src="{{ url_for(
-                                    'collection.static',
-                                    filename='uploads/' + item.image
+                                    'marketplace.static',
+                                    filename='uploads/listings/' + listing.image
                                 ) }}"
                                 alt="{{ item.name }}"
                                 class="card-img-top"
@@ -67,9 +57,7 @@ Missing Items - {{ collection.name }}
                                 "
                             >
 
-
                         {% else %}
-
 
                             <div
                                 class="d-flex align-items-center justify-content-center bg-light text-muted"
@@ -80,16 +68,12 @@ Missing Items - {{ collection.name }}
 
                             </div>
 
-
                         {% endif %}
 
 
-
-                        <!-- Item Information -->
-
+                        <!-- Listing Information -->
 
                         <div class="card-body">
-
 
                             <h5 class="card-title fw-bold">
 
@@ -98,104 +82,99 @@ Missing Items - {{ collection.name }}
                             </h5>
 
 
-                            {% if item.description %}
+                            <p class="mb-2">
 
-                                <p class="card-text">
+                                <strong>Type:</strong>
 
-                                    {{ item.description }}
+                                {{ listing.listing_type|capitalize }}
+
+                            </p>
+
+
+                            {% if listing.price is not none %}
+
+                                <p class="mb-2">
+
+                                    <strong>Price:</strong>
+
+                                    RM {{ "%.2f"|format(listing.price) }}
 
                                 </p>
 
                             {% endif %}
 
 
-                            <div class="mb-3">
+                            {% if listing.condition %}
 
-                                <strong>Status:</strong>
+                                <p class="mb-2">
 
-                                <span class="badge bg-danger">
+                                    <strong>Condition:</strong>
 
-                                    Missing
+                                    {{ listing.condition }}
 
-                                </span>
+                                </p>
 
-                            </div>
+                            {% endif %}
 
 
-                            <!-- Find Item Button -->
+                            {% if listing.description %}
 
+                                <p class="card-text">
+
+                                    {{ listing.description }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- View Listing -->
 
                             <a
                                 href="{{ url_for(
-                                    'marketplace.find_missing_item',
-                                    collection_id=collection.id,
-                                    item_id=item.id
+                                    'marketplace.view_listing',
+                                    listing_id=listing.id
                                 ) }}"
                                 class="btn btn-primary w-100"
                             >
 
-                                <i class="bi bi-search"></i>
+                                <i class="bi bi-eye"></i>
 
-                                Check to Purchase Available Listings
+                                View Listing
 
                             </a>
 
-
                         </div>
-
 
                     </div>
 
-
                 </div>
 
-
             {% endfor %}
-
 
         </div>
 
 
     {% else %}
 
+        <!-- No Results -->
 
-        <!-- No Missing Items -->
+        <div class="alert alert-info">
 
-
-        <div class="alert alert-success">
-
-
-            <h5 class="fw-bold">
-
-                Collection Complete!
-
-            </h5>
-
-
-            <p class="mb-0">
-
-                You own all approved items in
-                <strong>{{ collection.name }}</strong>.
-
-            </p>
-
+            No available listings found for this item.
 
         </div>
-
 
     {% endif %}
 
 
-
     <!-- Back Button -->
-
 
     <div class="mt-4">
 
-
         <a
             href="{{ url_for(
-                'my_collection.view_my_collection',
+                'my_collection.view_missing_items',
                 collection_id=collection.id
             ) }}"
             class="btn btn-secondary"
@@ -203,15 +182,12 @@ Missing Items - {{ collection.name }}
 
             <i class="bi bi-arrow-left"></i>
 
-            Back to My Collection
+            Back to Missing Items
 
         </a>
 
-
     </div>
 
-
 </div>
-
 
 {% endblock %}
