@@ -437,6 +437,11 @@ class Transaction(db.Model):
     price = db.Column(db.Float, nullable=False)
     
     payment_proof = db.Column(db.String(255))
+    
+    rejection_reason = db.Column(
+        db.Text,
+        nullable=True
+    )
 
     status = db.Column(
         db.String(20),
@@ -490,6 +495,11 @@ class Trade(db.Model):
     db.String(50),
     nullable=False,
     server_default="Good"
+    )
+    
+    rejection_reason = db.Column(
+        db.Text,
+        nullable=True
     )
     
     offered_image = db.Column(

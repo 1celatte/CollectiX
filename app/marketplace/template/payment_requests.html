@@ -43,7 +43,7 @@ Confirm Payments
                     ) }}"
                     alt="Payment proof uploaded by {{ buyer.name }}"
                     class="img-fluid border rounded"
-                    style="max-width: 500px; max-height: 500px; object-fit: contain;"
+                    style="max-width: 300px; max-height: 300px; object-fit: contain;"
                 >
             {% else %}
                 <p class="text-muted">
@@ -68,20 +68,46 @@ Confirm Payments
                     </button>
                 </form>
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'marketplace.reject_payment',
-                        transaction_id=transaction.id
-                    ) }}"
-                >
-                    <button
-                        type="submit"
-                        class="btn btn-danger"
-                    >
+                <details>
+                    <summary class="btn btn-danger">
                         Reject Payment
-                    </button>
-                </form>
+                    </summary>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'marketplace.reject_payment',
+                            transaction_id=transaction.id
+                        ) }}"
+                        class="mt-3"
+                    >
+                        <label
+                            for="rejection_reason_{{ transaction.id }}"
+                            class="form-label"
+                        >
+                            Reason for rejection
+                        </label>
+
+                        <textarea
+                            id="rejection_reason_{{ transaction.id }}"
+                            name="rejection_reason"
+                            class="form-control form-control-sm"
+                            rows="2"
+                            style="width: 280px;"
+                            placeholder="Explain why the payment proof was rejected."
+                            required
+                        ></textarea>
+
+                        <br>
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                        >
+                            Confirm Rejection
+                        </button>
+                    </form>
+                </details>
             </div>
         </div>
     {% endfor %}

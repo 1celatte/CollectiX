@@ -15,6 +15,8 @@ from app.models import (
 )
 from werkzeug.security import generate_password_hash
 from app.utils import normalize_text
+import os
+import shutil
 
 
 app = create_app()
@@ -97,7 +99,49 @@ with app.app_context():
 
     db.session.commit()
 
+    # =========================
+    # PAYMENT QR
+    # =========================
 
+    bob_qr_filename = "bob_payment_qr.png"
+
+    seed_qr_path = os.path.join(
+        app.root_path,
+        "marketplace",
+        "static",
+        "seed_images",
+        bob_qr_filename
+    )
+
+    qr_upload_folder = os.path.join(
+        app.root_path,
+        "marketplace",
+        "static",
+        "uploads",
+        "payment_qrs"
+    )
+
+    os.makedirs(
+        qr_upload_folder,
+        exist_ok=True
+    )
+
+    shutil.copyfile(
+        seed_qr_path,
+        os.path.join(
+            qr_upload_folder,
+            bob_qr_filename
+        )
+    )
+
+    bob_payment_qr = PaymentQR(
+        user_id=bob.id,
+        filename=bob_qr_filename
+    )
+
+    db.session.add(bob_payment_qr)
+    db.session.commit()
+    
     # =========================
     # TAGS
     # =========================

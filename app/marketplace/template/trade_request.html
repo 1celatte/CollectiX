@@ -53,12 +53,16 @@ Send Trade Request
                 Select an item
             </option>
 
-            {% for offered_item in offered_items %}
-                <option
-                    value="{{ offered_item.id }}"
-                >
-                    {{ offered_item.name }}
-                </option>
+            {% for collection in collections %}
+                <optgroup label="{{ collection.name }}">
+                    {% for offered_item in items_by_collection[collection.id] %}
+                        <option
+                            value="{{ offered_item.id }}"
+                        >
+                            {{ offered_item.name }}
+                        </option>
+                    {% endfor %}
+                </optgroup>
             {% endfor %}
         </select>
 

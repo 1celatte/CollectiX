@@ -60,6 +60,18 @@ Transaction History
     </p>
 
     {% if transaction.buyer_id == current_user.id
+    and transaction.status == "payment_rejected"
+    and transaction.rejection_reason %}
+
+        <!--Show the seller's reason when the buyer's payment proof was rejected-->
+        <div class="alert alert-danger mt-3">
+            <strong>Payment proof rejected.</strong><br>
+            Reason: {{ transaction.rejection_reason }}
+        </div>
+
+    {% endif %}
+
+    {% if transaction.buyer_id == current_user.id
     and transaction.status == "payment_submitted" %}
         <div class="alert alert-info mt-3">
             <strong>Payment proof submitted.</strong><br>

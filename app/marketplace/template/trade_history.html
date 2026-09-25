@@ -42,6 +42,7 @@ Trade History
                     filename='uploads/trades/' ~ detail.trade.offered_image
                 ) }}"
                 alt="{{ detail.offered_item.name }}"
+                class="img-fluid border rounded"
                 style="max-width: 300px; max-height: 300px; object-fit: contain;"
             >
         
@@ -62,6 +63,61 @@ Trade History
             Status:
             {{ detail.trade.status|title }}
         </p>
+
+        {% if detail.trade.sender_id == current_user.id
+        and detail.trade.status == "rejected"
+        and detail.trade.rejection_reason %}
+
+            <!--Show the listing owner's rejection reason to the Trade requester-->
+            <p>
+                <strong>Trade Request rejected.</strong><br>
+                Reason: {{ detail.trade.rejection_reason }}
+            </p>
+
+        {% endif %}
+
+        <!--Let each user confirm after an accepted Trade-->
+        {% if detail.trade.status == "accepted" %}
+
+            {% if detail.trade.sender_id == current_user.id
+            and not detail.trade.sender_received %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'marketplace.confirm_trade_item_received',
+                        trade_id=detail.trade.id
+                    ) }}"
+                >
+                    <button type="submit" class="btn btn-success">
+                        Confirm Item Received
+                    </button>
+                </form>
+
+            {% elif detail.trade.receiver_id == current_user.id
+            and not detail.trade.receiver_received %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'marketplace.confirm_trade_item_received',
+                        trade_id=detail.trade.id
+                    ) }}"
+                >
+                    <button type="submit" class="btn btn-success">
+                        Confirm Item Received
+                    </button>
+                </form>
+
+            {% else %}
+
+                <p>
+                    You have confirmed that you received your item.
+                </p>
+
+            {% endif %}
+
+        {% endif %}
 
         <hr>
 
