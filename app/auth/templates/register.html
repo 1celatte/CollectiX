@@ -6,163 +6,657 @@ Register - CollectiX
 
 {% block content %}
 
-<div class="container py-5">
+<style>
 
-<div class="row justify-content-center">
+    .register-section {
+        padding: 45px 0;
+    }
 
-    <div class="col-lg-6 col-md-8">
+    /* =========================
+       MAIN CARD
+    ========================= */
 
-        <!-- Header -->
-        <div class="mb-4">
+    .register-card {
+        position: relative;
+        overflow: hidden;
 
-            <h1 class="fw-bold mb-2">
-                Create Account
-            </h1>
+        border-radius: 26px;
 
-            <p class="text-muted mb-0">
-                Create your CollectiX account to start managing your collection.
-            </p>
+        background-color: #ffffff;
 
-        </div>
+        border: 1px solid #d5eaf4;
 
-
-        <!-- Register Form -->
-        <div class="bg-white border rounded-4 shadow-sm p-4 p-md-5">
-
-            <form method="POST">
-
-                <!-- Name -->
-                <div class="mb-4">
-
-                    <label
-                        for="name"
-                        class="form-label fw-semibold"
-                    >
-                        Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value="{{ name or '' }}"
-                        class="form-control"
-                        placeholder="Enter your name"
-                        required
-                    >
-
-                </div>
+        box-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.08);
+    }
 
 
-                <!-- Email -->
-                <div class="mb-4">
+    /* =========================
+       LEFT SIDE
+    ========================= */
 
-                    <label
-                        for="email"
-                        class="form-label fw-semibold"
-                    >
-                        Email
-                    </label>
+    .register-side {
+        position: relative;
+        overflow: hidden;
 
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ email or '' }}"
-                        class="form-control {% if email_error %}is-invalid{% endif %}"
-                        placeholder="Enter your email"
-                        required
-                    >
+        min-height: 650px;
 
-                    {% if email_error %}
+        padding: 50px 40px;
 
-                        <div class="invalid-feedback">
-                            ⚠ {{ email_error }}
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        background: linear-gradient(
+            145deg,
+            #102a43,
+            #0d6efd
+        );
+
+        color: white;
+    }
+
+    .register-side::before {
+        content: "";
+
+        position: absolute;
+
+        width: 240px;
+        height: 240px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.08);
+
+        top: -90px;
+        right: -75px;
+    }
+
+    .register-side::after {
+        content: "";
+
+        position: absolute;
+
+        width: 190px;
+        height: 190px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.06);
+
+        bottom: -85px;
+        left: -65px;
+    }
+
+    .register-side-content {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    /* Icon */
+
+    .brand-icon {
+        width: 70px;
+        height: 70px;
+
+        border-radius: 20px;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 25px;
+    }
+
+    .brand-icon i {
+        font-size: 32px;
+        color: white;
+    }
+
+
+    /* Text */
+
+    .register-side h2 {
+        font-size: 34px;
+        font-weight: 750;
+
+        line-height: 1.2;
+
+        margin-bottom: 15px;
+    }
+
+    .register-side h2 span {
+        color: #8ed8ff;
+    }
+
+    .register-side p {
+        font-size: 15px;
+
+        color: rgba(255, 255, 255, 0.76);
+
+        line-height: 1.7;
+
+        max-width: 320px;
+
+        margin-bottom: 30px;
+    }
+
+
+    /* Features */
+
+    .register-feature {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        margin-bottom: 14px;
+
+        font-size: 14px;
+
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+    .register-feature i {
+        width: 30px;
+        height: 30px;
+
+        border-radius: 9px;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================
+       RIGHT FORM SIDE
+    ========================= */
+
+    .register-form-side {
+        background-color: #f5fbfe;
+
+        padding: 45px;
+
+        min-height: 650px;
+
+        display: flex;
+        align-items: center;
+    }
+
+    .register-form-content {
+        width: 100%;
+        max-width: 430px;
+
+        margin: auto;
+    }
+
+
+    /* Header */
+
+    .register-badge {
+        display: inline-block;
+
+        background-color: #e3f6ff;
+
+        border: 1px solid #cdebf7;
+
+        color: #087ea4;
+
+        border-radius: 30px;
+
+        padding: 6px 13px;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.5px;
+
+        margin-bottom: 14px;
+    }
+
+    .register-form-side h1 {
+        font-size: 32px;
+
+        font-weight: 750;
+
+        color: #1f2937;
+
+        margin-bottom: 8px;
+    }
+
+    .register-description {
+        color: #6c757d;
+
+        font-size: 14px;
+
+        margin-bottom: 28px;
+    }
+
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .form-label {
+        color: #374151;
+
+        font-size: 14px;
+
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        background-color: #ffffff;
+
+        border: 1px solid #cfe3ec;
+
+        border-radius: 10px;
+
+        padding: 10px 13px;
+
+        font-size: 14px;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+
+        box-shadow:
+            0 0 0 3px rgba(13, 110, 253, 0.10);
+    }
+
+    .form-control::placeholder {
+        color: #adb5bd;
+    }
+
+    .invalid-feedback {
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       REGISTER BUTTON
+    ========================= */
+
+    .register-btn {
+        border: none;
+
+        border-radius: 10px;
+
+        padding: 11px 15px;
+
+        font-weight: 600;
+
+        background: linear-gradient(
+            135deg,
+            #0d6efd,
+            #087ea4
+        );
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .register-btn:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 7px 16px rgba(13, 110, 253, 0.22);
+    }
+
+
+    /* =========================
+       LOGIN LINK
+    ========================= */
+
+    .login-link {
+        text-align: center;
+
+        margin-top: 20px;
+
+        font-size: 14px;
+
+        color: #6c757d;
+    }
+
+    .login-link a {
+        color: #0d6efd;
+
+        text-decoration: none;
+
+        font-weight: 600;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 991px) {
+
+        .register-side {
+            min-height: auto;
+
+            padding: 40px 35px;
+        }
+
+        .register-form-side {
+            min-height: auto;
+
+            padding: 40px 35px;
+        }
+
+    }
+
+    @media (max-width: 576px) {
+
+        .register-section {
+            padding: 25px 0;
+        }
+
+        .register-card {
+            border-radius: 20px;
+        }
+
+        .register-side {
+            padding: 35px 25px;
+        }
+
+        .register-form-side {
+            padding: 35px 25px;
+        }
+
+        .register-side h2 {
+            font-size: 29px;
+        }
+
+        .register-form-side h1 {
+            font-size: 28px;
+        }
+
+    }
+
+</style>
+
+
+<div class="container register-section">
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-9 col-lg-10">
+
+            <div class="register-card">
+
+                <div class="row g-0">
+
+
+                    <!-- =========================
+                         LEFT BRANDING
+                    ========================= -->
+
+                    <div class="col-lg-5">
+
+                        <div class="register-side">
+
+                            <div class="register-side-content">
+
+                                <div class="brand-icon">
+
+                                    <i class="bi bi-person-plus"></i>
+
+                                </div>
+
+
+                                <h2>
+                                    Join
+                                    <span>CollectiX</span>
+                                </h2>
+
+
+                                <p>
+                                    Create your account and start
+                                    building your own collection
+                                    while discovering items from
+                                    other collectors.
+                                </p>
+
+
+                                <div class="register-feature">
+
+                                    <i class="bi bi-collection"></i>
+
+                                    <span>
+                                        Build your collection
+                                    </span>
+
+                                </div>
+
+
+                                <div class="register-feature">
+
+                                    <i class="bi bi-shop"></i>
+
+                                    <span>
+                                        Discover collectible items
+                                    </span>
+
+                                </div>
+
+
+                                <div class="register-feature">
+
+                                    <i class="bi bi-people"></i>
+
+                                    <span>
+                                        Connect with collectors
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
                         </div>
 
-                    {% endif %}
-
-                </div>
+                    </div>
 
 
-                <!-- Password -->
-                <div class="mb-4">
+                    <!-- =========================
+                         REGISTER FORM
+                    ========================= -->
 
-                    <label
-                        for="password"
-                        class="form-label fw-semibold"
-                    >
-                        Password
-                    </label>
+                    <div class="col-lg-7">
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-control"
-                        placeholder="Enter your password"
-                        required
-                    >
+                        <div class="register-form-side">
 
-                </div>
+                            <div class="register-form-content">
 
 
-                <!-- Confirm Password -->
-                <div class="mb-4">
+                                <span class="register-badge">
+                                    CREATE ACCOUNT
+                                </span>
 
-                    <label
-                        for="confirm_password"
-                        class="form-label fw-semibold"
-                    >
-                        Confirm Password
-                    </label>
 
-                    <input
-                        type="password"
-                        id="confirm_password"
-                        name="confirm_password"
-                        class="form-control {% if password_error %}is-invalid{% endif %}"
-                        placeholder="Re-enter your password"
-                        required
-                    >
+                                <h1>
+                                    Create Account
+                                </h1>
 
-                    {% if password_error %}
 
-                        <div class="invalid-feedback">
-                            ⚠ {{ password_error }}
+                                <p class="register-description">
+                                    Create your CollectiX account
+                                    to start managing your collection.
+                                </p>
+
+
+                                <form method="POST">
+
+
+                                    <!-- Name -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="name"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Name
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            value="{{ name or '' }}"
+                                            class="form-control"
+                                            placeholder="Enter your name"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- Email -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="email"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Email
+                                        </label>
+
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            value="{{ email or '' }}"
+                                            class="form-control {% if email_error %}is-invalid{% endif %}"
+                                            placeholder="Enter your email"
+                                            required
+                                        >
+
+                                        {% if email_error %}
+
+                                            <div class="invalid-feedback">
+                                                ⚠ {{ email_error }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <!-- Password -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="password"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Password
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            id="password"
+                                            name="password"
+                                            class="form-control"
+                                            placeholder="Enter your password"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- Confirm Password -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="confirm_password"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Confirm Password
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            id="confirm_password"
+                                            name="confirm_password"
+                                            class="form-control {% if password_error %}is-invalid{% endif %}"
+                                            placeholder="Re-enter your password"
+                                            required
+                                        >
+
+                                        {% if password_error %}
+
+                                            <div class="invalid-feedback">
+                                                ⚠ {{ password_error }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <!-- Register Button -->
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary register-btn w-100"
+                                    >
+                                        <i class="bi bi-person-plus me-2"></i>
+                                        Create Account
+                                    </button>
+
+                                </form>
+
+
+                                <!-- Login -->
+
+                                <div class="login-link">
+
+                                    Already have an account?
+
+                                    <a
+                                        href="{{ url_for('auth.login') }}"
+                                    >
+                                        Login here
+                                    </a>
+
+                                </div>
+
+
+                            </div>
+
                         </div>
 
-                    {% endif %}
+                    </div>
 
                 </div>
 
-
-                <!-- Register Button -->
-                <button
-                    type="submit"
-                    class="btn btn-primary w-100 py-2 fw-semibold"
-                >
-                    Register
-                </button>
-
-            </form>
-
-        </div>
-
-
-        <!-- Login -->
-        <div class="text-center mt-4">
-
-            <span class="text-muted">
-                Already have an account?
-            </span>
-
-            <a
-                href="{{ url_for('auth.login') }}"
-                class="text-primary text-decoration-none fw-semibold"
-            >
-                Login here
-            </a>
+            </div>
 
         </div>
 
@@ -170,6 +664,5 @@ Register - CollectiX
 
 </div>
 
-</div>
-
 {% endblock %}
+

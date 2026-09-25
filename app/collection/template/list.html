@@ -16,14 +16,15 @@ Public Collections
         </h1>
 
         <!-- Create Collection Button -->
-        <button
-            type="button"
+        <a
+            href="{{ url_for(
+                'browse.browse_page',
+                from_create='true'
+            ) }}"
             class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#createCollectionReminder"
         >
             + Create Collection
-        </button>
+        </a>
 
     </div>
 
@@ -221,89 +222,19 @@ Public Collections
                 Be the first to create a collection!
             </p>
 
-            <button
-                type="button"
+            <a
+                href="{{ url_for(
+                    'browse.browse_page',
+                    from_create='true'
+                ) }}"
                 class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#createCollectionReminder"
             >
                 + Create Collection
-            </button>
+            </a>
 
         </div>
 
     {% endif %}
-
-</div>
-
-
-<!-- ===================================================== -->
-<!-- Create Collection Reminder Modal -->
-<!-- ===================================================== -->
-
-<div
-    class="modal fade"
-    id="createCollectionReminder"
-    tabindex="-1"
-    aria-labelledby="createCollectionReminderLabel"
-    aria-hidden="true"
->
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <!-- Modal Header -->
-
-            <div class="modal-header">
-
-                <h5
-                    class="modal-title fw-bold"
-                    id="createCollectionReminderLabel"
-                >
-                    Reminder
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
-
-            </div>
-
-
-            <!-- Modal Body -->
-
-            <div class="modal-body">
-
-                <p class="mb-0">
-                    Please search the public collections first to check
-                    if the collection already exists before creating a
-                    new one.
-                </p>
-
-            </div>
-
-
-            <!-- Modal Footer -->
-
-            <div class="modal-footer">
-
-                <!-- Redirect after clicking Got it -->
-                <a
-                    href="{{ url_for('browse.browse_page') }}"
-                    class="btn btn-primary"
-                >
-                    Got it
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 

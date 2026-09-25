@@ -19,16 +19,63 @@ def marketplace_home():
     listings = Listing.query.join(
         Item,
         Listing.item_id == Item.id
+    ).join(
+        User,
+        Listing.user_id == User.id
     ).add_entity(
         Item
     ).filter(
-        Listing.status == "available"
+        Listing.status == "available",
+        User.is_banned == False
     ).order_by(
         Listing.created_at.desc()
     ).all()
 
     return render_template(
         "marketplace_list.html",
+        listings=listings
+    )
+    
+#====================================================================================================================================
+
+# FIND A MISSING ITEM IN THE MARKETPLACE(let user find the item they want to buy in the marketplace)
+
+#=======================================================================================================================================
+
+@marketplace_bp.route(
+    "/find/<int:collection_id>/<int:item_id>"
+)
+@login_required
+def find_missing_item(collection_id, item_id):
+
+    # Get the selected item
+    item = Item.query.filter_by(
+        id=item_id,
+        collection_id=collection_id,
+        status="approved"
+    ).first_or_404()
+
+    # Get the collection
+    collection = Collection.query.get_or_404(
+        collection_id
+    )
+
+    # Find available marketplace listings
+    listings = Listing.query.join(
+        User,
+        Listing.user_id == User.id
+    ).filter(
+        Listing.item_id == item.id,
+        Listing.status == "available",
+        User.is_banned == False
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    return render_template(
+        "marketplace_find_item.html",
+        collection=collection,
+        item=item,
         listings=listings
     )
     
@@ -574,8 +621,12 @@ def edit_listing(listing_id):
 def view_listing(listing_id):
 
     #Find the marketplace listing using its ID.
-    listing = Listing.query.filter_by(
-        id=listing_id
+    listing = Listing.query.join(
+        User,
+        Listing.user_id == User.id
+    ).filter(
+        Listing.id == listing_id,
+        User.is_banned == False
     ).first_or_404()
 
     #Find the item connected to this listing.

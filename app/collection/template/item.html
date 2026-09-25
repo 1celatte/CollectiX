@@ -6,120 +6,185 @@ Add Item
 
 {% block content %}
 
-<h1>
-    Add Item to {{ collection.name }}
-</h1>
+<div class="container py-4">
 
-<p>
-    You are adding a new item to:
-    <strong>{{ collection.name }}</strong>
-</p>
+    <!-- ===================================================== -->
+    <!-- FLASH MESSAGES -->
+    <!-- ===================================================== -->
 
-<p>
-    <strong>Collection Tag:</strong>
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
-    {% if collection.tag %}
-        {{ collection.tag.name }}
-    {% else %}
-        Not assigned
-    {% endif %}
-</p>
+        {% if messages %}
 
-<!-- ===================================================== -->
-<!-- ADD ITEM FORM -->
-<!-- ===================================================== -->
+            {% for category, message in messages %}
 
-<form
-    method="POST"
-    enctype="multipart/form-data"
->
+                <div
+                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ message }}
 
-    <!-- Item Name -->
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
 
-    <div>
+                </div>
 
-        <label for="name">
-            Item Name:
-        </label>
+            {% endfor %}
 
-        <br>
+        {% endif %}
 
-        <input
-            type="text"
-            id="name"
-            name="name"
-            required
+    {% endwith %}
+
+
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="mb-4">
+
+        <h1 class="fw-bold">
+            Add Item to {{ collection.name }}
+        </h1>
+
+        <p class="text-muted mb-2">
+            You are adding a new item to:
+            <strong>{{ collection.name }}</strong>
+        </p>
+
+        <p class="mb-0">
+            <strong>Collection Tag:</strong>
+
+            {% if collection.tag %}
+                <span class="badge bg-secondary">
+                    {{ collection.tag.name }}
+                </span>
+            {% else %}
+                <span class="text-muted">
+                    Not assigned
+                </span>
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ADD ITEM FORM -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body p-4">
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <!-- Item Name -->
+
+                <div class="mb-3">
+
+                    <label
+                        for="name"
+                        class="form-label fw-semibold"
+                    >
+                        Item Name:
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-control"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="mb-3">
+
+                    <label
+                        for="description"
+                        class="form-label fw-semibold"
+                    >
+                        Description:
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        class="form-control"
+                        rows="5"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Item Image -->
+
+                <div class="mb-4">
+
+                    <label
+                        for="image"
+                        class="form-label fw-semibold"
+                    >
+                        Item Image:
+                    </label>
+
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        class="form-control"
+                        accept="image/*"
+                    >
+
+                </div>
+
+
+                <!-- Submit -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Submit Item
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- BACK TO COLLECTION -->
+    <!-- ===================================================== -->
+
+    <div class="mt-3">
+
+        <a
+            href="{{ url_for(
+                'collection.view_collection',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-secondary"
         >
+            ← Back to Collection
+        </a>
 
     </div>
 
-    <br>
-
-    <!-- Description -->
-
-    <div>
-
-        <label for="description">
-            Description:
-        </label>
-
-        <br>
-
-        <textarea
-            id="description"
-            name="description"
-            rows="5"
-            cols="40"
-        ></textarea>
-
-    </div>
-
-    <br>
-
-    <!-- Item Image -->
-
-    <div>
-
-        <label for="image">
-            Item Image:
-        </label>
-
-        <br>
-
-        <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-        >
-
-    </div>
-
-    <br>
-
-    <!-- Submit -->
-
-    <button type="submit">
-        Submit Item
-    </button>
-
-</form>
-
-<br>
-
-<!-- ===================================================== -->
-<!-- BACK TO COLLECTION -->
-<!-- ===================================================== -->
-
-<a
-    href="{{ url_for(
-        'collection.view_collection',
-        collection_id=collection.id
-    ) }}"
->
-    <button type="button">
-        ← Back to Collection
-    </button>
-</a>
+</div>
 
 {% endblock %}

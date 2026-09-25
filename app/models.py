@@ -252,6 +252,11 @@ class Submission(db.Model):
         nullable=False
     )
 
+    user = db.relationship(
+        "User",
+        foreign_keys=[user_id]
+    )
+
     type = db.Column(
         db.String(20),
         nullable=False

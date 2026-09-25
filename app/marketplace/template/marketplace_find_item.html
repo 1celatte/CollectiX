@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}
+Find {{ item.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Header -->
+
+    <div class="mb-4">
+
+        <h1 class="fw-bold">
+            Find Item
+        </h1>
+
+        <p class="text-muted mb-0">
+            Marketplace listings for
+            <strong>{{ item.name }}</strong>
+            from
+            <strong>{{ collection.name }}</strong>
+        </p>
+
+    </div>
+
+
+    <!-- Marketplace Listings -->
+
+    {% if listings %}
+
+        <div class="row g-4">
+
+            {% for listing in listings %}
+
+                <div class="col-12 col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+
+                        <!-- Listing Image -->
+
+                        {% if listing.image %}
+
+                            <img
+                                src="{{ url_for(
+                                    'marketplace.static',
+                                    filename='uploads/listings/' + listing.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                class="card-img-top"
+                                style="
+                                    height: 220px;
+                                    object-fit: contain;
+                                    background-color: #f8f9fa;
+                                "
+                            >
+
+                        {% else %}
+
+                            <div
+                                class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                style="height: 220px;"
+                            >
+
+                                No Image
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Listing Information -->
+
+                        <div class="card-body">
+
+                            <h5 class="card-title fw-bold">
+
+                                {{ item.name }}
+
+                            </h5>
+
+
+                            <p class="mb-2">
+
+                                <strong>Type:</strong>
+
+                                {{ listing.listing_type|capitalize }}
+
+                            </p>
+
+
+                            {% if listing.price is not none %}
+
+                                <p class="mb-2">
+
+                                    <strong>Price:</strong>
+
+                                    RM {{ "%.2f"|format(listing.price) }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if listing.condition %}
+
+                                <p class="mb-2">
+
+                                    <strong>Condition:</strong>
+
+                                    {{ listing.condition }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if listing.description %}
+
+                                <p class="card-text">
+
+                                    {{ listing.description }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- View Listing -->
+
+                            <a
+                                href="{{ url_for(
+                                    'marketplace.view_listing',
+                                    listing_id=listing.id
+                                ) }}"
+                                class="btn btn-primary w-100"
+                            >
+
+                                <i class="bi bi-eye"></i>
+
+                                View Listing
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- No Results -->
+
+        <div class="alert alert-info">
+
+            No available listings found for this item.
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- Back Button -->
+
+    <div class="mt-4">
+
+        <a
+            href="{{ url_for(
+                'my_collection.view_missing_items',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-secondary"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back to Missing Items
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

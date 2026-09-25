@@ -12,10 +12,8 @@ collection_bp = Blueprint(
     __name__,
     url_prefix="/collections",
     template_folder="template",
-    static_folder="static",
-    static_url_path="/collection-static"
+    static_folder="static"
 )
-
 #=======================================================================================================================
 
 #list collections in Public collection
@@ -121,7 +119,27 @@ def create_collection():
             return redirect(
                 url_for("collection.list_collections")
             )
-
+    
+        # Check if this collection is already waiting for admin approval.
+        pending_collection_submissions = Submission.query.filter_by(
+                status="pending",
+                type="new_collection"
+        ).all()
+            
+        for pending_submission in pending_collection_submissions:
+            
+                if normalize_text(pending_submission.name) == normalized_name:
+            
+                    flash(
+                        "This collection is already waiting for admin approval.",
+                        "error"
+                    )
+            
+                    return redirect(
+                        url_for("collection.list_collections")
+                    )
+           
+        
         selected_tag_id = None
         requested_new_tag = None
 
@@ -264,30 +282,12 @@ def create_collection():
             )
 
         # -----------------------------------------
-        # Create pending collection
-        # -----------------------------------------
-        collection = Collection(
-            name=name,
-            normalized_name=normalized_name,
-            tag_id=selected_tag_id,
-            description=description,
-            image=image_filename,
-            status="pending",
-            created_by=current_user.id
-        )
-
-        db.session.add(collection)
-
-        # Get collection.id before creating Submission.
-        db.session.flush()
-
-        # -----------------------------------------
         # Create submission for admin approval
         # -----------------------------------------
         submission = Submission(
             user_id=current_user.id,
             type="new_collection",
-            collection_id=collection.id,
+            collection_id=None,
             tag_id=selected_tag_id,
             new_tag=requested_new_tag,
             name=name,
@@ -298,7 +298,7 @@ def create_collection():
 
         db.session.add(submission)
 
-        # Save collection + submission.
+        # Save submission.
         db.session.commit()
 
         notify_admin_new_submission(submission)
@@ -374,7 +374,7 @@ def add_item(collection_id):
             )
             return redirect(
                 url_for(
-                    "collection.add_item",
+                    "collection.view_collection",
                     collection_id=collection.id
                 )
             )
@@ -402,7 +402,7 @@ def add_item(collection_id):
             )
             return redirect(
                 url_for(
-                    "collection.add_item",
+                    "collection.view_collection",
                     collection_id=collection.id
                 )
             )
