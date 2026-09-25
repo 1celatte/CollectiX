@@ -213,6 +213,38 @@ Browse & Search - CollectiX
             class="card h-100 shadow-sm"
         >
 
+            <!--Show the image for this search result-->
+            {% if result.image %}
+                {% if result.image_source == "marketplace" %}
+                    <img
+                        src="{{ url_for(
+                            'marketplace.static',
+                            filename='uploads/listings/' ~ result.image
+                        ) }}"
+                        alt="{{ result.name }}"
+                        class="card-img-top"
+                        style="height: 220px; object-fit: contain;"
+                    >
+                {% else %}
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' ~ result.image
+                        ) }}"
+                        alt="{{ result.name }}"
+                        class="card-img-top"
+                        style="height: 220px; object-fit: contain;"
+                    >
+                {% endif %}
+            {% else %}
+                <div
+                    class="bg-light d-flex align-items-center justify-content-center text-muted"
+                    style="height: 220px;"
+                >
+                    No image available
+                </div>
+            {% endif %}
+
             <div
                 class="card-body"
             >
@@ -298,9 +330,13 @@ Browse & Search - CollectiX
                 </a>
 
                 {% elif result.type == "item" %}
-                <!--Open the collection containing this item-->
+                <!--Open the item details-->
                 <a
-                    href="{{ url_for('collection.view_collection', collection_id=result.collection_id) }}"
+                    href="{{ url_for(
+                        'collection.view_item',
+                        collection_id=result.collection_id,
+                        item_id=result.id
+                    ) }}"
                     class="btn btn-primary"
                 >
                     View Details
