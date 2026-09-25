@@ -6,181 +6,255 @@ Create New Collection
 
 {% block content %}
 
-<h1>Create New Collection</h1>
+<div class="container py-4">
 
-<p>
-    Create a new collectible collection.
-    Your collection will be reviewed by an admin before
-    appearing publicly.
-</p>
+    <!-- ===================================================== -->
+    <!-- FLASH MESSAGES -->
+    <!-- ===================================================== -->
 
-<form
-    method="POST"
-    enctype="multipart/form-data"
->
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
-    <!-- Collection Name -->
+        {% if messages %}
 
-    <div>
+            {% for category, message in messages %}
 
-        <label for="name">
-            Collection Name:
-        </label>
+                <div
+                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ message }}
 
-        <br>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
 
-        <input
-            type="text"
-            id="name"
-            name="name"
-            required
-        >
-
-    </div>
-
-    <br>
-
-    <!-- Tag -->
-
-    <div>
-
-        <label for="tag_id">
-            Tag:
-        </label>
-
-        <br>
-
-        <select
-            id="tag_id"
-            name="tag_id"
-            required
-            onchange="toggleNewTagField()"
-        >
-
-            <option value="">
-                -- Select a tag --
-            </option>
-
-            {% for tag in tags %}
-
-                <option value="{{ tag.id }}">
-                    {{ tag.name }}
-                </option>
+                </div>
 
             {% endfor %}
 
-            <option value="other">
-                Other 
-            </option>
+        {% endif %}
 
-        </select>
+    {% endwith %}
 
-    </div>
 
-    <br>
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================================== -->
 
-    <!-- New Tag: shown only for Other -->
+    <div class="mb-4">
 
-    <div
-        id="new-tag-field"
-        style="display: none;"
-    >
+        <h1 class="fw-bold">
+            Create New Collection
+        </h1>
 
-        <label for="new_tag">
-            New Tag Name:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            id="new_tag"
-            name="new_tag"
-            maxlength="80"
-            placeholder="e.g. KPOP MERCHANDISE"
-        >
-
-        <p>
-            Your new tag will require admin approval.
+        <p class="text-muted mb-0">
+            Create a new collectible collection.
+            Your collection will be reviewed by an admin before
+            appearing publicly.
         </p>
 
     </div>
 
-    <!-- Description -->
 
-    <div>
+    <!-- ===================================================== -->
+    <!-- CREATE COLLECTION CARD -->
+    <!-- ===================================================== -->
 
-        <label for="description">
-            Description:
-        </label>
+    <div class="card shadow-sm">
 
-        <br>
+        <div class="card-body p-4">
 
-        <textarea
-            id="description"
-            name="description"
-            rows="5"
-            cols="40"
-        ></textarea>
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <!-- Collection Name -->
+
+                <div class="mb-3">
+
+                    <label
+                        for="name"
+                        class="form-label fw-semibold"
+                    >
+                        Collection Name:
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-control"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Tag -->
+
+                <div class="mb-3">
+
+                    <label
+                        for="tag_id"
+                        class="form-label fw-semibold"
+                    >
+                        Tag:
+                    </label>
+
+                    <select
+                        id="tag_id"
+                        name="tag_id"
+                        class="form-select"
+                        required
+                        onchange="toggleNewTagField()"
+                    >
+
+                        <option value="">
+                            -- Select a tag --
+                        </option>
+
+                        {% for tag in tags %}
+
+                            <option value="{{ tag.id }}">
+                                {{ tag.name }}
+                            </option>
+
+                        {% endfor %}
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- New Tag: shown only for Other -->
+
+                <div
+                    id="new-tag-field"
+                    class="mb-3"
+                    style="display: none;"
+                >
+
+                    <label
+                        for="new_tag"
+                        class="form-label fw-semibold"
+                    >
+                        New Tag Name:
+                    </label>
+
+                    <input
+                        type="text"
+                        id="new_tag"
+                        name="new_tag"
+                        class="form-control"
+                        maxlength="80"
+                        placeholder="e.g. KPOP MERCHANDISE"
+                    >
+
+                    <div class="form-text">
+                        Your new tag will require admin approval.
+                    </div>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="mb-3">
+
+                    <label
+                        for="description"
+                        class="form-label fw-semibold"
+                    >
+                        Description:
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        class="form-control"
+                        rows="5"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Collection Image -->
+
+                <div class="mb-4">
+
+                    <label
+                        for="image"
+                        class="form-label fw-semibold"
+                    >
+                        Collection Image:
+                    </label>
+
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        class="form-control"
+                        accept="image/*"
+                    >
+
+                </div>
+
+
+                <!-- Submit -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Create Collection
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
 
-    <br>
 
-    <!-- Collection Image -->
+    <!-- Back to Collections -->
 
-    <div>
+    <div class="mt-3">
 
-        <label for="image">
-            Collection Image:
-        </label>
-
-        <br>
-
-        <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
+        <a
+            href="{{ url_for('collection.list_collections') }}"
+            class="btn btn-secondary"
         >
+            ← Back to Collections
+        </a>
 
     </div>
 
-    <br>
 
-    <!-- Submit -->
+    <script>
+        function toggleNewTagField() {
+            const tagSelect = document.getElementById("tag_id");
+            const newTagField = document.getElementById("new-tag-field");
+            const newTagInput = document.getElementById("new_tag");
 
-    <button type="submit">
-        Create Collection
-    </button>
+            const selectedOther = tagSelect.value === "other";
 
-</form>
+            newTagField.style.display = selectedOther ? "block" : "none";
+            newTagInput.required = selectedOther;
 
-<br>
-
-<!-- Back to Collections -->
-
-<a href="{{ url_for('collection.list_collections') }}">
-    <button type="button">
-        ← Back to Collections
-    </button>
-</a>
-
-<script>
-    function toggleNewTagField() {
-        const tagSelect = document.getElementById("tag_id");
-        const newTagField = document.getElementById("new-tag-field");
-        const newTagInput = document.getElementById("new_tag");
-
-        const selectedOther = tagSelect.value === "other";
-
-        newTagField.style.display = selectedOther ? "block" : "none";
-        newTagInput.required = selectedOther;
-
-        if (!selectedOther) {
-            newTagInput.value = "";
+            if (!selectedOther) {
+                newTagInput.value = "";
+            }
         }
-    }
-</script>
+    </script>
+
+</div>
 
 {% endblock %}

@@ -12,10 +12,8 @@ collection_bp = Blueprint(
     __name__,
     url_prefix="/collections",
     template_folder="template",
-    static_folder="static",
-    static_url_path="/collection-static"
+    static_folder="static"
 )
-
 #=======================================================================================================================
 
 #list collections in Public collection
@@ -374,7 +372,7 @@ def add_item(collection_id):
             )
             return redirect(
                 url_for(
-                    "collection.add_item",
+                    "collection.view_collection",
                     collection_id=collection.id
                 )
             )
@@ -402,7 +400,7 @@ def add_item(collection_id):
             )
             return redirect(
                 url_for(
-                    "collection.add_item",
+                    "collection.view_collection",
                     collection_id=collection.id
                 )
             )

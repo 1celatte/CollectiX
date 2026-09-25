@@ -32,6 +32,45 @@ def marketplace_home():
         listings=listings
     )
     
+#====================================================================================================================================
+
+# FIND A MISSING ITEM IN THE MARKETPLACE(let user find the item they want to buy in the marketplace)
+
+#=======================================================================================================================================
+
+@marketplace_bp.route(
+    "/find/<int:collection_id>/<int:item_id>"
+)
+@login_required
+def find_missing_item(collection_id, item_id):
+
+    # Get the selected item
+    item = Item.query.filter_by(
+        id=item_id,
+        collection_id=collection_id,
+        status="approved"
+    ).first_or_404()
+
+    # Get the collection
+    collection = Collection.query.get_or_404(
+        collection_id
+    )
+
+    # Find available marketplace listings
+    listings = Listing.query.filter_by(
+        item_id=item.id,
+        status="available"
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    return render_template(
+        "marketplace_find_item.html",
+        collection=collection,
+        item=item,
+        listings=listings
+    )
+    
 #======================================================================
 # CREATE LISTING
 #======================================================================
