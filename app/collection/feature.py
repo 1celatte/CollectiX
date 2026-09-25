@@ -262,30 +262,12 @@ def create_collection():
             )
 
         # -----------------------------------------
-        # Create pending collection
-        # -----------------------------------------
-        collection = Collection(
-            name=name,
-            normalized_name=normalized_name,
-            tag_id=selected_tag_id,
-            description=description,
-            image=image_filename,
-            status="pending",
-            created_by=current_user.id
-        )
-
-        db.session.add(collection)
-
-        # Get collection.id before creating Submission.
-        db.session.flush()
-
-        # -----------------------------------------
         # Create submission for admin approval
         # -----------------------------------------
         submission = Submission(
             user_id=current_user.id,
             type="new_collection",
-            collection_id=collection.id,
+            collection_id=None,
             tag_id=selected_tag_id,
             new_tag=requested_new_tag,
             name=name,
@@ -296,7 +278,7 @@ def create_collection():
 
         db.session.add(submission)
 
-        # Save collection + submission.
+        # Save submission.
         db.session.commit()
 
         notify_admin_new_submission(submission)

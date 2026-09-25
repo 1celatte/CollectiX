@@ -484,25 +484,10 @@ with app.app_context():
     # SUBMISSION
     # =========================
 
-    pending_collection = Collection(
-        name="One Piece Figures",
-        normalized_name=normalize_text("One Piece Figures"),
-        tag_id=anime_figure.id,
-        description="One Piece collectible figures.",
-        image=None,
-        status="pending",
-        created_by=charlie.id
-    )
-
-    db.session.add(pending_collection)
-
-    db.session.flush()
-
-
     submission = Submission(
         user_id=charlie.id,
         type="new_collection",
-        collection_id=pending_collection.id,
+        collection_id=None,
         name="One Piece Figures",
         description="One Piece collectible figures.",
         image=None,

@@ -6,123 +6,595 @@ Login - CollectiX
 
 {% block content %}
 
-<div class="container py-5">
+<style>
 
-<div class="row justify-content-center">
+    .login-section {
+        padding: 45px 0;
+    }
 
-    <div class="col-lg-6 col-md-8">
+    /* Main Card */
 
-        <!-- Header -->
-        <div class="mb-4">
+    .login-card {
+        position: relative;
+        overflow: hidden;
 
-            <h1 class="fw-bold mb-2">
-                Login
-            </h1>
+        border-radius: 26px;
 
-            <p class="text-muted mb-0">
-                Log in to your CollectiX account.
-            </p>
+        background-color: #ffffff;
 
-        </div>
+        border: 1px solid #d5eaf4;
 
-
-        <!-- Login Form -->
-        <div class="bg-white border rounded-4 shadow-sm p-4 p-md-5">
-
-            <form method="POST">
-
-                <!-- Email -->
-                <div class="mb-4">
-
-                    <label
-                        for="email"
-                        class="form-label fw-semibold"
-                    >
-                        Email
-                    </label>
-
-                    <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        value="{{ email or '' }}"
-                        class="form-control {% if login_error %}is-invalid{% endif %}"
-                        placeholder="Enter your email"
-                        required
-                    >
-
-                </div>
+        box-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.08);
+    }
 
 
-                <!-- Password -->
-                <div class="mb-4">
+    /* =========================
+       LEFT SIDE
+    ========================= */
 
-                    <label
-                        for="password"
-                        class="form-label fw-semibold"
-                    >
-                        Password
-                    </label>
+    .login-side {
+        position: relative;
+        overflow: hidden;
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-control {% if login_error %}is-invalid{% endif %}"
-                        placeholder="Enter your password"
-                        required
-                    >
+        min-height: 560px;
 
-                    {% if login_error %}
+        padding: 50px 40px;
 
-                        <div class="invalid-feedback">
-                            ⚠ {{ login_error }}
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        background: linear-gradient(
+            145deg,
+            #102a43,
+            #0d6efd
+        );
+
+        color: white;
+    }
+
+    .login-side::before {
+        content: "";
+
+        position: absolute;
+
+        width: 230px;
+        height: 230px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.08);
+
+        top: -90px;
+        right: -70px;
+    }
+
+    .login-side::after {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.06);
+
+        bottom: -80px;
+        left: -60px;
+    }
+
+    .login-side-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .brand-icon {
+        width: 70px;
+        height: 70px;
+
+        border-radius: 20px;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 25px;
+    }
+
+    .brand-icon i {
+        font-size: 32px;
+        color: white;
+    }
+
+    .login-side h2 {
+        font-size: 34px;
+        font-weight: 750;
+
+        line-height: 1.2;
+
+        margin-bottom: 15px;
+    }
+
+    .login-side h2 span {
+        color: #8ed8ff;
+    }
+
+    .login-side p {
+        font-size: 15px;
+
+        color: rgba(255, 255, 255, 0.76);
+
+        line-height: 1.7;
+
+        max-width: 320px;
+
+        margin-bottom: 30px;
+    }
+
+    .login-feature {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        margin-bottom: 14px;
+
+        font-size: 14px;
+
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+    .login-feature i {
+        width: 30px;
+        height: 30px;
+
+        border-radius: 9px;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================
+       RIGHT SIDE
+    ========================= */
+
+    .login-form-side {
+        background-color: #f5fbfe;
+
+        padding: 50px 45px;
+
+        min-height: 560px;
+
+        display: flex;
+        align-items: center;
+    }
+
+    .login-form-content {
+        width: 100%;
+        max-width: 430px;
+        margin: auto;
+    }
+
+    .login-badge {
+        display: inline-block;
+
+        background-color: #e3f6ff;
+
+        border: 1px solid #cdebf7;
+
+        color: #087ea4;
+
+        border-radius: 30px;
+
+        padding: 6px 13px;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.5px;
+
+        margin-bottom: 14px;
+    }
+
+    .login-form-side h1 {
+        font-size: 32px;
+
+        font-weight: 750;
+
+        color: #1f2937;
+
+        margin-bottom: 8px;
+    }
+
+    .login-description {
+        color: #6c757d;
+
+        font-size: 14px;
+
+        margin-bottom: 30px;
+    }
+
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .form-label {
+        color: #374151;
+
+        font-size: 14px;
+
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        background-color: #ffffff;
+
+        border: 1px solid #cfe3ec;
+
+        border-radius: 10px;
+
+        padding: 11px 13px;
+
+        font-size: 14px;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+
+        box-shadow:
+            0 0 0 3px rgba(13, 110, 253, 0.10);
+    }
+
+    .form-control::placeholder {
+        color: #adb5bd;
+    }
+
+
+    /* =========================
+       LOGIN BUTTON
+    ========================= */
+
+    .login-btn {
+        border: none;
+
+        border-radius: 10px;
+
+        padding: 11px 15px;
+
+        font-weight: 600;
+
+        background: linear-gradient(
+            135deg,
+            #0d6efd,
+            #087ea4
+        );
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 7px 16px rgba(13, 110, 253, 0.22);
+    }
+
+
+    /* =========================
+       LINKS
+    ========================= */
+
+    .login-links {
+        text-align: center;
+
+        margin-top: 22px;
+    }
+
+    .login-links p {
+        margin-bottom: 8px;
+
+        color: #6c757d;
+
+        font-size: 14px;
+    }
+
+    .login-links a {
+        color: #0d6efd;
+
+        text-decoration: none;
+
+        font-weight: 600;
+    }
+
+    .login-links a:hover {
+        text-decoration: underline;
+    }
+
+    .forgot-link {
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       ERROR
+    ========================= */
+
+    .invalid-feedback {
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 991px) {
+
+        .login-side {
+            min-height: auto;
+            padding: 40px 35px;
+        }
+
+        .login-form-side {
+            min-height: auto;
+            padding: 40px 35px;
+        }
+
+    }
+
+    @media (max-width: 576px) {
+
+        .login-section {
+            padding: 25px 0;
+        }
+
+        .login-card {
+            border-radius: 20px;
+        }
+
+        .login-side {
+            padding: 35px 25px;
+        }
+
+        .login-form-side {
+            padding: 35px 25px;
+        }
+
+        .login-side h2 {
+            font-size: 29px;
+        }
+
+        .login-form-side h1 {
+            font-size: 28px;
+        }
+
+    }
+
+</style>
+
+
+<div class="container login-section">
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-9 col-lg-10">
+
+            <div class="login-card">
+
+                <div class="row g-0">
+
+
+                    <!-- =========================
+                         LEFT BRANDING SIDE
+                    ========================= -->
+
+                    <div class="col-lg-5">
+
+                        <div class="login-side">
+
+                            <div class="login-side-content">
+
+                                <div class="brand-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+
+                                <h2>
+                                    Welcome back to
+                                    <span>CollectiX</span>
+                                </h2>
+
+                                <p>
+                                    Continue exploring your collections,
+                                    discover new items and connect with
+                                    other collectors.
+                                </p>
+
+
+                                <div class="login-feature">
+
+                                    <i class="bi bi-collection"></i>
+
+                                    <span>
+                                        Manage your collections
+                                    </span>
+
+                                </div>
+
+
+                                <div class="login-feature">
+
+                                    <i class="bi bi-shop"></i>
+
+                                    <span>
+                                        Discover the marketplace
+                                    </span>
+
+                                </div>
+
+
+                                <div class="login-feature">
+
+                                    <i class="bi bi-arrow-left-right"></i>
+
+                                    <span>
+                                        Buy, sell and exchange items
+                                    </span>
+
+                                </div>
+
+                            </div>
+
                         </div>
 
-                    {% endif %}
+                    </div>
+
+
+                    <!-- =========================
+                         LOGIN FORM
+                    ========================= -->
+
+                    <div class="col-lg-7">
+
+                        <div class="login-form-side">
+
+                            <div class="login-form-content">
+
+                                <span class="login-badge">
+                                    ACCOUNT LOGIN
+                                </span>
+
+                                <h1>
+                                    Login
+                                </h1>
+
+                                <p class="login-description">
+                                    Log in to your CollectiX account.
+                                </p>
+
+
+                                <form method="POST">
+
+
+                                    <!-- Email -->
+
+                                    <div class="mb-4">
+
+                                        <label
+                                            for="email"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Email
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="email"
+                                            name="email"
+                                            value="{{ email or '' }}"
+                                            class="form-control {% if login_error %}is-invalid{% endif %}"
+                                            placeholder="Enter your email"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- Password -->
+
+                                    <div class="mb-4">
+
+                                        <label
+                                            for="password"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Password
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            id="password"
+                                            name="password"
+                                            class="form-control {% if login_error %}is-invalid{% endif %}"
+                                            placeholder="Enter your password"
+                                            required
+                                        >
+
+                                        {% if login_error %}
+
+                                            <div class="invalid-feedback">
+                                                ⚠ {{ login_error }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <!-- Login Button -->
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary login-btn w-100"
+                                    >
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                                        Login
+                                    </button>
+
+                                </form>
+
+
+                                <!-- Links -->
+
+                                <div class="login-links">
+
+                                    <p>
+                                        Don't have an account?
+                                        <a
+                                            href="{{ url_for('auth.register') }}"
+                                        >
+                                            Register here
+                                        </a>
+                                    </p>
+
+                                    <a
+                                        href="{{ url_for('auth.forgot_password') }}"
+                                        class="forgot-link"
+                                    >
+                                        Forgot Password?
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-
-                <!-- Login Button -->
-                <button
-                    type="submit"
-                    class="btn btn-primary w-100 py-2 fw-semibold"
-                >
-                    Login
-                </button>
-
-            </form>
-
-        </div>
-
-
-        <!-- Register -->
-        <div class="text-center mt-4">
-
-            <span class="text-muted">
-                Don't have an account?
-            </span>
-
-            <a
-                href="{{ url_for('auth.register') }}"
-                class="text-primary text-decoration-none fw-semibold"
-            >
-                Register here
-            </a>
-
-        </div>
-
-
-        <!-- Forgot Password -->
-        <div class="text-center mt-2">
-
-            <a
-                href="{{ url_for('auth.forgot_password') }}"
-                class="text-primary text-decoration-none"
-            >
-                Forgot Password?
-            </a>
+            </div>
 
         </div>
 
@@ -130,6 +602,5 @@ Login - CollectiX
 
 </div>
 
-</div>
-
 {% endblock %}
+

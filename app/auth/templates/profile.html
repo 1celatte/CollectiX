@@ -6,89 +6,549 @@ My Profile - CollectiX
 
 {% block content %}
 
-<div class="container-fluid py-4 px-4 px-md-5">
+<style>
 
-    <!-- Page Header -->
-    <div class="mb-4">
-        <h1 class="fw-bold mb-1">My Profile</h1>
-        <p class="text-muted mb-0">
-            Manage your CollectiX account
+    /* =========================
+       PAGE
+    ========================= */
+
+    .profile-page {
+        padding: 35px 0;
+    }
+
+    .profile-header {
+        margin-bottom: 28px;
+    }
+
+    .profile-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 6px;
+    }
+
+    .profile-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+
+    /* =========================
+       PROFILE CARD
+    ========================= */
+
+    .profile-card {
+        position: relative;
+        overflow: hidden;
+
+        background: linear-gradient(
+            135deg,
+            #e8f5ff,
+            #f4fbff
+        );
+
+        border: 1px solid #cfe7f4;
+        border-radius: 20px;
+
+        padding: 32px;
+
+        margin-bottom: 32px;
+
+        box-shadow:
+            0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    .profile-card::after {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        border-radius: 50%;
+
+        background-color: rgba(13, 110, 253, 0.05);
+
+        right: -60px;
+        top: -65px;
+    }
+
+    .profile-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .profile-picture {
+        width: 150px;
+        height: 150px;
+
+        object-fit: cover;
+
+        border-radius: 50%;
+
+        border: 5px solid #ffffff;
+
+        box-shadow:
+            0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .profile-name {
+        font-size: 29px;
+        font-weight: 700;
+
+        color: #1f2937;
+
+        margin-bottom: 5px;
+    }
+
+    .profile-member {
+        color: #6c757d;
+        font-size: 14px;
+
+        margin-bottom: 22px;
+    }
+
+
+    /* =========================
+       INFORMATION BOXES
+    ========================= */
+
+    .info-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+
+        max-width: 680px;
+    }
+
+    .info-box {
+        background-color: rgba(255, 255, 255, 0.72);
+
+        border: 1px solid #d7eaf3;
+
+        border-radius: 12px;
+
+        padding: 13px 15px;
+    }
+
+    .info-label {
+        display: block;
+
+        font-size: 12px;
+
+        color: #6c757d;
+
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 14px;
+
+        font-weight: 600;
+
+        color: #212529;
+    }
+
+    .role-badge {
+        display: inline-block;
+
+        background-color: #dceeff;
+
+        color: #0d6efd;
+
+        border-radius: 20px;
+
+        padding: 4px 10px;
+
+        font-size: 12px;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       SECTION TITLE
+    ========================= */
+
+    .section-heading {
+        margin-bottom: 18px;
+    }
+
+    .section-heading h3 {
+        font-size: 23px;
+
+        font-weight: 700;
+
+        color: #212529;
+
+        margin-bottom: 5px;
+    }
+
+    .section-heading p {
+        color: #6c757d;
+
+        font-size: 14px;
+
+        margin: 0;
+    }
+
+
+    /* =========================
+       FUNCTION CARDS
+    ========================= */
+
+    .function-card {
+        position: relative;
+        overflow: hidden;
+
+        height: 100%;
+
+        border-radius: 17px;
+
+        padding: 26px;
+
+        border: 1px solid;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .function-card:hover {
+        transform: translateY(-4px);
+
+        box-shadow:
+            0 9px 22px rgba(0, 0, 0, 0.08);
+    }
+
+    .function-card::before {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+
+        width: 100%;
+        height: 4px;
+    }
+
+    .collection-card {
+        background: linear-gradient(
+            135deg,
+            #eef7ff,
+            #f8fcff
+        );
+
+        border-color: #d2e8f7;
+    }
+
+    .collection-card::before {
+        background-color: #0d6efd;
+    }
+
+    .listing-card {
+        background: linear-gradient(
+            135deg,
+            #eefaf4,
+            #f9fdfb
+        );
+
+        border-color: #d3eadf;
+    }
+
+    .listing-card::before {
+        background-color: #198754;
+    }
+
+    .function-icon {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 23px;
+
+        margin-bottom: 18px;
+    }
+
+    .collection-icon {
+        background-color: #dceeff;
+        color: #0d6efd;
+    }
+
+    .listing-icon {
+        background-color: #dff3e8;
+        color: #198754;
+    }
+
+    .function-card h4 {
+        font-size: 19px;
+
+        font-weight: 700;
+
+        color: #212529;
+
+        margin-bottom: 9px;
+    }
+
+    .function-card p {
+        color: #6c757d;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+
+        margin-bottom: 23px;
+    }
+
+    .function-card .btn {
+        border-radius: 8px;
+
+        font-size: 14px;
+
+        padding: 8px 14px;
+    }
+
+
+    /* =========================
+       ACCOUNT SETTINGS
+    ========================= */
+
+    .account-section {
+        position: relative;
+        overflow: hidden;
+
+        background: linear-gradient(
+            135deg,
+            #f4f1fb,
+            #faf9fd
+        );
+
+        border: 1px solid #e4dff0;
+
+        border-radius: 18px;
+
+        padding: 27px;
+
+        margin-top: 32px;
+
+        box-shadow:
+            0 5px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .account-section::after {
+        content: "";
+
+        position: absolute;
+
+        width: 140px;
+        height: 140px;
+
+        border-radius: 50%;
+
+        background-color: rgba(111, 66, 193, 0.04);
+
+        right: -45px;
+        bottom: -55px;
+    }
+
+    .account-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .account-header {
+        margin-bottom: 20px;
+    }
+
+    .account-header h3 {
+        font-size: 22px;
+
+        font-weight: 700;
+
+        color: #212529;
+
+        margin-bottom: 5px;
+    }
+
+    .account-header p {
+        color: #6c757d;
+
+        font-size: 14px;
+
+        margin: 0;
+    }
+
+    .account-btn {
+        width: 100%;
+
+        border-radius: 8px;
+
+        padding: 10px;
+
+        font-size: 14px;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 768px) {
+
+        .profile-page {
+            padding: 25px 0;
+        }
+
+        .profile-card {
+            padding: 25px;
+        }
+
+        .profile-picture {
+            width: 130px;
+            height: 130px;
+
+            margin-bottom: 20px;
+        }
+
+        .profile-name {
+            font-size: 26px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .function-card {
+            padding: 23px;
+        }
+
+    }
+
+</style>
+
+
+<div class="container-fluid profile-page px-4 px-md-5">
+
+
+    <!-- =========================
+         PAGE HEADER
+    ========================= -->
+
+    <div class="profile-header">
+
+        <h1>
+            My Profile
+        </h1>
+
+        <p>
+            Manage your CollectiX account and personal collections.
         </p>
+
     </div>
 
 
-    <!-- Profile Information -->
-    <div class="card border-0 shadow-sm mb-4">
+    <!-- =========================
+         PROFILE INFORMATION
+    ========================= -->
 
-        <div class="card-body p-4">
+    <div class="profile-card">
 
-            <div class="row align-items-center">
+        <div class="profile-content">
+
+            <div class="row align-items-center g-4">
+
 
                 <!-- Profile Picture -->
-                <div class="col-md-3 text-center mb-4 mb-md-0">
+
+                <div class="col-lg-3 col-md-4 text-center">
 
                     {% if current_user.profile_picture %}
+
                         <img
-                            src="{{ url_for('auth.static', filename=current_user.profile_picture) }}"
+                            src="{{ url_for(
+                                'auth.static',
+                                filename=current_user.profile_picture
+                            ) }}"
                             alt="Profile Picture"
-                            width="170"
-                            height="170"
-                            class="rounded-circle object-fit-cover border shadow-sm"
+                            class="profile-picture"
                         >
+
                     {% else %}
+
                         <img
-                            src="{{ url_for('auth.static', filename='images/default_avatar.jpg') }}"
+                            src="{{ url_for(
+                                'auth.static',
+                                filename='images/default_avatar.jpg'
+                            ) }}"
                             alt="Default Profile Picture"
-                            width="170"
-                            height="170"
-                            class="rounded-circle object-fit-cover border shadow-sm"
+                            class="profile-picture"
                         >
+
                     {% endif %}
 
                 </div>
 
 
                 <!-- User Information -->
-                <div class="col-md-9">
 
-                    <h2 class="fw-bold mb-1">
+                <div class="col-lg-9 col-md-8">
+
+                    <h2 class="profile-name">
                         {{ current_user.name }}
                     </h2>
 
-                    <p class="text-muted mb-4">
+                    <p class="profile-member">
                         <i class="bi bi-person-circle me-1"></i>
                         CollectiX Member
                     </p>
 
 
-                    <div class="row g-4">
+                    <div class="info-grid">
 
-                        <div class="col-md-6">
 
-                            <small class="text-muted d-block mb-1">
-                                <i class="bi bi-envelope me-2"></i>
+                        <!-- Email -->
+
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                <i class="bi bi-envelope me-1"></i>
                                 Email
-                            </small>
+                            </span>
 
-                            <span class="fw-semibold">
+                            <span class="info-value">
                                 {{ current_user.email }}
                             </span>
 
                         </div>
 
 
-                        <div class="col-md-6">
+                        <!-- Role -->
 
-                            <small class="text-muted d-block mb-1">
-                                <i class="bi bi-person-badge me-2"></i>
+                        <div class="info-box">
+
+                            <span class="info-label">
+                                <i class="bi bi-person-badge me-1"></i>
                                 Role
-                            </small>
+                            </span>
 
-                            <span class="badge bg-primary">
+                            <span class="role-badge">
                                 {{ current_user.role }}
                             </span>
 
                         </div>
+
 
                     </div>
 
@@ -101,47 +561,92 @@ My Profile - CollectiX
     </div>
 
 
-    <!-- My Collection -->
-    <div class="card border-0 shadow-sm mb-4">
+    <!-- =========================
+         MY COLLECTION
+    ========================= -->
 
-        <div class="card-body p-4">
+    <div class="section-heading">
 
-            <h4 class="fw-bold mb-1">
-                <i class="bi bi-collection me-2"></i>
-                My Collection
-            </h4>
+        <h3>
+            My Collection
+        </h3>
 
-            <p class="text-muted mb-4">
-                Manage your collections and marketplace listings.
-            </p>
+        <p>
+            Access your collections and marketplace listings.
+        </p>
+
+    </div>
 
 
-            <div class="row g-3">
+    <div class="row g-4">
 
-                <div class="col-md-6">
 
-                    <a
-                        href="{{ url_for('my_collection.list_my_collections') }}"
-                        class="btn btn-outline-primary w-100 py-3"
-                    >
-                        <i class="bi bi-collection me-2"></i>
-                        View My Collection
-                    </a>
+        <!-- My Collection -->
+
+        <div class="col-md-6">
+
+            <div class="function-card collection-card">
+
+                <div class="function-icon collection-icon">
+
+                    <i class="bi bi-collection"></i>
+
+                </div>
+
+                <h4>
+                    My Collection
+                </h4>
+
+                <p>
+                    View and manage the collections and items
+                    you currently own.
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'my_collection.list_my_collections'
+                    ) }}"
+                    class="btn btn-outline-primary"
+                >
+                    View My Collection
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- My Listings -->
+
+        <div class="col-md-6">
+
+            <div class="function-card listing-card">
+
+                <div class="function-icon listing-icon">
+
+                    <i class="bi bi-shop"></i>
 
                 </div>
 
+                <h4>
+                    My Listings
+                </h4>
 
-                <div class="col-md-6">
+                <p>
+                    View and manage collectible items
+                    you have listed for sale.
+                </p>
 
-                    <a
-                        href="{{ url_for('marketplace.my_listings') }}"
-                        class="btn btn-outline-success w-100 py-3"
-                    >
-                        <i class="bi bi-shop me-2"></i>
-                        View My Listing
-                    </a>
-
-                </div>
+                <a
+                    href="{{ url_for(
+                        'marketplace.my_listings'
+                    ) }}"
+                    class="btn btn-outline-success"
+                >
+                    View My Listings
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </a>
 
             </div>
 
@@ -150,28 +655,38 @@ My Profile - CollectiX
     </div>
 
 
-    <!-- Account -->
-    <div class="card border-0 shadow-sm">
+    <!-- =========================
+         ACCOUNT SETTINGS
+    ========================= -->
 
-        <div class="card-body p-4">
+    <div class="account-section">
 
-            <h4 class="fw-bold mb-1">
-                <i class="bi bi-gear me-2"></i>
-                Account
-            </h4>
+        <div class="account-content">
 
-            <p class="text-muted mb-4">
-                Manage your profile and account.
-            </p>
+            <div class="account-header">
+
+                <h3>
+                    <i class="bi bi-gear me-2"></i>
+                    Account Settings
+                </h3>
+
+                <p>
+                    Update your profile or manage your account.
+                </p>
+
+            </div>
 
 
             <div class="row g-3">
+
+
+                <!-- Edit Profile -->
 
                 <div class="col-md-4">
 
                     <a
                         href="{{ url_for('auth.edit_profile') }}"
-                        class="btn btn-primary w-100 py-3"
+                        class="btn btn-primary account-btn"
                     >
                         <i class="bi bi-pencil-square me-2"></i>
                         Edit Profile
@@ -180,11 +695,13 @@ My Profile - CollectiX
                 </div>
 
 
+                <!-- Back to Home -->
+
                 <div class="col-md-4">
 
                     <a
                         href="{{ url_for('home') }}"
-                        class="btn btn-outline-secondary w-100 py-3"
+                        class="btn btn-outline-secondary account-btn"
                     >
                         <i class="bi bi-house me-2"></i>
                         Back to Home
@@ -193,11 +710,13 @@ My Profile - CollectiX
                 </div>
 
 
+                <!-- Logout -->
+
                 <div class="col-md-4">
 
                     <a
                         href="{{ url_for('auth.logout') }}"
-                        class="btn btn-outline-danger w-100 py-3"
+                        class="btn btn-outline-danger account-btn"
                     >
                         <i class="bi bi-box-arrow-right me-2"></i>
                         Logout
@@ -205,12 +724,15 @@ My Profile - CollectiX
 
                 </div>
 
+
             </div>
 
         </div>
 
     </div>
 
+
 </div>
 
 {% endblock %}
+
