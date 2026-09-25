@@ -10,16 +10,29 @@ from app.extensions import db
 
 @admin.route("/admin")
 @login_required
-def dashboard():
+def admin_home():
 
     if current_user.role != "admin":
         return "Access denied.", 403 
 
-    pending_count = Submission.query.filter_by(status="pending").count()
+    return redirect(url_for("admin.users"))
 
-    return render_template(
-        "dashboard.html",
-       pending_count=pending_count
+
+@admin.context_processor
+def inject_admin_counts():
+
+    if current_user.is_authenticated and current_user.role == "admin":
+
+        pending_count = Submission.query.filter_by(
+            status="pending"
+        ).count()
+
+    else:
+
+        pending_count = 0
+
+    return dict(
+        pending_count=pending_count
     )
 
 
@@ -423,7 +436,15 @@ def ban_user(user_id):
 
     user.is_banned = True
     user.ban_reason = ban_reason
-    
+
+    pending_submissions = Submission.query.filter_by(
+        user_id=user.id,
+        status="pending"
+    ).all()
+
+    for submission in pending_submissions:
+        submission.status = "rejected"
+
     db.session.commit()
 
     return redirect(url_for("admin.users"))

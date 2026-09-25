@@ -1,33 +1,22 @@
-<!DOCTYPE html>
+{% extends "admin_base.html" %}
 
-<html lang="en">
+{% block title %}
+Manage Users - CollectiX
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block content %}
 
-<title>Manage Users - CollectiX</title>
+<!-- =========================
+     PAGE HEADER
+========================= -->
 
-<link
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css"
-    rel="stylesheet"
->
+<div class="mb-4">
 
-</head>
-
-<body>
-
-<div class="page-container">
-
-<!-- Page Header -->
-
-<div class="page-header">
-
-    <h1>
+    <h1 class="fw-bold mb-1">
         Manage Users
     </h1>
 
-    <p>
+    <p class="text-secondary mb-0">
         View and manage registered users in CollectiX.
     </p>
 
@@ -36,811 +25,328 @@
 
 {% if users %}
 
+<!-- =========================
+     USERS TABLE
+========================= -->
 
-<!-- Users Table -->
+<div class="card border-0 shadow-sm">
 
-<div class="table-container">
+    <div class="card-body p-0">
 
-    <table>
+        <div class="table-responsive">
 
-        <thead>
+            <table class="table table-hover align-middle mb-0">
 
-            <tr>
+                <thead class="table-light">
 
-                <th>ID</th>
+                    <tr>
 
-                <th>Name</th>
+                        <th class="px-4">
+                            ID
+                        </th>
 
-                <th>Profile Picture</th>
+                        <th>
+                            Name
+                        </th>
 
-                <th>Email</th>
+                        <th>
+                            Profile Picture
+                        </th>
 
-                <th>Role</th>
+                        <th>
+                            Email
+                        </th>
 
-                <th>Action</th>
+                        <th>
+                            Role
+                        </th>
 
-            </tr>
+                        <th class="text-center">
+                            Action
+                        </th>
 
-        </thead>
+                    </tr>
 
+                </thead>
 
-        <tbody>
 
-            {% for user in users %}
+                <tbody>
 
-            <tr>
+                    {% for user in users %}
 
+                    <tr>
 
-                <!-- ID -->
+                        <!-- ID -->
 
-                <td>
-                    {{ user.id }}
-                </td>
+                        <td class="px-4">
+                            {{ user.id }}
+                        </td>
 
 
-                <!-- Name -->
+                        <!-- Name -->
 
-                <td>
+                        <td>
+                            <strong>
+                                {{ user.name }}
+                            </strong>
+                        </td>
 
-                    <strong>
-                        {{ user.name }}
-                    </strong>
 
-                </td>
+                        <!-- Profile Picture -->
 
+                        <td>
 
-                <!-- Profile Picture -->
+                            {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
 
-                <td>
-
-                    {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
-
-                        <img
-                            src="{{ url_for(
-                                'auth.static',
-                                filename=user.profile_picture
-                            ) }}"
-                            alt="{{ user.name }}"
-                            class="profile-picture"
-                        >
-
-                    {% else %}
-
-                        <img
-                            src="{{ url_for(
-                                'auth.static',
-                                filename='images/default_avatar.jpg'
-                            ) }}"
-                            alt="Default Profile Picture"
-                            class="profile-picture"
-                        >
-
-                    {% endif %}
-
-                </td>
-
-
-                <!-- Email -->
-
-                <td>
-                    {{ user.email }}
-                </td>
-
-
-                <!-- Role -->
-
-                <td>
-
-                    {% if user.role == "admin" %}
-
-                        <span class="role-badge role-admin">
-                            Admin
-                        </span>
-
-                    {% else %}
-
-                        <span class="role-badge role-user">
-                            User
-                        </span>
-
-                    {% endif %}
-
-                </td>
-
-
-                <!-- Action -->
-
-                <td>
-
-                    {% if user.role != "admin" %}
-
-
-                        <!-- View Details -->
-
-                        <a
-                            href="{{ url_for(
-                                'admin.user_details',
-                                user_id=user.id
-                            ) }}"
-                            class="view-btn"
-                        >
-                            View Details
-                        </a>
-
-
-                        <!-- Ban -->
-
-                        <button
-                            type="button"
-                            class="ban-btn"
-                            popovertarget="banUser{{ user.id }}"
-                        >
-                            <i class="bi bi-person-x"></i>
-                            Ban
-                        </button>
-
-
-                        <!-- Ban Popup -->
-
-                        <div
-                            id="banUser{{ user.id }}"
-                            popover
-                            class="delete-popup"
-                        >
-
-                            <div class="delete-box">
-
-
-                                <div class="warning-icon">
-                                    <i class="bi bi-person-x"></i>
-                                </div>
-
-                                <h3>
-                                    Ban User?
-                                </h3>
-
-
-                                <p>
-                                    Are you sure you want to ban this user?
-                                </p>
-
-
-                                <form
-                                    action="{{ url_for(
-                                        'admin.ban_user',
-                                        user_id=user.id
+                                <img
+                                    src="{{ url_for(
+                                        'auth.static',
+                                        filename=user.profile_picture
                                     ) }}"
-                                    method="POST"
+                                    alt="{{ user.name }}"
+                                    class="rounded-circle border"
+                                    style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    "
                                 >
 
+                            {% else %}
 
-                                    <label
-                                        for="banReason{{ user.id }}"
-                                        class="reason-label"
-                                    >
-                                        Ban Reason
-                                    </label>
+                                <img
+                                    src="{{ url_for(
+                                        'auth.static',
+                                        filename='images/default_avatar.jpg'
+                                    ) }}"
+                                    alt="Default Profile Picture"
+                                    class="rounded-circle border"
+                                    style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    "
+                                >
 
+                            {% endif %}
 
-                                    <textarea
-                                        id="banReason{{ user.id }}"
-                                        name="ban_reason"
-                                        rows="4"
-                                        placeholder="Enter the reason for banning this user..."
-                                        required
-                                    ></textarea>
-
-
-                                    <div class="popup-actions">
-
-
-                                        <button
-                                            type="submit"
-                                            class="delete-confirm"
-                                        >
-                                            Ban User
-                                        </button>
+                        </td>
 
 
-                                        <button
-                                            type="button"
-                                            class="cancel-btn"
-                                            popovertarget="banUser{{ user.id }}"
-                                            popovertargetaction="hide"
-                                        >
-                                            Cancel
-                                        </button>
+                        <!-- Email -->
 
+                        <td>
+                            {{ user.email }}
+                        </td>
+
+
+                        <!-- Role -->
+
+                        <td>
+
+                            {% if user.role == "admin" %}
+
+                                <span class="badge text-bg-primary">
+                                    Admin
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    User
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Action -->
+
+                        <td class="text-center">
+
+                            {% if user.role != "admin" %}
+
+
+                                <!-- View Details -->
+
+                                <a
+                                    href="{{ url_for(
+                                        'admin.user_details',
+                                        user_id=user.id
+                                    ) }}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    <i class="bi bi-person-lines-fill me-1"></i>
+                                    View Details
+                                </a>
+
+
+                                <!-- Ban Button -->
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#banUser{{ user.id }}"
+                                >
+                                    <i class="bi bi-person-x me-1"></i>
+                                    Ban
+                                </button>
+
+
+                                <!-- Ban Modal -->
+
+                                <div
+                                    class="modal fade"
+                                    id="banUser{{ user.id }}"
+                                    tabindex="-1"
+                                    aria-labelledby="banUserLabel{{ user.id }}"
+                                    aria-hidden="true"
+                                >
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content">
+
+
+                                            <!-- Modal Header -->
+
+                                            <div class="modal-header">
+
+                                                <h5
+                                                    class="modal-title"
+                                                    id="banUserLabel{{ user.id }}"
+                                                >
+                                                    <i class="bi bi-person-x text-danger me-2"></i>
+                                                    Ban User
+                                                </h5>
+
+                                                <button
+                                                    type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close"
+                                                ></button>
+
+                                            </div>
+
+
+                                            <!-- Modal Body -->
+
+                                            <div class="modal-body text-start">
+
+                                                <p>
+                                                    Are you sure you want to ban
+                                                    <strong>{{ user.name }}</strong>?
+                                                </p>
+
+
+                                                <form
+                                                    action="{{ url_for(
+                                                        'admin.ban_user',
+                                                        user_id=user.id
+                                                    ) }}"
+                                                    method="POST"
+                                                >
+
+                                                    <label
+                                                        for="banReason{{ user.id }}"
+                                                        class="form-label fw-semibold"
+                                                    >
+                                                        Ban Reason
+                                                    </label>
+
+                                                    <textarea
+                                                        id="banReason{{ user.id }}"
+                                                        name="ban_reason"
+                                                        class="form-control"
+                                                        rows="4"
+                                                        placeholder="Enter the reason for banning this user..."
+                                                        required
+                                                    ></textarea>
+
+
+                                                    <div class="text-end mt-3">
+
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-secondary"
+                                                            data-bs-dismiss="modal"
+                                                        >
+                                                            Cancel
+                                                        </button>
+
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-danger"
+                                                        >
+                                                            <i class="bi bi-person-x me-1"></i>
+                                                            Ban User
+                                                        </button>
+
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
 
                                     </div>
 
-
-                                </form>
-
-
-                            </div>
-
-                        </div>
+                                </div>
 
 
-                    {% else %}
+                            {% else %}
 
-                        <span class="admin-label">
-                            -
-                        </span>
+                                <span class="text-secondary">
+                                    -
+                                </span>
 
-                    {% endif %}
+                            {% endif %}
 
-                </td>
+                        </td>
 
+                    </tr>
 
-            </tr>
+                    {% endfor %}
 
-            {% endfor %}
+                </tbody>
 
-        </tbody>
+            </table>
 
-    </table>
+        </div>
+
+    </div>
 
 </div>
 
 
 {% else %}
 
+<!-- =========================
+     EMPTY STATE
+========================= -->
 
-<!-- Empty State -->
+<div class="card border-0 shadow-sm">
 
-<div class="empty-state">
+    <div class="card-body text-center py-5">
 
-    <div class="empty-icon">
-        👤
+        <i class="bi bi-people fs-1 text-secondary"></i>
+
+        <h4 class="mt-3">
+            No Users
+        </h4>
+
+        <p class="text-secondary mb-0">
+            There are currently no active users.
+        </p>
+
     </div>
-
-    <h2>
-        No Users
-    </h2>
-
-    <p>
-        There are currently no active users.
-    </p>
 
 </div>
 
 {% endif %}
 
-
-<!-- Bottom Buttons -->
-
-<div class="bottom-actions">
-
-    <a
-        href="{{ url_for('admin.banned_users') }}"
-        class="back-btn"
-    >
-        Banned Users
-    </a>
-
-
-    <a
-        href="{{ url_for('admin.dashboard') }}"
-        class="back-btn"
-    >
-        ← Back to Dashboard
-    </a>
-
-</div>
-
-</div>
-
-<style>
-
-
-    /* Page */
-
-    body {
-
-        font-family: Arial, sans-serif;
-
-        margin: 0;
-
-        background-color: #f8f9fa;
-
-    }
-
-
-    .page-container {
-
-        width: 100%;
-
-        padding: 35px 40px;
-
-        box-sizing: border-box;
-
-    }
-
-
-    /* Header */
-
-    .page-header {
-
-        margin-bottom: 25px;
-
-    }
-
-
-    .page-header h1 {
-
-        margin: 0 0 6px 0;
-
-        font-size: 30px;
-
-        font-weight: 700;
-
-    }
-
-
-    .page-header p {
-
-        margin: 0;
-
-        color: #6c757d;
-
-        font-size: 15px;
-
-    }
-
-
-    /* Table */
-
-    .table-container {
-
-        background-color: white;
-
-        border: 1px solid #dee2e6;
-
-        border-radius: 8px;
-
-        overflow-x: auto;
-
-    }
-
-
-    table {
-
-        width: 100%;
-
-        border-collapse: collapse;
-
-    }
-
-
-    th,
-    td {
-
-        padding: 14px 16px;
-
-        border: 1px solid #dee2e6;
-
-        text-align: left;
-
-        vertical-align: middle;
-
-    }
-
-
-    th {
-
-        background-color: #f2f2f2;
-
-        font-size: 14px;
-
-        font-weight: 600;
-
-    }
-
-
-    td {
-
-        font-size: 14px;
-
-    }
-
-
-    tbody tr:hover {
-
-        background-color: #f8f9fa;
-
-    }
-
-
-    /* Profile Picture */
-
-    .profile-picture {
-
-        width: 60px;
-
-        height: 60px;
-
-        object-fit: cover;
-
-        border-radius: 50%;
-
-        border: 1px solid #ddd;
-
-    }
-
-
-    /* Role */
-
-    .role-badge {
-
-        display: inline-block;
-
-        padding: 5px 10px;
-
-        border-radius: 12px;
-
-        font-size: 13px;
-
-        font-weight: 600;
-
-    }
-
-
-    .role-admin {
-
-        background-color: #cfe2ff;
-
-        color: #084298;
-
-    }
-
-
-    .role-user {
-
-        background-color: #e9ecef;
-
-        color: #495057;
-
-    }
-
-
-    .admin-label {
-
-        color: #6c757d;
-
-    }
-
-
-    /* View Details */
-
-    .view-btn {
-
-        display: inline-block;
-
-        min-width: 90px;
-
-        padding: 6px 12px;
-
-        background-color: #0d6efd;
-
-        color: white;
-
-        text-decoration: none;
-
-        text-align: center;
-
-        border-radius: 4px;
-
-        font-size: 14px;
-
-    }
-
-
-    .view-btn:hover {
-
-        background-color: #0b5ed7;
-
-    }
-
-
-    /* Ban Button */
-
-.ban-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-
-    min-width: 70px;
-    padding: 6px 12px;
-
-    background-color: #dc3545;
-    color: white;
-
-    border: none;
-    border-radius: 4px;
-
-    cursor: pointer;
-    font-size: 14px;
-    margin-left: 5px;
-}
-
-.ban-btn:hover {
-    background-color: #bb2d3b;
-}
-
-    /* Popup */
-
-    .delete-popup {
-
-        padding: 0;
-
-        border: none;
-
-        background: transparent;
-
-    }
-
-
-    .delete-box {
-
-        background-color: white;
-
-        padding: 25px;
-
-        border-radius: 8px;
-
-        width: 350px;
-
-        text-align: center;
-
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-
-    }
-
-
-    /* Warning Icon */
-
-    .warning-icon {
-
-        width: 45px;
-
-        height: 45px;
-
-        margin: 0 auto 15px auto;
-
-        border-radius: 50%;
-
-        background-color: #f8d7da;
-    
-        color: #dc3545;
-
-        font-size: 25px;
-
-        font-weight: bold;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-    }
-
-
-    .delete-box h3 {
-
-        margin: 0 0 10px 0;
-
-        font-size: 20px;
-
-    }
-
-
-    .delete-box p {
-
-        margin: 0 0 20px 0;
-
-        color: #6c757d;
-
-    }
-
-
-    /* Ban Reason */
-
-    .reason-label {
-
-        display: block;
-
-        text-align: left;
-
-        font-weight: 600;
-
-        margin-bottom: 8px;
-
-    }
-
-
-    textarea {
-
-        width: 100%;
-
-        min-height: 100px;
-
-        box-sizing: border-box;
-
-        padding: 10px;
-
-        border: 1px solid #adb5bd;
-
-        border-radius: 4px;
-
-        resize: vertical;
-
-        font-family: Arial, sans-serif;
-
-        font-size: 14px;
-
-        background-color: #f8f9fa;
-
-    }
-
-
-    textarea:focus {
-
-        outline: none;
-
-        background-color: white;
-
-        border-color: #86b7fe;
-
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-
-    }
-
-
-    /* Popup Buttons */
-
-    .popup-actions {
-
-        margin-top: 20px;
-
-    }
-
-
-    .delete-confirm {
-
-        padding: 6px 15px;
-
-        background-color: #dc3545;
-
-        color: white;
-
-        border: none;
-
-        border-radius: 4px;
-
-        cursor: pointer;
-
-    }
-
-
-    .delete-confirm:hover {
-
-        background-color: #bb2d3b;
-
-    }
-
-
-    .cancel-btn {
-
-        padding: 6px 15px;
-
-        background-color: #6c757d;
-
-        color: white;
-
-        border: none;
-
-        border-radius: 4px;
-
-        cursor: pointer;
-
-        margin-left: 5px;
-
-    }
-
-
-    .cancel-btn:hover {
-
-        background-color: #5c636a;
-
-    }
-
-
-    /* Empty State */
-
-    .empty-state {
-
-        background-color: white;
-
-        border: 1px solid #dee2e6;
-
-        border-radius: 8px;
-
-        padding: 60px 20px;
-
-        text-align: center;
-
-    }
-
-
-    .empty-icon {
-
-        font-size: 45px;
-
-        margin-bottom: 12px;
-
-    }
-
-
-    .empty-state h2 {
-
-        margin: 0 0 8px 0;
-
-        font-size: 22px;
-
-    }
-
-
-    .empty-state p {
-
-        margin: 0;
-
-        color: #6c757d;
-
-    }
-
-
-    /* Bottom Buttons */
-
-    .bottom-actions {
-
-        display: flex;
-
-        gap: 10px;
-
-        margin-top: 25px;
-
-    }
-
-
-    .back-btn {
-
-        display: inline-block;
-
-        padding: 8px 15px;
-
-        background-color: #6c757d;
-
-        color: white;
-
-        text-decoration: none;
-
-        border-radius: 4px;
-
-    }
-
-
-    .back-btn:hover {
-
-        background-color: #5c636a;
-
-    }
-
-</style>
-
-</body>
-
-</html>
+{% endblock %}

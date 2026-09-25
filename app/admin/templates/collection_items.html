@@ -1,674 +1,452 @@
-<!DOCTYPE html>
+{% extends "admin_base.html" %}
 
-<html lang="en">
+{% block title %}
+{{ collection.name }} - Items
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block content %}
 
-    <title>{{ collection.name }} - Items</title>
+<!-- =========================
+     COLLECTION INFORMATION
+========================= -->
 
-    <style>
+<div class="card border-0 shadow-sm mb-4">
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
+    <div class="card-body">
 
-        .page-container {
-            width: 100%;
-            padding: 35px 40px;
-            box-sizing: border-box;
-        }
+        <div class="row align-items-center g-4">
 
 
-        /* Collection Header */
+            <!-- Collection Image -->
 
-        .collection-header {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
+            <div class="col-md-3 col-lg-2">
 
-        .collection-image-box {
-            width: 140px;
-            height: 140px;
-            flex-shrink: 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            overflow: hidden;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+                {% if collection.image %}
 
-        .collection-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+                    <img
+                        src="{{ url_for(
+                            'collection.static',
+                            filename='uploads/' + collection.image
+                        ) }}"
+                        alt="{{ collection.name }}"
+                        class="img-fluid rounded border"
+                        style="
+                            width: 140px;
+                            height: 140px;
+                            object-fit: cover;
+                        "
+                    >
 
-        .no-collection-image {
-            font-size: 40px;
-            color: #6c757d;
-        }
+                {% else %}
 
-        .collection-info h1 {
-            margin: 0 0 10px 0;
-            font-size: 30px;
-            font-weight: 700;
-        }
+                    <div
+                        class="border rounded d-flex align-items-center justify-content-center bg-light text-secondary"
+                        style="
+                            width: 140px;
+                            height: 140px;
+                            font-size: 40px;
+                        "
+                    >
+                        <i class="bi bi-image"></i>
+                    </div>
 
-        .tag-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 12px;
-            background-color: #fff3cd;
-            color: #856404;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
+                {% endif %}
 
-        .collection-description {
-            margin: 5px 0 0 0;
-            color: #6c757d;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-
-        /* Section Header */
-
-        .section-header {
-            margin-bottom: 15px;
-        }
-
-        .section-header h2 {
-            margin: 0 0 5px 0;
-            font-size: 22px;
-        }
-
-        .section-header p {
-            margin: 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-
-        /* Table */
-
-        .table-container {
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 14px 16px;
-            border: 1px solid #dee2e6;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        td {
-            font-size: 14px;
-        }
-
-        tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-
-        /* Item Image */
-
-        .item-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-
-        .no-image {
-            color: #6c757d;
-        }
-
-
-        /* Description */
-
-        .description {
-            max-width: 400px;
-            line-height: 1.5;
-        }
-
-
-        /* Status */
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .status-approved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-
-        /* Buttons */
-
-        .edit-btn,
-        .remove-btn {
-            display: inline-block;
-            min-width: 75px;
-            padding: 6px 12px;
-            text-align: center;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .edit-btn {
-            background-color: #0d6efd;
-            color: white;
-            text-decoration: none;
-        }
-
-        .edit-btn:hover {
-            background-color: #0b5ed7;
-        }
-
-        .remove-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            margin-left: 5px;
-        }
-
-        .remove-btn:hover {
-            background-color: #bb2d3b;
-        }
-
-
-        /* Delete Popup */
-
-        .delete-popup {
-            padding: 0;
-            border: none;
-            background: transparent;
-        }
-
-        .delete-box {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            width: 350px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .warning-icon {
-            width: 45px;
-            height: 45px;
-            margin: 0 auto 15px auto;
-            border-radius: 50%;
-            background-color: #ff9191;
-            color: #950101;
-            font-size: 25px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .delete-box h3 {
-            margin: 0 0 10px 0;
-            font-size: 20px;
-        }
-
-        .delete-box p {
-            margin: 0 0 20px 0;
-            color: #6c757d;
-        }
-
-        .delete-confirm {
-            padding: 6px 15px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .cancel-btn {
-            padding: 6px 15px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-
-        .delete-confirm:hover {
-            background-color: #bb2d3b;
-        }
-
-        .cancel-btn:hover {
-            background-color: #5c636a;
-        }
-
-
-        /* Empty State */
-
-        .empty-state {
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .empty-icon {
-            font-size: 45px;
-            margin-bottom: 12px;
-        }
-
-        .empty-state h3 {
-            margin: 0 0 8px 0;
-            font-size: 20px;
-        }
-
-        .empty-state p {
-            margin: 0;
-            color: #6c757d;
-        }
-
-
-        /* Back Button */
-
-        .back-btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .back-btn:hover {
-            background-color: #5c636a;
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-<div class="page-container">
-
-
-    <!-- Collection Information -->
-
-    <div class="collection-header">
-
-
-        <!-- Collection Image -->
-
-        <div class="collection-image-box">
-
-            {% if collection.image %}
-
-            <img
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + collection.image
-                ) }}"
-                alt="{{ collection.name }}"
-                class="collection-image"
-            >
-
-            {% else %}
-
-            <div class="no-collection-image">
-                🖼️
             </div>
 
-            {% endif %}
 
-        </div>
+            <!-- Collection Details -->
 
+            <div class="col-md-9 col-lg-10">
 
-        <!-- Collection Details -->
-
-        <div class="collection-info">
-
-            <h1>
-                {{ collection.name }}
-            </h1>
+                <h1 class="fw-bold mb-2">
+                    {{ collection.name }}
+                </h1>
 
 
-            {% if collection.tag %}
+                {% if collection.tag %}
 
-            <span class="tag-badge">
-                {{ collection.tag.name }}
-            </span>
+                    <span class="badge rounded-pill text-bg-warning mb-2">
+                        {{ collection.tag.name }}
+                    </span>
 
-            {% endif %}
+                {% endif %}
 
 
-            {% if collection.description %}
+                {% if collection.description %}
 
-            <p class="collection-description">
-                {{ collection.description }}
-            </p>
+                    <p class="text-secondary mb-0">
+                        {{ collection.description }}
+                    </p>
 
-            {% else %}
+                {% else %}
 
-            <p class="collection-description">
-                No collection description available.
-            </p>
+                    <p class="text-secondary mb-0">
+                        No collection description available.
+                    </p>
 
-            {% endif %}
+                {% endif %}
+
+            </div>
 
         </div>
 
     </div>
 
+</div>
 
-    <!-- Items Section -->
 
-    <div class="section-header">
+<!-- =========================
+     ITEMS SECTION
+========================= -->
 
-        <h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <div>
+
+        <h2 class="fw-bold mb-1">
             Items
         </h2>
 
-        <p>
+        <p class="text-secondary mb-0">
             View and manage the items in this collection.
         </p>
 
     </div>
 
 
-    {% if items %}
+    <a
+        href="{{ url_for('admin.collections') }}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to Collections
+    </a>
+
+</div>
 
 
-    <!-- Items Table -->
+{% if items %}
 
-    <div class="table-container">
+<!-- =========================
+     ITEMS TABLE
+========================= -->
 
-        <table>
+<div class="card border-0 shadow-sm">
 
-            <thead>
+    <div class="card-body p-0">
 
-                <tr>
+        <div class="table-responsive">
 
-                    <th>ID</th>
+            <table class="table table-hover align-middle mb-0">
 
-                    <th>Item Name</th>
+                <thead class="table-light">
 
-                    <th>Image</th>
+                    <tr>
 
-                    <th>Description</th>
+                        <th class="px-4">
+                            ID
+                        </th>
 
-                    <th>Status</th>
+                        <th>
+                            Item Name
+                        </th>
 
-                    <th>Action</th>
+                        <th>
+                            Image
+                        </th>
 
-                </tr>
+                        <th>
+                            Description
+                        </th>
 
-            </thead>
+                        <th>
+                            Status
+                        </th>
 
+                        <th class="text-center">
+                            Action
+                        </th>
 
-            <tbody>
+                    </tr>
 
-
-                {% for item in items %}
-
-
-                <tr>
-
-
-                    <td>
-                        {{ item.id }}
-                    </td>
+                </thead>
 
 
-                    <td>
-                        <strong>
+                <tbody>
+
+                    {% for item in items %}
+
+                    <tr>
+
+
+                        <!-- ID -->
+
+                        <td class="px-4">
+                            {{ item.id }}
+                        </td>
+
+
+                        <!-- Item Name -->
+
+                        <td class="fw-semibold">
                             {{ item.name }}
-                        </strong>
-                    </td>
+                        </td>
 
 
-                    <td>
+                        <!-- Image -->
 
-                        {% if item.image %}
+                        <td>
 
-                        <img
-                            src="{{ url_for(
-                                'collection.static',
-                                filename='uploads/' + item.image
-                            ) }}"
-                            alt="{{ item.name }}"
-                            class="item-image"
-                        >
+                            {% if item.image %}
 
-                        {% else %}
-
-                        <span class="no-image">
-                            --
-                        </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <td class="description">
-
-                        {% if item.description %}
-
-                            {{ item.description }}
-
-                        {% else %}
-
-                            --
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        <span class="status-badge status-{{ item.status }}">
-                            {{ item.status }}
-                        </span>
-
-                    </td>
-
-
-                    <td>
-
-
-                        <!-- Edit -->
-
-                        <a
-                            href="{{ url_for(
-                                'admin.edit_item',
-                                item_id=item.id
-                            ) }}"
-                            class="edit-btn"
-                        >
-                            Edit
-                        </a>
-
-
-                        <!-- Remove -->
-
-                        <button
-                            type="button"
-                            class="remove-btn"
-                            popovertarget="deleteItem{{ item.id }}"
-                        >
-                            Remove
-                        </button>
-
-
-                        <!-- Delete Popup -->
-
-                        <div
-                            id="deleteItem{{ item.id }}"
-                            popover
-                            class="delete-popup"
-                        >
-
-                            <div class="delete-box">
-
-
-                                <div class="warning-icon">
-                                    !
-                                </div>
-
-
-                                <h3>
-                                    Delete Item?
-                                </h3>
-
-
-                                <p>
-                                    Are you sure you want to delete this item?
-                                </p>
-
-
-                                <form
-                                    action="{{ url_for(
-                                        'admin.remove_item',
-                                        item_id=item.id
+                                <img
+                                    src="{{ url_for(
+                                        'collection.static',
+                                        filename='uploads/' + item.image
                                     ) }}"
-                                    method="POST"
+                                    alt="{{ item.name }}"
+                                    class="rounded border"
+                                    style="
+                                        width: 100px;
+                                        height: 100px;
+                                        object-fit: cover;
+                                    "
                                 >
 
+                            {% else %}
 
-                                    <button
-                                        type="submit"
-                                        class="delete-confirm"
-                                    >
-                                        Yes, Delete
-                                    </button>
+                                <span class="text-secondary">
+                                    --
+                                </span>
 
+                            {% endif %}
 
-                                    <button
-                                        type="button"
-                                        class="cancel-btn"
-                                        popovertarget="deleteItem{{ item.id }}"
-                                        popovertargetaction="hide"
-                                    >
-                                        Cancel
-                                    </button>
+                        </td>
 
 
-                                </form>
+                        <!-- Description -->
 
+                        <td
+                            style="
+                                min-width: 250px;
+                                max-width: 400px;
+                            "
+                        >
+
+                            {% if item.description %}
+
+                                {{ item.description }}
+
+                            {% else %}
+
+                                <span class="text-secondary">
+                                    --
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if item.status == "approved" %}
+
+                                <span class="badge text-bg-success">
+                                    Approved
+                                </span>
+
+                            {% elif item.status == "pending" %}
+
+                                <span class="badge text-bg-warning">
+                                    Pending
+                                </span>
+
+                            {% elif item.status == "rejected" %}
+
+                                <span class="badge text-bg-danger">
+                                    Rejected
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    {{ item.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Action -->
+
+                        <td class="text-center text-nowrap">
+
+
+                            <!-- Edit -->
+
+                            <a
+                                href="{{ url_for(
+                                    'admin.edit_item',
+                                    item_id=item.id
+                                ) }}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                <i class="bi bi-pencil me-1"></i>
+                                Edit
+                            </a>
+
+
+                            <!-- Remove -->
+
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteItem{{ item.id }}"
+                            >
+                                <i class="bi bi-trash me-1"></i>
+                                Remove
+                            </button>
+
+
+                            <!-- Delete Modal -->
+
+                            <div
+                                class="modal fade"
+                                id="deleteItem{{ item.id }}"
+                                tabindex="-1"
+                                aria-labelledby="deleteItemLabel{{ item.id }}"
+                                aria-hidden="true"
+                            >
+
+                                <div class="modal-dialog modal-dialog-centered">
+
+                                    <div class="modal-content">
+
+
+                                        <!-- Modal Header -->
+
+                                        <div class="modal-header">
+
+                                            <h5
+                                                class="modal-title"
+                                                id="deleteItemLabel{{ item.id }}"
+                                            >
+                                                <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                                                Delete Item
+                                            </h5>
+
+                                            <button
+                                                type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close"
+                                            ></button>
+
+                                        </div>
+
+
+                                        <!-- Modal Body -->
+
+                                        <div class="modal-body">
+
+                                            <p class="mb-0">
+
+                                                Are you sure you want to delete
+                                                <strong>{{ item.name }}</strong>?
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <!-- Modal Footer -->
+
+                                        <div class="modal-footer">
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                data-bs-dismiss="modal"
+                                            >
+                                                Cancel
+                                            </button>
+
+
+                                            <form
+                                                action="{{ url_for(
+                                                    'admin.remove_item',
+                                                    item_id=item.id
+                                                ) }}"
+                                                method="POST"
+                                                class="d-inline"
+                                            >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger"
+                                                >
+                                                    <i class="bi bi-trash me-1"></i>
+                                                    Yes, Delete
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
-                        </div>
 
+                        </td>
 
-                    </td>
+                    </tr>
 
+                    {% endfor %}
 
-                </tr>
+                </tbody>
 
+            </table>
 
-                {% endfor %}
-
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 
+</div>
 
-    {% else %}
 
+{% else %}
 
-    <!-- Empty State -->
+<!-- =========================
+     EMPTY STATE
+========================= -->
 
-    <div class="empty-state">
+<div class="card border-0 shadow-sm">
 
-        <div class="empty-icon">
-            📦
-        </div>
+    <div class="card-body text-center py-5">
 
-        <h3>
+        <i class="bi bi-box fs-1 text-secondary"></i>
+
+        <h4 class="mt-3">
             No Items
-        </h3>
+        </h4>
 
-        <p>
+        <p class="text-secondary mb-0">
             There are currently no items in this collection.
         </p>
 
     </div>
 
-
-    {% endif %}
-
-
-    <!-- Back Button -->
-
-    <a
-        href="{{ url_for('admin.collections') }}"
-        class="back-btn"
-    >
-        ← Back to Collections
-    </a>
-
-
 </div>
 
-</body>
+{% endif %}
 
-</html>
+{% endblock %}
