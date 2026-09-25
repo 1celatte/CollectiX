@@ -19,10 +19,14 @@ def marketplace_home():
     listings = Listing.query.join(
         Item,
         Listing.item_id == Item.id
+    ).join(
+        User,
+        Listing.user_id == User.id
     ).add_entity(
         Item
     ).filter(
-        Listing.status == "available"
+        Listing.status == "available",
+        User.is_banned == False
     ).order_by(
         Listing.created_at.desc()
     ).all()
@@ -57,9 +61,13 @@ def find_missing_item(collection_id, item_id):
     )
 
     # Find available marketplace listings
-    listings = Listing.query.filter_by(
-        item_id=item.id,
-        status="available"
+    listings = Listing.query.join(
+        User,
+        Listing.user_id == User.id
+    ).filter(
+        Listing.item_id == item.id,
+        Listing.status == "available",
+        User.is_banned == False
     ).order_by(
         Listing.created_at.desc()
     ).all()
@@ -613,8 +621,12 @@ def edit_listing(listing_id):
 def view_listing(listing_id):
 
     #Find the marketplace listing using its ID.
-    listing = Listing.query.filter_by(
-        id=listing_id
+    listing = Listing.query.join(
+        User,
+        Listing.user_id == User.id
+    ).filter(
+        Listing.id == listing_id,
+        User.is_banned == False
     ).first_or_404()
 
     #Find the item connected to this listing.

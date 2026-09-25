@@ -451,6 +451,20 @@ def ban_user(user_id):
     if not ban_reason:
         return "Ban reason is required.", 400
 
+    active_transaction = Transaction.query.filter(
+        (
+            (Transaction.buyer_id == user.id) |
+            (Transaction.seller_id == user.id)
+        ),
+        ~Transaction.status.in_([
+            "completed",
+            "cancelled"
+        ])
+    ).first()
+
+    if active_transaction:
+        return "Cannot ban user while they have an active transaction.", 403
+
     user.is_banned = True
     user.ban_reason = ban_reason
 
