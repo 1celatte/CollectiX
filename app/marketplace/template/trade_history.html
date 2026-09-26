@@ -19,11 +19,14 @@ Trade History
                 <div class="card-body p-4 p-md-5">
                     <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-4">
                         <div>
-                            <p class="text-muted small text-uppercase fw-semibold mb-1">Trade Between</p>
+                            <p class="text-muted small text-uppercase fw-semibold mb-1">Trade Request</p>
                             <h2 class="h4 fw-bold mb-0">
-                                <span class="text-primary">{{ detail.sender.name }}</span>
-                                <span class="text-muted fw-normal">and</span>
-                                <span class="text-primary">{{ detail.receiver.name }}</span>
+                                From
+                                {% if detail.trade.sender_id == current_user.id %}
+                                    <span class="text-primary">{{ detail.receiver.name }}</span>
+                                {% else %}
+                                    <span class="text-primary">{{ detail.sender.name }}</span>
+                                {% endif %}
                             </h2>
                         </div>
 
