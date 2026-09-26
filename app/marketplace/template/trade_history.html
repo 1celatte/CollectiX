@@ -7,127 +7,170 @@ Trade History
 {% block content %}
 
 <!--Page heading-->
-<h1>Trade History</h1>
+<div class="mb-4">
+    <h1 class="display-6 fw-bold mb-2">Trade History</h1>
+</div>
 
 {% if trade_details %}
 
-    {% for detail in trade_details %}
+    <div class="vstack gap-4">
+        {% for detail in trade_details %}
+            <article class="card border-0 shadow-sm overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-4">
+                        <div>
+                            <p class="text-muted small text-uppercase fw-semibold mb-1">Trade Between</p>
+                            <h2 class="h4 fw-bold mb-0">
+                                <span class="text-primary">{{ detail.sender.name }}</span>
+                                <span class="text-muted fw-normal">and</span>
+                                <span class="text-primary">{{ detail.receiver.name }}</span>
+                            </h2>
+                        </div>
 
-        <!--Show both users involved in this Trade-->
-        <h2>
-            Trade between
-            {{ detail.sender.name }}
-            and
-            {{ detail.receiver.name }}
-        </h2>
+                        {% if detail.trade.status == "completed" %}
+                            <span class="badge text-bg-success align-self-sm-start">Completed</span>
+                        {% elif detail.trade.status == "rejected" %}
+                            <span class="badge text-bg-danger align-self-sm-start">Rejected</span>
+                        {% elif detail.trade.status == "accepted" %}
+                            <span class="badge text-bg-primary align-self-sm-start">Accepted</span>
+                        {% else %}
+                            <span class="badge text-bg-warning align-self-sm-start">
+                                {{ detail.trade.status|title }}
+                            </span>
+                        {% endif %}
+                    </div>
 
-        <!--Show the item offered by the sender-->
-        <p>
-            {{ detail.sender.name }} offered:
-            {{ detail.offered_item.name }}
-        </p>
+                    <div class="row g-4">
+                        <!--Show the item offered by the sender-->
+                        <div class="col-md-6">
+                            <div class="h-100 rounded border p-3">
+                                <p class="text-muted small text-uppercase fw-semibold mb-2">
+                                    {{ detail.sender.name }} Offered
+                                </p>
+                                <h3 class="h5 fw-bold">{{ detail.offered_item.name }}</h3>
+                                <p class="mb-3">
+                                    <span class="text-muted">Condition:</span>
+                                    {{ detail.trade.offered_condition }}
+                                </p>
 
-        <!--Show the offered item's condition-->
-        <p>
-            Offered item condition:
-            {{ detail.trade.offered_condition }}
-        </p>
+                                <!--Show the sender's uploaded item image when available-->
+                                {% if detail.trade.offered_image %}
+                                    <div class="bg-white border rounded d-flex align-items-center justify-content-center p-2">
+                                        <img
+                                            src="{{ url_for(
+                                                'marketplace.static',
+                                                filename='uploads/trades/' ~ detail.trade.offered_image
+                                            ) }}"
+                                            alt="{{ detail.offered_item.name }}"
+                                            class="img-fluid"
+                                            style="width: 100%; height: 220px; object-fit: contain;"
+                                        >
+                                    </div>
+                                {% else %}
+                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted p-3" style="height: 220px;">
+                                        No image was uploaded for the offered item.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
 
-        <!--Show the sender's uploaded item image when available-->
-        {% if detail.trade.offered_image %}
+                        <!--Show the item requested from the receiver-->
+                        <div class="col-md-6">
+                            <div class="h-100 rounded border p-3">
+                                <p class="text-muted small text-uppercase fw-semibold mb-2">
+                                    {{ detail.sender.name }} Requested
+                                </p>
+                                <h3 class="h5 fw-bold">{{ detail.requested_item.name }}</h3>
+                                <p class="mb-3">
+                                    <span class="text-muted">Condition:</span>
+                                    {{ detail.listing.condition }}
+                                </p>
 
-            <img
-                src="{{ url_for(
-                    'marketplace.static',
-                    filename='uploads/trades/' ~ detail.trade.offered_image
-                ) }}"
-                alt="{{ detail.offered_item.name }}"
-                class="img-fluid border rounded"
-                style="max-width: 300px; max-height: 300px; object-fit: contain;"
-            >
-        
-        {% else %}
-            <p>
-                No image was uploaded for the offered item.
-            </p>
-        {% endif %}
+                                {% if detail.listing.image %}
+                                    <div class="bg-white border rounded d-flex align-items-center justify-content-center p-2">
+                                        <img
+                                            src="{{ url_for(
+                                                'marketplace.static',
+                                                filename='uploads/listings/' ~ detail.listing.image
+                                            ) }}"
+                                            alt="{{ detail.requested_item.name }}"
+                                            class="img-fluid"
+                                            style="width: 100%; height: 220px; object-fit: contain;"
+                                        >
+                                    </div>
+                                {% else %}
+                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted p-3" style="height: 220px;">
+                                        No image available
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-        <!--Show the item requested from the receiver-->
-        <p>
-            {{ detail.sender.name }} requested:
-            {{ detail.requested_item.name }}
-        </p>
+                    {% if detail.trade.sender_id == current_user.id
+                    and detail.trade.status == "rejected"
+                    and detail.trade.rejection_reason %}
 
-        <!--Show the current Trade status-->
-        <p>
-            Status:
-            {{ detail.trade.status|title }}
-        </p>
+                        <!--Show the listing owner's rejection reason to the Trade requester-->
+                        <div class="alert alert-danger mt-4 mb-0" role="alert">
+                            <strong>Trade Request rejected.</strong>
+                            <span class="d-block mt-1">Reason: {{ detail.trade.rejection_reason }}</span>
+                        </div>
 
-        {% if detail.trade.sender_id == current_user.id
-        and detail.trade.status == "rejected"
-        and detail.trade.rejection_reason %}
+                    {% endif %}
 
-            <!--Show the listing owner's rejection reason to the Trade requester-->
-            <p>
-                <strong>Trade Request rejected.</strong><br>
-                Reason: {{ detail.trade.rejection_reason }}
-            </p>
+                    <!--Let each user confirm after an accepted Trade-->
+                    {% if detail.trade.status == "accepted" %}
+                        <div class="mt-4">
+                            {% if detail.trade.sender_id == current_user.id
+                            and not detail.trade.sender_received %}
 
-        {% endif %}
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'marketplace.confirm_trade_item_received',
+                                        trade_id=detail.trade.id
+                                    ) }}"
+                                >
+                                    <button type="submit" class="btn btn-success">
+                                        Confirm Item Received
+                                    </button>
+                                </form>
 
-        <!--Let each user confirm after an accepted Trade-->
-        {% if detail.trade.status == "accepted" %}
+                            {% elif detail.trade.receiver_id == current_user.id
+                            and not detail.trade.receiver_received %}
 
-            {% if detail.trade.sender_id == current_user.id
-            and not detail.trade.sender_received %}
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'marketplace.confirm_trade_item_received',
+                                        trade_id=detail.trade.id
+                                    ) }}"
+                                >
+                                    <button type="submit" class="btn btn-success">
+                                        Confirm Item Received
+                                    </button>
+                                </form>
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'marketplace.confirm_trade_item_received',
-                        trade_id=detail.trade.id
-                    ) }}"
-                >
-                    <button type="submit" class="btn btn-success">
-                        Confirm Item Received
-                    </button>
-                </form>
+                            {% else %}
 
-            {% elif detail.trade.receiver_id == current_user.id
-            and not detail.trade.receiver_received %}
+                                <div class="alert alert-success mb-0" role="alert">
+                                    You have confirmed that you received your item.
+                                </div>
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'marketplace.confirm_trade_item_received',
-                        trade_id=detail.trade.id
-                    ) }}"
-                >
-                    <button type="submit" class="btn btn-success">
-                        Confirm Item Received
-                    </button>
-                </form>
-
-            {% else %}
-
-                <p>
-                    You have confirmed that you received your item.
-                </p>
-
-            {% endif %}
-
-        {% endif %}
-
-        <hr>
-
-    {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
 
 {% else %}
 
-    <p>
+    <div class="alert alert-light border mb-0" role="alert">
         You have no Trade History yet.
-    </p>
+    </div>
 
 {% endif %}
 

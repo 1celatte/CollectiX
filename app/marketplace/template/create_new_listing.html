@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Marketplace Listing
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<div class="mb-4">
+    <h1 class="display-6 fw-bold mb-2">Create New Listing</h1>
+</div>
+
+<!--Show validation error without leaving this page-->
+{% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+{% endif %}
+
+<!--Form for creating a new marketplace listing-->
+<form
+    method="POST"
+    enctype="multipart/form-data"
+    class="card border-0 shadow-sm"
+>
+    <div class="card-body p-4 p-md-5">
+        <!--User selects the item to list-->
+        <div class="mb-4">
+            <label for="item_id" class="form-label fw-semibold">Item</label>
+
+            <select
+                id="item_id"
+                name="item_id"
+                class="form-select"
+            >
+                <option value="">Select an item (only items you currently own are shown)</option>
+
+                <!--Show collection, follow by all the items-->
+                {% for collection in collections %}
+                    <optgroup label="{{ collection.name }}">
+                    {% for item in items_by_collection[collection.id] %}
+                        <option value="{{ item.id }}">
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+                <!--User uploads photo of the item-->
+                <label for="image" class="form-label fw-semibold">Item Image</label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    class="form-control"
+                >
+        </div>
+
+        <!--User selects the item's condition-->
+        <div class="mb-4">
+            <label for="condition" class="form-label fw-semibold">Condition</label>
+
+            <select
+                id="condition"
+                name="condition"
+                class="form-select"
+            >
+                <option value="Brand New">Brand New</option>
+                <option value="Like New">Like New</option>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Poor">Poor</option>
+            </select>
+        </div>
+
+        <!--User chooses whether to sell or trade the item-->
+        <div class="mb-4">
+            <label for="listing_type" class="form-label fw-semibold">Listing Type</label>
+
+            <select
+                id="listing_type"
+                name="listing_type"
+                class="form-select"
+            >
+                <option value="sell">Sell</option>
+                <option value="trade">Trade</option>
+            </select>
+        </div>
+
+        <!--User enters the price; trade listings may leave this empty-->
+        <div class="mb-4">
+            <label for="price" class="form-label fw-semibold">Price (RM)</label>
+
+            <input
+                type="number"
+                id="price"
+                name="price"
+                min="0"
+                step="0.01"
+                class="form-control"
+            >
+            <div class="form-text">Leave this empty for a trade listing.</div>
+        </div>
+
+        <!--User describes the item-->
+        <div class="mb-4">
+            <label for="description" class="form-label fw-semibold">Description</label>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="5"
+                cols="40"
+                class="form-control"
+            ></textarea>
+        </div>
+
+        <!--Submit the listing form-->
+        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+                Create Listing
+            </button>
+
+            <a
+                href="{{ url_for('marketplace.my_listings') }}"
+                class="btn btn-outline-secondary px-4"
+            >
+                Cancel
+            </a>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

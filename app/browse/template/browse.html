@@ -221,7 +221,7 @@ Browse & Search - CollectiX
         class="col-md-6 col-lg-4"
     >
         <div
-            class="card h-100 shadow-sm"
+            class="card h-100 border-0 shadow-sm overflow-hidden"
         >
 
             <!--Show the image for this search result-->
@@ -233,7 +233,7 @@ Browse & Search - CollectiX
                             filename='uploads/listings/' ~ result.image
                         ) }}"
                         alt="{{ result.name }}"
-                        class="card-img-top"
+                        class="card-img-top bg-white"
                         style="height: 220px; object-fit: contain;"
                     >
                 {% else %}
@@ -243,16 +243,19 @@ Browse & Search - CollectiX
                             filename='uploads/' ~ result.image
                         ) }}"
                         alt="{{ result.name }}"
-                        class="card-img-top"
+                        class="card-img-top bg-white"
                         style="height: 220px; object-fit: contain;"
                     >
                 {% endif %}
             {% else %}
                 <div
-                    class="bg-light d-flex align-items-center justify-content-center text-muted"
+                    class="bg-white d-flex align-items-center justify-content-center text-muted"
                     style="height: 220px;"
                 >
-                    No image available
+                    <div class="text-center">
+                        <div class="fs-2">🖼️</div>
+                        No image available
+                    </div>
                 </div>
             {% endif %}
 
@@ -282,11 +285,29 @@ Browse & Search - CollectiX
                 {% endif %}
 
                 <!--Result name-->
+                {% if result.type == "marketplace" %}
+                <div class="d-flex justify-content-between align-items-start gap-3 mt-2">
+                    <h5 class="card-title mb-0">
+                        {{ result.name }}
+                    </h5>
+
+                    {% if result.listing_type == "sell" %}
+                    <span class="badge text-bg-primary">
+                        For Sale
+                    </span>
+                    {% else %}
+                    <span class="badge text-bg-warning">
+                        For Trade
+                    </span>
+                    {% endif %}
+                </div>
+                {% else %}
                 <h5
                     class="card-title mt-2"
                 >
                     {{ result.name }}
                 </h5>
+                {% endif %}
 
                 <!--Tag-->
                 <p

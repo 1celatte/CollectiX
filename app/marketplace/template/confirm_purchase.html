@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+Confirm Purchase
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<div class="mb-4">
+    <h1 class="h3 fw-bold mb-0">
+        Review the listing before continuing to payment......
+    </h1>
+</div>
+
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="row g-0">
+
+        <!--Show the item image or placeholder-->
+        <div
+            class="col-md-5 bg-white d-flex align-items-center justify-content-center"
+            style="min-height: 280px;"
+        >
+            {% if listing.image %}
+                <img
+                    src="{{ url_for(
+                        'marketplace.static',
+                        filename='uploads/listings/' ~ listing.image
+                    ) }}"
+                    alt="{{ item.name }}"
+                    class="img-fluid w-100"
+                    style="max-height: 280px; object-fit: contain;"
+                >
+            {% else %}
+                <div class="text-center text-muted">
+                    <div class="display-5">🖼️</div>
+                    <p class="mb-0 mt-2">No image available</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!--Show the item the user is about to purchase-->
+        <div class="col-md-7">
+            <div class="card-body p-4 p-lg-5">
+                <h2 class="h3 mb-3">
+                    {{ item.name }}
+                </h2>
+
+                <p class="mb-2">
+                    Condition: <strong>{{ listing.condition }}</strong>
+                </p>
+
+                <p class="text-muted mb-4">
+                    <span class="fw-semibold text-body">Description:</span>
+                    {{ listing.description or "No description provided." }}
+                </p>
+
+                <p class="fs-4 fw-bold text-success mb-4">
+                    RM {{ "%.2f"|format(listing.price) }}
+                </p>
+
+                <div class="alert alert-info border-0 mb-4">
+                    After confirming, you will scan the seller's DuitNow QR to pay and upload payment proof.
+                </div>
+
+                <!--Submit the purchase confirmation-->
+                <form method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        Confirm Purchase
+                    </button>
+                </form>
+
+                <!--Return to the listing without buying-->
+                <a
+                    href="{{ url_for(
+                        'marketplace.view_listing',
+                        listing_id=listing.id
+                    ) }}"
+                    class="btn btn-outline-secondary ms-2"
+                >
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

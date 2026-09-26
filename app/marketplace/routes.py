@@ -32,7 +32,7 @@ def marketplace_home():
     ).all()
 
     return render_template(
-        "marketplace_list.html",
+        "view_marketplace.html",
         listings=listings
     )
     
@@ -145,7 +145,7 @@ def create_listing():
     #Show the create form again with an error message.
     def show_form_error(message):
         return render_template(
-            "marketplace_create.html",
+            "create_new_listing.html",
             owned_items=owned_items,
             collections=collections,
             items_by_collection=items_by_collection,
@@ -155,7 +155,7 @@ def create_listing():
     #When the user first time open the create listing page, show the form
     if request.method == "GET":
             return render_template(
-                "marketplace_create.html",
+        "create_new_listing.html",
                 owned_items=owned_items,
                 collections=collections,
                 items_by_collection=items_by_collection
@@ -465,6 +465,15 @@ def mark_listing_unavailable(listing_id):
         id=listing.item_id
     ).first_or_404()
 
+    #Show the edit form again with a validation error message.
+    def show_form_error(message):
+        return render_template(
+            "edit_listing.html",
+            listing=listing,
+            item=item,
+            error=message
+        )
+    
     #Change status to unavailable
     listing.status = "unavailable"
 
@@ -568,7 +577,7 @@ def edit_listing(listing_id):
     
     if request.method == "GET":
         return render_template(
-            "marketplace_edit.html",
+            "edit_listing.html",
             listing=listing,
             item=item
         )
@@ -579,31 +588,75 @@ def edit_listing(listing_id):
     description = request.form.get("description", "").strip()
     price = request.form.get("price", "").strip()
 
+    #Get the new image file only when the user selected one.
+    image_file = request.files.get("image")
+    image_filename = None
+
+    if image_file and image_file.filename:
+        original_filename = secure_filename(
+            image_file.filename
+        )
+
+        image_filename = (
+            f"{uuid4().hex}_{original_filename}"
+        )
+
     #for sell must enter a price (cannot leave empty)
     if listing_type == "sell":
         try:
             listing.price = float(price)
         except ValueError:
-            return "Please enter a valid price for a sell listing."
+            return show_form_error(
+                "Please enter a valid price for a Sell listing."
+            )
 
     #A trade listing must not have a price.
     elif listing_type == "trade":
         if price:
-            return "Trade listings should not have a price."
+            return show_form_error(
+                "Trade listings should not have a price."
+            )
 
         listing.price = None
 
     #Reject an invalid listing type.
     else:
-        return "Please choose Sell or Trade."
+        return show_form_error(
+            "Please choose Sell or Trade."
+        )
 
     #Update the editable listing information.
     listing.condition = condition
     listing.listing_type = listing_type
     listing.description = description
 
+    #Replace the listing image only when a new image was uploaded.
+    if image_filename:
+        listing.image = image_filename
+
     #Save the changes to the database.
     db.session.commit()
+
+    #Save the new uploaded image file in the app static folder.
+    if image_file and image_filename:
+        upload_folder = os.path.join(
+            marketplace_bp.root_path,
+            "static",
+            "uploads",
+            "listings"
+        )
+
+        os.makedirs(
+            upload_folder,
+            exist_ok=True
+        )
+
+        image_file.save(
+            os.path.join(
+                upload_folder,
+                image_filename
+            )
+        )
 
     #Return to My Listings after a successful update.
     return redirect(
@@ -636,7 +689,7 @@ def view_listing(listing_id):
 
     #Send the listing and item information to the detail page.
     return render_template(
-        "marketplace_detail.html",
+        "view_details.html",
         listing=listing,
         item=item
     )
@@ -696,7 +749,7 @@ def send_trade_request(listing_id):
 
     if request.method == "GET":
         return render_template(
-            "trade_request.html",
+            "send_trade_request.html",
             listing=listing,
             seller=seller,
             requested_item=requested_item,
@@ -807,11 +860,17 @@ def view_trade_requests():
             trade.requested_item_id
         )
 
+        #Get the original Trade listing requested by the sender.
+        listing = Listing.query.get_or_404(
+            trade.listing_id
+        )
+
         trade_details.append({
             "trade": trade,
             "sender": sender,
             "offered_item": offered_item,
-            "requested_item": requested_item
+            "requested_item": requested_item,
+            "listing": listing
         })
 
     return render_template(
@@ -1083,13 +1142,17 @@ def trade_history():
         #Get the item requested from the receiver.
         requested_item = Item.query.get_or_404(trade.requested_item_id)
 
+        #Get the original Trade listing requested by the sender.
+        listing = Listing.query.get_or_404(trade.listing_id)
+
         #Group all the information for the HTML page
         trade_details.append({
             "trade": trade,
             "sender": sender,
             "receiver": receiver,
             "offered_item": offered_item,
-            "requested_item": requested_item
+            "requested_item": requested_item,
+            "listing": listing
         })
 
     return render_template(
@@ -1126,7 +1189,7 @@ def purchase_listing(listing_id):
     #GET: show the confirmation page.
     if request.method == "GET":
         return render_template(
-            "marketplace_purchase_confirm.html",
+            "confirm_purchase.html",
             listing=listing,
             item=item
         )
@@ -1319,7 +1382,7 @@ def payment_requests():
     ).all()
 
     return render_template(
-        "payment_requests.html",
+        "confirm_payments.html",
         requests=requests
     )
 
@@ -1489,7 +1552,7 @@ def transaction_history():
     
     #Send all transaction information to the history page.
     return render_template(
-        "marketplace_history.html",
+        "transaction_history.html",
         transactions=transactions,
         malaysia_offset=timedelta(hours=8)
     )

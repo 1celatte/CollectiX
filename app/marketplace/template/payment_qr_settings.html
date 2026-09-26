@@ -4,82 +4,116 @@
 
 {% block content %}
 <!--Page heading-->
-<h1>DuitNow QR Upload</h1>
+<div class="mb-4">
+    <h1 class="display-6 fw-bold mb-2">
+        DuitNow QR Upload
+    </h1>
+</div>
 
 <!--Explain why a QR is required before creating a listing-->
 {% if request.args.get("required") %}
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning border-0 shadow-sm" role="alert">
         <strong>Please upload your DuitNow QR before creating a listing! Buyers will use this QR to make payment.</strong>
     </div>
 {% endif %}
 
 <!--Show QR upload or deletion error-->
 {% if error %}
-    <p style="color: rgb(255, 21, 21);">
+    <div class="alert alert-danger border-0 shadow-sm">
         {{ error }}
-    </p>
+    </div>
 {% endif %}
 
-<!--Show the seller's current QR when one exists-->
-{% if payment_qr %}
-    <p>Your current DuitNow QR:</p>
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="row g-0">
 
-    <img
-        src="{{ url_for(
-            'marketplace.static',
-            filename='uploads/payment_qrs/' ~ payment_qr.filename
-        ) }}"
-        alt="Your DuitNow QR"
-        style="width: 220px; height: 220px; object-fit: contain;"
-    >
+        <!--Show the seller's current QR when one exists-->
+        <div
+            class="col-md-5 bg-white d-flex align-items-center justify-content-center p-4"
+            style="min-height: 320px;"
+        >
+            {% if payment_qr %}
+                <img
+                    src="{{ url_for(
+                        'marketplace.static',
+                        filename='uploads/payment_qrs/' ~ payment_qr.filename
+                    ) }}"
+                    alt="Your DuitNow QR"
+                    class="img-fluid"
+                    style="width: 220px; height: 220px; object-fit: contain;"
+                >
+            {% else %}
+                <!--Show message when the seller has not uploaded a QR-->
+                <div class="text-center text-muted">
+                    <div class="display-5">▦</div>
+                    <p class="mb-0 mt-2">No DuitNow QR uploaded</p>
+                </div>
+            {% endif %}
+        </div>
 
-    <p>Choose another image below if you want to update your QR.</p>
-{% else %}
-    <!--Show message when the seller has not uploaded a QR-->
-    <p>You have not uploaded a payment QR yet.</p>
-{% endif %}
+        <div class="col-md-7">
+            <div class="card-body p-4 p-lg-5">
+                {% if payment_qr %}
+                    <h2 class="h3 mb-2">Your current DuitNow QR</h2>
+                    <p class="text-muted mb-4">
+                        Choose another image below if you want to update your QR.
+                    </p>
+                {% else %}
+                    <h2 class="h3 mb-2">Upload your DuitNow QR</h2>
+                    <p class="text-muted mb-4">
+                        You need a DuitNow QR before creating a sell listing.
+                    </p>
+                {% endif %}
 
-<!--Upload a new QR or update the existing QR-->
-<form
-    method="POST"
-    enctype="multipart/form-data"
->
-    <label for="payment_qr">DuitNow QR Image</label>
+                <!--Upload a new QR or update the existing QR-->
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+                    <label for="payment_qr" class="form-label fw-semibold">
+                        DuitNow QR Image
+                    </label>
 
-    <input
-        type="file"
-        id="payment_qr"
-        name="payment_qr"
-        accept="image/*"
-        required
-    >
+                    <input
+                        type="file"
+                        id="payment_qr"
+                        name="payment_qr"
+                        accept="image/*"
+                        class="form-control"
+                        required
+                    >
 
-    <br><br>
+                    <button type="submit" class="btn btn-primary mt-3">
+                        Save Payment QR
+                    </button>
+                </form>
 
-    <button type="submit">
-        Save Payment QR
-    </button>
-</form>
+                {% if payment_qr %}
+                    <!--Allow the seller to delete the QR when it is safe-->
+                    <div class="border-top pt-4 mt-4">
 
-{% if payment_qr %}
-    <!--Allow the seller to delete the QR when it is safe-->
-    <br><br>
-
-    <form
-        method="POST"
-        action="{{ url_for('marketplace.delete_payment_qr') }}"
-        onsubmit="return confirm('Are you sure you want to delete your DuitNow QR?')"
-    >
-        <button type="submit">
-            Delete DuitNow QR
-        </button>
-    </form>
-{% endif %}
-
-<br>
+                        <form
+                            method="POST"
+                            action="{{ url_for('marketplace.delete_payment_qr') }}"
+                            onsubmit="return confirm('Are you sure you want to delete your DuitNow QR?')"
+                        >
+                            <button type="submit" class="btn btn-outline-danger">
+                                Delete DuitNow QR
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--Return to the seller's listings-->
-<a href="{{ url_for('marketplace.my_listings') }}">
+<a
+    href="{{ url_for('marketplace.my_listings') }}"
+    class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mt-4"
+>
+    <span aria-hidden="true">←</span>
     Back to My Listings
 </a>
 {% endblock %}
