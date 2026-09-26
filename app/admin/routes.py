@@ -463,7 +463,13 @@ def ban_user(user_id):
     ).first()
 
     if active_transaction:
-        return "Cannot ban user while they have an active transaction.", 403
+        return redirect(
+            url_for(
+                "admin.users",
+                ban_error="Cannot ban user while they have an active transaction.",
+                error_user_id=user.id
+            )
+        )
 
     user.is_banned = True
     user.ban_reason = ban_reason
