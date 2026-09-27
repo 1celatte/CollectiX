@@ -161,6 +161,7 @@ def browse_page():
                 "image_source": "marketplace" if listing.image else "collection",
                 "collection_name": collection.name,
                 "price": listing.price,
+                "listing_type": listing.listing_type,
                 "created_at": listing.created_at,
             })
 
@@ -205,3 +206,8 @@ def browse_page():
     )
     
     
+
+
+
+
+

@@ -1,6 +1,6 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
-from app.models import Item, OwnedItem, Listing, Transaction, User, Collection, PaymentQR
+from app.models import Item, OwnedItem, Listing, Transaction, User, Collection, UserCollection, PaymentQR, Trade
 from app.extensions import db
 from app.marketplace import marketplace_bp
 from sqlalchemy import or_
@@ -32,7 +32,7 @@ def marketplace_home():
     ).all()
 
     return render_template(
-        "marketplace_list.html",
+        "view_marketplace.html",
         listings=listings
     )
     
@@ -90,15 +90,6 @@ def create_listing():
     payment_qr = PaymentQR.query.filter_by(
         user_id=current_user.id
     ).first()
-
-    #A seller must upload their DuitNow before creating a listing.
-    if not payment_qr:
-        return redirect(
-            url_for(
-                "marketplace.payment_qr_settings",
-                required="must_upload_qr"
-            )
-        )
        
     #Get items owned by the currently logged-in user.
     owned_items = Item.query.join(
@@ -154,7 +145,7 @@ def create_listing():
     #Show the create form again with an error message.
     def show_form_error(message):
         return render_template(
-            "marketplace_create.html",
+            "create_new_listing.html",
             owned_items=owned_items,
             collections=collections,
             items_by_collection=items_by_collection,
@@ -164,7 +155,7 @@ def create_listing():
     #When the user first time open the create listing page, show the form
     if request.method == "GET":
             return render_template(
-                "marketplace_create.html",
+        "create_new_listing.html",
                 owned_items=owned_items,
                 collections=collections,
                 items_by_collection=items_by_collection
@@ -176,6 +167,15 @@ def create_listing():
     listing_type = request.form.get("listing_type")
     description = request.form.get("description")
     price = request.form.get("price")
+    
+    #Only Sell listings require a DuitNow QR.
+    if listing_type == "sell" and not payment_qr:
+        return redirect(
+            url_for(
+                "marketplace.payment_qr_settings",
+                required="must_upload_qr"
+            )
+        )
     
     #Get the image file selected by the user.
     image_file = request.files.get("image")
@@ -357,7 +357,7 @@ def payment_qr_settings():
     original_filename = secure_filename(qr_file.filename)
     qr_filename = f"{uuid4().hex}_{original_filename}"
 
-    #Create the folder for seller payment QR images if needed.
+    #Create the folder for seller payment QR images.
     upload_folder = os.path.join(
         marketplace_bp.root_path,
         "static",
@@ -465,6 +465,15 @@ def mark_listing_unavailable(listing_id):
         id=listing.item_id
     ).first_or_404()
 
+    #Show the edit form again with a validation error message.
+    def show_form_error(message):
+        return render_template(
+            "edit_listing.html",
+            listing=listing,
+            item=item,
+            error=message
+        )
+    
     #Change status to unavailable
     listing.status = "unavailable"
 
@@ -565,10 +574,18 @@ def edit_listing(listing_id):
     item = Item.query.filter_by(
         id=listing.item_id
     ).first_or_404()
+
+    def show_form_error(message):
+        return render_template(
+            "edit_listing.html",
+            listing=listing,
+            item=item,
+            error=message
+        )
     
     if request.method == "GET":
         return render_template(
-            "marketplace_edit.html",
+            "edit_listing.html",
             listing=listing,
             item=item
         )
@@ -579,31 +596,75 @@ def edit_listing(listing_id):
     description = request.form.get("description", "").strip()
     price = request.form.get("price", "").strip()
 
+    #Get the new image file only when the user selected one.
+    image_file = request.files.get("image")
+    image_filename = None
+
+    if image_file and image_file.filename:
+        original_filename = secure_filename(
+            image_file.filename
+        )
+
+        image_filename = (
+            f"{uuid4().hex}_{original_filename}"
+        )
+
     #for sell must enter a price (cannot leave empty)
     if listing_type == "sell":
         try:
             listing.price = float(price)
         except ValueError:
-            return "Please enter a valid price for a sell listing."
+            return show_form_error(
+                "Please enter a valid price for a Sell listing."
+            )
 
     #A trade listing must not have a price.
     elif listing_type == "trade":
         if price:
-            return "Trade listings should not have a price."
+            return show_form_error(
+                "Trade listings should not have a price."
+            )
 
         listing.price = None
 
     #Reject an invalid listing type.
     else:
-        return "Please choose Sell or Trade."
+        return show_form_error(
+            "Please choose Sell or Trade."
+        )
 
     #Update the editable listing information.
     listing.condition = condition
     listing.listing_type = listing_type
     listing.description = description
 
+    #Replace the listing image only when a new image was uploaded.
+    if image_filename:
+        listing.image = image_filename
+
     #Save the changes to the database.
     db.session.commit()
+
+    #Save the new uploaded image file in the app static folder.
+    if image_file and image_filename:
+        upload_folder = os.path.join(
+            marketplace_bp.root_path,
+            "static",
+            "uploads",
+            "listings"
+        )
+
+        os.makedirs(
+            upload_folder,
+            exist_ok=True
+        )
+
+        image_file.save(
+            os.path.join(
+                upload_folder,
+                image_filename
+            )
+        )
 
     #Return to My Listings after a successful update.
     return redirect(
@@ -636,11 +697,477 @@ def view_listing(listing_id):
 
     #Send the listing and item information to the detail page.
     return render_template(
-        "marketplace_detail.html",
+        "view_details.html",
         listing=listing,
         item=item
     )
 
+#======================================================================
+# SEND TRADE REQUEST
+#======================================================================
+@marketplace_bp.route(
+    "/<int:listing_id>/trade-request",
+    methods =["GET", "POST"]
+)
+@login_required
+def send_trade_request(listing_id):
+
+    #Only available Trade listings can receive a Trade request.
+    listing = Listing.query.filter_by(
+        id=listing_id,
+        status="available",
+        listing_type="trade"
+    ).first_or_404()
+
+    #Users cannot request their own Trade listing.
+    if listing.user_id == current_user.id:
+        return "You cannot send a Trade request for your own listing."
+
+    #Get the item offered by the listing owner.
+    requested_item = Item.query.get_or_404(listing.item_id)
+    seller = User.query.get_or_404(listing.user_id)
+
+    #Show items owned by the requester that can be offered.
+    offered_items = Item.query.join(
+        OwnedItem,
+        Item.id == OwnedItem.item_id
+    ).filter(
+        OwnedItem.user_id == current_user.id,
+        OwnedItem.quantity > 0,
+        Item.id != requested_item.id
+    ).order_by(
+        Item.name.asc()
+    ).all()
+
+    #Group the offerable items by collection.
+    items_by_collection = {}
+
+    for offered_item in offered_items:
+        items_by_collection.setdefault(
+            offered_item.collection_id,
+            []
+        ).append(offered_item)
+
+    #Get only collections that contain an item the requester can offer.
+    collections = Collection.query.filter(
+        Collection.id.in_(list(items_by_collection))
+    ).order_by(
+        Collection.name.asc()
+    ).all()
+
+    if request.method == "GET":
+        return render_template(
+            "send_trade_request.html",
+            listing=listing,
+            seller=seller,
+            requested_item=requested_item,
+            offered_items=offered_items,
+            collections=collections,
+            items_by_collection=items_by_collection
+        )
+        
+    #Get the item selected by the requester.
+    offered_item_id = request.form.get("offered_item_id")
+    offered_condition = request.form.get("offered_condition")
+
+    if not offered_item_id:
+        return "Please select an item to offer."
+    
+    if not offered_condition:
+        return "Please select the condition of your item."
+    
+    #Get the optionalimage uploaded for the offered item.
+    offered_image_file = request.files.get("offered_image")
+
+    offered_image_filename = None
+
+    if offered_image_file and offered_image_file.filename:
+        original_filename = secure_filename(
+            offered_image_file.filename
+        )
+
+        offered_image_filename = (
+            f"{uuid4().hex}_{original_filename}"
+        )
+
+        upload_folder = os.path.join(
+            marketplace_bp.root_path,
+            "static",
+            "uploads",
+            "trades"
+        )
+
+        os.makedirs(
+            upload_folder,
+            exist_ok=True
+        )
+
+        offered_image_file.save(
+            os.path.join(
+                upload_folder,
+                offered_image_filename
+            )
+        )
+
+    #Check that the selected offered item belongs to the requester.
+    offered_owned_item = OwnedItem.query.filter_by(
+        user_id=current_user.id,
+        item_id=offered_item_id
+    ).first()
+
+    if not offered_owned_item or offered_owned_item.quantity <= 0:
+        return "You can only offer an item that you own."
+
+    #The requester cannot offer the same item they want to receive.
+    if offered_owned_item.item_id == requested_item.id:
+        return "You cannot offer the same item for this Trade."
+
+    #Create a pending Trade request.
+    new_trade = Trade(
+        sender_id=current_user.id,
+        receiver_id=listing.user_id,
+        listing_id=listing.id,
+        offered_item_id=offered_owned_item.item_id,
+        offered_condition=offered_condition,
+        offered_image=offered_image_filename,
+        requested_item_id=requested_item.id,
+        status="pending"
+    )
+
+    #Reserve this Trade listing while the owner reviews the request.
+    listing.status = "pending"
+
+    db.session.add(new_trade)
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.marketplace_home")
+    )
+
+#======================================================================
+# VIEW TRADE REQUESTS
+#======================================================================
+@marketplace_bp.route("/trade-requests")
+@login_required
+def view_trade_requests():
+    trades = Trade.query.filter_by(
+        receiver_id=current_user.id,
+        status="pending"
+    ).all()
+
+    trade_details = []
+
+    for trade in trades:
+        sender = User.query.get_or_404(trade.sender_id)
+
+        offered_item = Item.query.get_or_404(
+            trade.offered_item_id
+        )
+
+        requested_item = Item.query.get_or_404(
+            trade.requested_item_id
+        )
+
+        #Get the original Trade listing requested by the sender.
+        listing = Listing.query.get_or_404(
+            trade.listing_id
+        )
+
+        trade_details.append({
+            "trade": trade,
+            "sender": sender,
+            "offered_item": offered_item,
+            "requested_item": requested_item,
+            "listing": listing
+        })
+
+    return render_template(
+        "trade_requests.html",
+        trade_details=trade_details
+    )
+
+#======================================================================
+# ACCEPT TRADE REQUESTS
+#======================================================================
+@marketplace_bp.route(
+    "/trade-requests/<int:trade_id>/accept",
+    methods=["POST"]
+)
+@login_required
+def accept_trade_request(trade_id):
+    trade = Trade.query.filter_by(
+        id=trade_id,
+        receiver_id=current_user.id,
+        status="pending"
+    ).first_or_404()
+
+    #Only accept a Trade Request while its listing is still available.
+    listing = Listing.query.filter_by(
+        id=trade.listing_id,
+        user_id=current_user.id
+    ).first()
+
+    #A pending Trade request may reserve the listing before it is accepted.
+    if not listing or listing.status not in ["available", "pending"]:
+        return "This Trade listing is no longer available."
+
+    #Check that the sender still owns the item they offered.
+    sender_owned_item = OwnedItem.query.filter_by(
+        user_id=trade.sender_id,
+        item_id=trade.offered_item_id
+    ).first()
+
+    #Check that the listing owner still owns the requested item.
+    receiver_owned_item = OwnedItem.query.filter_by(
+        user_id=current_user.id,
+        item_id=trade.requested_item_id
+    ).first()
+
+    if not sender_owned_item or sender_owned_item.quantity <= 0:
+        return "The requester no longer has the offered item."
+
+    if not receiver_owned_item or receiver_owned_item.quantity <= 0:
+        return "You no longer have the requested item."
+
+    #Both users still own their items, so the Trade is accepted.
+    trade.status = "accepted"
+
+    #Hide this listing while the accepted Trade is in progress.
+    listing.status = "trading"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.trade_history")
+    )
+
+#======================================================================
+# REJECT TRADE REQUEST
+#======================================================================
+@marketplace_bp.route(
+    "/trade-requests/<int:trade_id>/reject",
+    methods=["POST"]
+)
+@login_required
+def reject_trade_request(trade_id):
+    trade = Trade.query.filter_by(
+        id=trade_id,
+        receiver_id=current_user.id,
+        status="pending"
+    ).first_or_404()
+
+    listing = Listing.query.get_or_404(
+        trade.listing_id
+    )
+
+    #Get the listing owner's reason for rejecting the Trade Request.
+    rejection_reason = request.form.get(
+        "rejection_reason",
+        ""
+    ).strip()
+
+    if not rejection_reason:
+        return "Please enter a reason for rejecting the Trade Request."
+
+    #Reject the request and make the Trade listing available again.
+    trade.rejection_reason = rejection_reason
+    trade.status = "rejected"
+    listing.status = "available"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.view_trade_requests")
+    )
+
+#======================================================================
+# CONFIRM TRADE ITEM RECEIVED
+#======================================================================
+@marketplace_bp.route(
+    "/trades/<int:trade_id>/confirm-item-received",
+    methods=["POST"]
+)
+@login_required
+def confirm_trade_item_received(trade_id):
+
+    #Only an accepted Trade can be confirmed as received.
+    trade = Trade.query.filter_by(
+        id=trade_id,
+        status="accepted"
+    ).first_or_404()
+
+    #Record confirmation from the Trade requester.
+    if trade.sender_id == current_user.id:
+        trade.sender_received = True
+
+    #Record confirmation from the owner of the requested listing.
+    elif trade.receiver_id == current_user.id:
+        trade.receiver_received = True
+
+    #Block users who are not involved in this Trade.
+    else:
+        abort(403)
+
+    #Exchange the items only after both users confirm receiving them.
+    if trade.sender_received and trade.receiver_received:
+
+        sender_owned_item = OwnedItem.query.filter_by(
+            user_id=trade.sender_id,
+            item_id=trade.offered_item_id
+        ).first()
+
+        receiver_owned_item = OwnedItem.query.filter_by(
+            user_id=trade.receiver_id,
+            item_id=trade.requested_item_id
+        ).first()
+
+        #Stop the Trade if either user no longer owns their item.
+        if not sender_owned_item or sender_owned_item.quantity <= 0:
+            return "The requester no longer has the offered item."
+
+        if not receiver_owned_item or receiver_owned_item.quantity <= 0:
+            return "The listing owner no longer has the requested item."
+
+        offered_item = Item.query.get_or_404(
+            trade.offered_item_id
+        )
+
+        requested_item = Item.query.get_or_404(
+            trade.requested_item_id
+        )
+
+        #Remove one item from each original owner.
+        sender_owned_item.quantity -= 1
+        receiver_owned_item.quantity -= 1
+
+        #Give the requested item to the Trade requester.
+        sender_received_item = OwnedItem.query.filter_by(
+            user_id=trade.sender_id,
+            item_id=trade.requested_item_id
+        ).first()
+
+        if sender_received_item:
+            sender_received_item.quantity += 1
+        else:
+            db.session.add(
+                OwnedItem(
+                    user_id=trade.sender_id,
+                    item_id=trade.requested_item_id,
+                    quantity=1
+                )
+            )
+
+        #Give the offered item to the listing owner.
+        receiver_received_item = OwnedItem.query.filter_by(
+            user_id=trade.receiver_id,
+            item_id=trade.offered_item_id
+        ).first()
+
+        if receiver_received_item:
+            receiver_received_item.quantity += 1
+        else:
+            db.session.add(
+                OwnedItem(
+                    user_id=trade.receiver_id,
+                    item_id=trade.offered_item_id,
+                    quantity=1
+                )
+            )
+
+        #Add the requested item's collection to the sender if needed.
+        sender_collection = UserCollection.query.filter_by(
+            user_id=trade.sender_id,
+            collection_id=requested_item.collection_id
+        ).first()
+
+        if not sender_collection:
+            db.session.add(
+                UserCollection(
+                    user_id=trade.sender_id,
+                    collection_id=requested_item.collection_id
+                )
+            )
+
+        #Add the offered item's collection to the receiver if needed.
+        receiver_collection = UserCollection.query.filter_by(
+            user_id=trade.receiver_id,
+            collection_id=offered_item.collection_id
+        ).first()
+
+        if not receiver_collection:
+            db.session.add(
+                UserCollection(
+                    user_id=trade.receiver_id,
+                    collection_id=offered_item.collection_id
+                )
+            )
+
+        #Finish the Trade and close its original listing.
+        listing = Listing.query.get_or_404(
+            trade.listing_id
+        )
+
+        trade.status = "completed"
+        listing.status = "traded"
+
+    db.session.commit()
+
+    return redirect(
+        url_for("marketplace.trade_history")
+    )
+    
+#======================================================================
+# VIEW TRADE HISTORY
+#======================================================================
+@marketplace_bp.route("/trade-history")
+@login_required
+def trade_history():
+    
+    #Get all Trades history.
+    trades = Trade.query.filter(
+        or_(
+            Trade.sender_id == current_user.id,
+            Trade.receiver_id == current_user.id
+        )
+    ).order_by(
+        Trade.id.desc()
+    ).all()
+
+    #Store each Trade together with its related users and items.
+    trade_details = []
+
+    for trade in trades:
+        
+        #Get the user who sent the Trade Request.
+        sender = User.query.get_or_404(trade.sender_id)
+
+        #Get the owner of the original Trade Listing.
+        receiver = User.query.get_or_404(trade.receiver_id)
+
+        #Get the item offered by the sender.
+        offered_item = Item.query.get_or_404(trade.offered_item_id)
+
+        #Get the item requested from the receiver.
+        requested_item = Item.query.get_or_404(trade.requested_item_id)
+
+        #Get the original Trade listing requested by the sender.
+        listing = Listing.query.get_or_404(trade.listing_id)
+
+        #Group all the information for the HTML page
+        trade_details.append({
+            "trade": trade,
+            "sender": sender,
+            "receiver": receiver,
+            "offered_item": offered_item,
+            "requested_item": requested_item,
+            "listing": listing
+        })
+
+    return render_template(
+        "trade_history.html",
+        trade_details=trade_details
+    )
+    
 #======================================================================
 # BUYER PURCHASE LISTING (confirm purchase)
 #======================================================================
@@ -670,7 +1197,7 @@ def purchase_listing(listing_id):
     #GET: show the confirmation page.
     if request.method == "GET":
         return render_template(
-            "marketplace_purchase_confirm.html",
+            "confirm_purchase.html",
             listing=listing,
             item=item
         )
@@ -789,6 +1316,10 @@ def upload_payment_proof(transaction_id):
 
     #Save the proof filename and send it to the seller for review.
     transaction.payment_proof = proof_filename
+    
+    #Clear the old rejection reason when the buyer submits a new proof.
+    transaction.rejection_reason = None
+    
     transaction.status = "payment_submitted"
 
     db.session.commit()
@@ -859,7 +1390,7 @@ def payment_requests():
     ).all()
 
     return render_template(
-        "payment_requests.html",
+        "confirm_payments.html",
         requests=requests
     )
 
@@ -971,6 +1502,18 @@ def reject_payment(transaction_id):
         status="payment_submitted"
     ).first_or_404()
 
+    #Get the seller's reason for rejecting the payment proof.
+    rejection_reason = request.form.get(
+        "rejection_reason",
+        ""
+    ).strip()
+
+    if not rejection_reason:
+        return "Please enter a reason for rejecting the payment proof."
+
+    #Save the seller's rejection reason.
+    transaction.rejection_reason = rejection_reason
+    
     #Keep the listing reserved while the buyer uploads a new proof.
     transaction.status = "payment_rejected"
 
@@ -1017,7 +1560,7 @@ def transaction_history():
     
     #Send all transaction information to the history page.
     return render_template(
-        "marketplace_history.html",
+        "transaction_history.html",
         transactions=transactions,
         malaysia_offset=timedelta(hours=8)
     )

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}
+Transaction History
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<h1 class="display-6 fw-bold mb-4">
+    My Transaction History
+</h1>
+
+{% if transactions %}
+
+<!--Display every transaction related to the logged-in user-->
+{% for transaction, item, buyer, seller in transactions %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 p-lg-5">
+
+            <!--Show the item in this transaction-->
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <h2 class="h3 mb-0">{{ item.name }}</h2>
+
+                {% if transaction.status == "completed" %}
+                    <span class="badge text-bg-success">Completed</span>
+                {% elif transaction.status == "cancelled" %}
+                    <span class="badge text-bg-secondary">Cancelled</span>
+                {% elif transaction.status == "payment_rejected" %}
+                    <span class="badge text-bg-danger">Payment Rejected</span>
+                {% elif transaction.status == "payment_confirmed" %}
+                    <span class="badge text-bg-info">Payment Confirmed</span>
+                {% elif transaction.status == "payment_submitted" %}
+                    <span class="badge text-bg-warning">Payment Submitted</span>
+                {% else %}
+                    <span class="badge text-bg-primary">
+                        {{ transaction.status|replace("_", " ")|title }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <!--Explain whether the user bought or sold this item or other message which follow their status-->
+            {% if transaction.status == "completed" %}
+                {% if transaction.buyer_id == current_user.id %}
+                    <p class="text-muted">
+                        You purchased this item from <strong class="text-body">{{ seller.name }}</strong>.
+                    </p>
+                {% else %}
+                    <p class="text-muted">
+                        You sold this item to <strong class="text-body">{{ buyer.name }}</strong>.
+                    </p>
+                {% endif %}
+            {% elif transaction.status == "cancelled" %}
+                <p class="text-muted">This purchase was cancelled.</p>
+            {% else %}
+                {% if transaction.buyer_id == current_user.id %}
+                    <p class="text-muted">
+                        You are purchasing this item from <strong class="text-body">{{ seller.name }}</strong>.
+                    </p>
+                {% else %}
+                    <p class="text-muted">
+                        <strong class="text-body">{{ buyer.name }}</strong> is purchasing this item.
+                    </p>
+                {% endif %}
+            {% endif %}
+
+            <!--Show the transaction price-->
+            <p class="fs-5 fw-bold text-success mb-1">
+                RM {{ "%.2f"|format(transaction.price) }}
+            </p>
+
+            <p class="small text-muted mb-0">
+                Date:
+                {{ (transaction.created_at+ + malaysia_offset).strftime("%d %b %Y, %I:%M %p") }}
+            </p>
+
+            {% if transaction.buyer_id == current_user.id
+            and transaction.status == "payment_rejected"
+            and transaction.rejection_reason %}
+
+                <!--Show the seller's reason when the buyer's payment proof was rejected-->
+                <div class="alert alert-danger border-0 mt-4 mb-0">
+                    <strong>Payment proof rejected.</strong><br>
+                    Reason: {{ transaction.rejection_reason }}
+                </div>
+
+            {% endif %}
+
+            {% if transaction.buyer_id == current_user.id
+            and transaction.status == "payment_submitted" %}
+                <div class="alert alert-info border-0 mt-4 mb-0">
+                    <strong>Payment proof submitted.</strong><br>
+                    Waiting for the seller's review.
+                </div>
+            {% endif %}
+
+            {% if transaction.buyer_id == current_user.id
+            and transaction.status == "payment_confirmed" %}
+                <div class="alert alert-success border-0 mt-4 mb-0">
+                    <strong>Payment confirmed.</strong><br>
+                    Please click the button below after you have received the item.
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'marketplace.confirm_item_received',
+                            transaction_id=transaction.id
+                        ) }}"
+                        class="mt-3"
+                    >
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                        >
+                            Confirm Item Received
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {% if transaction.buyer_id == current_user.id
+            and transaction.status in ("awaiting_payment", "payment_rejected") %}
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a
+                        href="{{ url_for(
+                            'marketplace.upload_payment_proof',
+                            transaction_id=transaction.id
+                        ) }}"
+                        class="btn btn-primary"
+                    >
+                        {% if transaction.status == "awaiting_payment" %}
+                            Upload Payment Proof
+                        {% else %}
+                            Upload New Proof
+                        {% endif %}
+                    </a>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'marketplace.cancel_purchase',
+                            transaction_id=transaction.id
+                        ) }}"
+                    >
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger"
+                        >
+                            Cancel Purchase
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endfor %}
+
+{% else %}
+    <!--Message when the user has no purchase or sale records-->
+    <div class="alert alert-info border-0 shadow-sm">
+        You do not have any transactions yet.
+    </div>
+{% endif %}
+
+<!--Return to Browse and Search-->
+<a
+    href="{{ url_for('browse.browse_page') }}"
+    class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mt-2"
+>
+    <span aria-hidden="true">←</span>
+    Back to Browse & Search
+</a>
+
+{% endblock %}

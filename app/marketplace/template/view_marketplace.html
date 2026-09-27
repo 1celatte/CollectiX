@@ -7,11 +7,15 @@ View Marketplace
 {% block content %}
 
 <!--Page heading-->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1>Marketplace</h1>
-    </div>
+<div class="mb-4">
 
+    <h1 class="display-6 fw-bold mb-2">
+        Marketplace
+    </h1>
+
+    <p class="text-muted mb-0">
+        Browse available collectibles from other collectors.
+    </p>
 </div>
 
 {% if listings %}
@@ -19,7 +23,7 @@ View Marketplace
     <div class="row g-4">
         {% for listing, item in listings %}
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden">
                     <!--Show listing image when the seller uploaded one-->
                     {% if listing.image %}
                         <img
@@ -28,22 +32,25 @@ View Marketplace
                                 filename='uploads/listings/' ~ listing.image
                             ) }}"
                             alt="{{ item.name }}"
-                            class="card-img-top"
+                            class="card-img-top bg-white"
                             style="height: 220px; object-fit: contain;"
                         >
                     {% else %}
                         <div
-                            class="bg-light d-flex align-items-center justify-content-center text-muted"
+                            class="bg-white d-flex align-items-center justify-content-center text-muted"
                             style="height: 220px;"
                         >
-                            No image available
+                            <div class="text-center">
+                                <div class="fs-2">🖼️</div>
+                                No image available
+                            </div>
                         </div>
                     {% endif %}
 
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <!--Show item details and listing type-->
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h2 class="h5 mb-0">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <h2 class="h4 mb-0">
                                 {{ item.name }}
                             </h2>
 
@@ -63,21 +70,21 @@ View Marketplace
                             <strong>{{ listing.condition }}</strong>
                         </p>
 
-                        <p class="text-muted">
+                        <p class="text-muted mb-3">
                             {{ listing.description or "No description provided." }}
                         </p>
 
                         {% if listing.listing_type == "sell" %}
-                            <p class="fs-5 fw-bold">
+                            <p class="fs-5 fw-bold text-success mt-auto mb-3">
                                 RM {{ "%.2f"|format(listing.price) }}
                             </p>
                         {% else %}
-                            <p class="fs-5 fw-bold">
+                            <p class="fs-5 fw-bold mt-auto mb-3">
                                 Trade only
                             </p>
                         {% endif %}
 
-                        <p class="small text-success">
+                        <p class="small text-success mb-0">
                             Status: Available
                         </p>
                     </div>
@@ -100,7 +107,7 @@ View Marketplace
     </div>
 {% else %}
     <!--Show a message when no marketplace listings are available-->
-    <div class="alert alert-info">
+    <div class="alert alert-info border-0 shadow-sm">
         No marketplace listings are available yet.
     </div>
 {% endif %}

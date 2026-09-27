@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}
+Marketplace Listing
+{% endblock %}
+
+{% block content %}
+
+<!--Page heading-->
+<div class="mb-4">
+    <h1 class="display-6 fw-bold mb-2">
+        Marketplace Listing Details
+    </h1>
+</div>
+
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="row g-0">
+
+        <!--Show the listing image or placeholder-->
+        <div
+            class="col-md-5 bg-white d-flex align-items-center justify-content-center"
+            style="min-height: 320px;"
+        >
+            {% if listing.image %}
+                <img
+                    src="{{ url_for(
+                        'marketplace.static',
+                        filename='uploads/listings/' ~ listing.image
+                    ) }}"
+                    alt="{{ item.name }}"
+                    class="img-fluid w-100"
+                    style="max-height: 320px; object-fit: contain;"
+                >
+            {% else %}
+                <div class="text-center text-muted">
+                    <div class="display-5">🖼️</div>
+                    <p class="mb-0 mt-2">No image available</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!--Show the listing information and actions-->
+        <div class="col-md-7">
+            <div class="card-body p-4 p-lg-5 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <h2 class="h3 mb-0">
+                        {{ item.name }}
+                    </h2>
+
+                    {% if listing.listing_type == "sell" %}
+                        <span class="badge text-bg-primary">
+                            For Sale
+                        </span>
+                    {% else %}
+                        <span class="badge text-bg-warning">
+                            For Trade
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p class="mb-2">
+                    Condition: <strong>{{ listing.condition }}</strong>
+                </p>
+
+                <p class="text-muted mb-4">
+                    <span class="fw-semibold text-body">
+                        Description:
+                    </span>
+                    {{ listing.description or "No description provided." }}
+                </p>
+
+                {% if listing.price is not none %}
+                    <p class="fs-4 fw-bold text-success mt-auto mb-3">
+                        RM {{ "%.2f"|format(listing.price) }}
+                    </p>
+                {% else %}
+                    <p class="fs-4 fw-bold mt-auto mb-3">
+                        Trade only
+                    </p>
+                {% endif %}
+
+                <p class="mb-4">
+                    Status:
+                    {% if listing.status == "available" %}
+                        <span class="badge text-bg-success">Available</span>
+                    {% else %}
+                        <span class="badge text-bg-secondary">
+                            {{ listing.status|title }}
+                        </span>
+                    {% endif %}
+                </p>
+
+                {% if listing.status == "available" and listing.listing_type == "sell" %}
+                    <a
+                        href="{{ url_for(
+                            'marketplace.purchase_listing',
+                            listing_id=listing.id
+                        ) }}"
+                        class="btn btn-success"
+                    >
+                        Buy Now
+                    </a>
+
+                {% elif listing.status == "available" and listing.listing_type == "trade" %}
+                    <a
+                        href="{{ url_for(
+                            'marketplace.send_trade_request',
+                            listing_id=listing.id
+                        ) }}"
+                        class="btn btn-primary"
+                    >
+                        Send Trade Request
+                    </a>
+
+                {% else %}
+                    <div class="alert alert-secondary mb-0">
+                        This listing is no longer available.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Return to the Browse and Search page-->
+<a
+    href="{{ url_for('browse.browse_page') }}"
+    class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mt-4"
+>
+    <span aria-hidden="true">←</span>
+    Back to Browse &amp; Search
+</a>
+
+{% endblock %}
