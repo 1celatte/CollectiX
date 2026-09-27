@@ -6,11 +6,267 @@ Add Item
 
 {% block content %}
 
-<div class="container py-4">
+<style>
+    .add-item-section {
+        padding: 45px 0;
+    }
 
-    <!-- ===================================================== -->
-    <!-- FLASH MESSAGES -->
-    <!-- ===================================================== -->
+    .add-item-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 26px;
+        background: #fff;
+        border: 1px solid #d5eaf4;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .add-item-header {
+        position: relative;
+        min-height: 220px;
+        padding: 45px 40px;
+        background: linear-gradient(135deg, #102a43, #0d6efd);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .add-item-header::before,
+    .add-item-header::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .add-item-header::before {
+        width: 260px;
+        height: 260px;
+        top: -150px;
+        right: -70px;
+    }
+
+    .add-item-header::after {
+        width: 180px;
+        height: 180px;
+        bottom: -110px;
+        left: -60px;
+    }
+
+    .add-item-header-content {
+        position: relative;
+        z-index: 2;
+        max-width: 700px;
+    }
+
+    .add-item-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .add-item-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .add-item-header p {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .collection-name {
+        color: #8ed8ff;
+        font-weight: 600;
+    }
+
+    .collection-tag {
+        margin-top: 15px;
+    }
+
+    .collection-tag .badge {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 500;
+        padding: 7px 12px;
+        border-radius: 999px;
+    }
+
+    /* =====================================================
+       FORM SIDE
+       ===================================================== */
+
+    .add-item-form-side {
+        background: #f5fbfe;
+        padding: 45px;
+    }
+
+    .add-item-form-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .add-item-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #e5f5fb;
+        color: #087ea4;
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .add-item-form-content h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #102a43;
+        margin-bottom: 8px;
+    }
+
+    .add-item-description {
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+
+    .add-item-form-side .form-label {
+        font-size: 14px;
+        color: #102a43;
+        margin-bottom: 7px;
+    }
+
+    .add-item-form-side .form-control {
+        background: #fff;
+        border: 1px solid #cfe3ec;
+        border-radius: 10px;
+        padding: 11px 13px;
+        font-size: 14px;
+    }
+
+    .add-item-form-side .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+    }
+
+    .add-item-form-side textarea.form-control {
+        resize: vertical;
+    }
+
+    .image-help {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 6px;
+    }
+
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
+
+    .add-item-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 11px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(135deg, #0d6efd, #087ea4);
+        transition: all 0.2s ease;
+    }
+
+    .add-item-btn:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.22);
+    }
+
+    .back-btn {
+        border: 1px solid #cfe3ec;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #102a43;
+        background: #fff;
+    }
+
+    .back-btn:hover {
+        background: #f5fbfe;
+        border-color: #9ec9da;
+        color: #102a43;
+    }
+
+    /* =====================================================
+       FLASH MESSAGES
+       ===================================================== */
+
+    .add-item-alert {
+        margin-bottom: 20px;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 991px) {
+        .add-item-header {
+            min-height: auto;
+            padding: 40px 35px;
+        }
+
+        .add-item-form-side {
+            padding: 35px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .add-item-section {
+            padding: 25px 0;
+        }
+
+        .add-item-header {
+            padding: 35px 25px;
+        }
+
+        .add-item-header h1 {
+            font-size: 26px;
+        }
+
+        .add-item-form-side {
+            padding: 30px 25px;
+        }
+
+        .add-item-form-content h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<div class="container add-item-section">
+
+    <!-- =====================================================
+         FLASH MESSAGES
+         ===================================================== -->
 
     {% with messages = get_flashed_messages(with_categories=true) %}
 
@@ -19,9 +275,10 @@ Add Item
             {% for category, message in messages %}
 
                 <div
-                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    class="alert alert-{{ category }} alert-dismissible fade show add-item-alert"
                     role="alert"
                 >
+                    <i class="bi bi-info-circle me-2"></i>
                     {{ message }}
 
                     <button
@@ -40,147 +297,195 @@ Add Item
     {% endwith %}
 
 
-    <!-- ===================================================== -->
-    <!-- PAGE HEADER -->
-    <!-- ===================================================== -->
+    <!-- =====================================================
+         MAIN CARD
+         ===================================================== -->
 
-    <div class="mb-4">
+    <div class="add-item-card">
 
-        <h1 class="fw-bold">
-            Add Item to {{ collection.name }}
-        </h1>
+        <!-- =================================================
+             PAGE HEADER
+             ================================================= -->
 
-        <p class="text-muted mb-2">
-            You are adding a new item to:
-            <strong>{{ collection.name }}</strong>
-        </p>
+        <div class="add-item-header">
 
-        <p class="mb-0">
-            <strong>Collection Tag:</strong>
+            <div class="add-item-header-content">
 
-            {% if collection.tag %}
-                <span class="badge bg-secondary">
-                    {{ collection.tag.name }}
-                </span>
-            {% else %}
-                <span class="text-muted">
-                    Not assigned
-                </span>
-            {% endif %}
+                <div class="add-item-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
 
-        </p>
+                <h1>
+                    Add Item to
+                    <span class="collection-name">
+                        {{ collection.name }}
+                    </span>
+                </h1>
 
-    </div>
+                <p>
+                    You are adding a new item to:
+                    <strong>{{ collection.name }}</strong>
+                </p>
 
+                <div class="collection-tag">
 
-    <!-- ===================================================== -->
-    <!-- ADD ITEM FORM -->
-    <!-- ===================================================== -->
+                    {% if collection.tag %}
 
-    <div class="card shadow-sm">
+                        <span class="badge">
+                            <i class="bi bi-tag me-1"></i>
+                            {{ collection.tag.name }}
+                        </span>
 
-        <div class="card-body p-4">
+                    {% else %}
 
-            <form
-                method="POST"
-                enctype="multipart/form-data"
-            >
+                        <span class="badge">
+                            <i class="bi bi-tag me-1"></i>
+                            Not assigned
+                        </span>
 
-                <!-- Item Name -->
-
-                <div class="mb-3">
-
-                    <label
-                        for="name"
-                        class="form-label fw-semibold"
-                    >
-                        Item Name:
-                    </label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        class="form-control"
-                        required
-                    >
+                    {% endif %}
 
                 </div>
 
+            </div>
 
-                <!-- Description -->
+        </div>
 
-                <div class="mb-3">
 
-                    <label
-                        for="description"
-                        class="form-label fw-semibold"
-                    >
-                        Description:
-                    </label>
+        <!-- =================================================
+             FORM
+             ================================================= -->
 
-                    <textarea
-                        id="description"
-                        name="description"
-                        class="form-control"
-                        rows="5"
-                    ></textarea>
+        <div class="add-item-form-side">
 
+            <div class="add-item-form-content">
+
+                <div class="add-item-badge">
+                    <i class="bi bi-plus-circle"></i>
+                    New Collection Item
                 </div>
 
+                <h2>
+                    Item Details
+                </h2>
 
-                <!-- Item Image -->
-
-                <div class="mb-4">
-
-                    <label
-                        for="image"
-                        class="form-label fw-semibold"
-                    >
-                        Item Image:
-                    </label>
-
-                    <input
-                        type="file"
-                        id="image"
-                        name="image"
-                        class="form-control"
-                        accept="image/*"
-                    >
-
-                </div>
+                <p class="add-item-description">
+                    Provide the details and image for the item you want
+                    to add to this collection.
+                </p>
 
 
-                <!-- Submit -->
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
                 >
-                    Submit Item
-                </button>
 
-            </form>
+                    <!-- Item Name -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="name"
+                            class="form-label fw-semibold"
+                        >
+                            Item Name:
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control"
+                            placeholder="Enter item name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="description"
+                            class="form-label fw-semibold"
+                        >
+                            Description:
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="form-control"
+                            rows="5"
+                            placeholder="Enter an optional description"
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- Item Image -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="image"
+                            class="form-label fw-semibold"
+                        >
+                            Item Image:
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            class="form-control"
+                            accept="image/*"
+                        >
+
+                        <div class="image-help">
+                            <i class="bi bi-image me-1"></i>
+                            Upload an image of the item.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Submit -->
+
+                    <button
+                        type="submit"
+                        class="btn add-item-btn"
+                    >
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Submit Item
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- ===================================================== -->
-    <!-- BACK TO COLLECTION -->
-    <!-- ===================================================== -->
+    <!-- =====================================================
+         BACK TO COLLECTION
+         ===================================================== -->
 
-    <div class="mt-3">
+    <div class="mt-4">
 
         <a
             href="{{ url_for(
                 'collection.view_collection',
                 collection_id=collection.id
             ) }}"
-            class="btn btn-secondary"
+            class="btn back-btn"
         >
-            ← Back to Collection
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Collection
         </a>
 
     </div>

@@ -12,7 +12,7 @@ Find {{ item.name }}
 
     <div class="mb-4">
 
-        <h1 class="fw-bold">
+        <h1 class="display-6 fw-bold mb-2">
             Find Item
         </h1>
 
@@ -36,8 +36,7 @@ Find {{ item.name }}
 
                 <div class="col-12 col-md-6 col-lg-4">
 
-                    <div class="card h-100 shadow-sm">
-
+                    <div class="card h-100 border-0 shadow-sm overflow-hidden">
 
                         <!-- Listing Image -->
 
@@ -49,22 +48,26 @@ Find {{ item.name }}
                                     filename='uploads/listings/' + listing.image
                                 ) }}"
                                 alt="{{ item.name }}"
-                                class="card-img-top"
-                                style="
-                                    height: 220px;
-                                    object-fit: contain;
-                                    background-color: #f8f9fa;
-                                "
+                                class="card-img-top bg-white"
+                                style="height: 220px; object-fit: contain;"
                             >
 
                         {% else %}
 
                             <div
-                                class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                class="bg-white d-flex align-items-center justify-content-center text-muted"
                                 style="height: 220px;"
                             >
 
-                                No Image
+                                <div class="text-center">
+
+                                    <div class="fs-2 mb-1">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+
+                                    No image available
+
+                                </div>
 
                             </div>
 
@@ -73,32 +76,36 @@ Find {{ item.name }}
 
                         <!-- Listing Information -->
 
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
 
-                            <h5 class="card-title fw-bold">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
 
-                                {{ item.name }}
+                                <h2 class="h4 mb-0">
+                                    {{ item.name }}
+                                </h2>
 
-                            </h5>
+                                {% if listing.listing_type == "sell" %}
 
+                                    <span class="badge text-bg-primary">
+                                        For Sale
+                                    </span>
 
-                            <p class="mb-2">
+                                {% else %}
 
-                                <strong>Type:</strong>
+                                    <span class="badge text-bg-warning">
+                                        For Trade
+                                    </span>
 
-                                {{ listing.listing_type|capitalize }}
+                                {% endif %}
 
-                            </p>
+                            </div>
 
 
                             {% if listing.price is not none %}
 
                                 <p class="mb-2">
-
                                     <strong>Price:</strong>
-
                                     RM {{ "%.2f"|format(listing.price) }}
-
                                 </p>
 
                             {% endif %}
@@ -107,11 +114,8 @@ Find {{ item.name }}
                             {% if listing.condition %}
 
                                 <p class="mb-2">
-
                                     <strong>Condition:</strong>
-
                                     {{ listing.condition }}
-
                                 </p>
 
                             {% endif %}
@@ -119,10 +123,8 @@ Find {{ item.name }}
 
                             {% if listing.description %}
 
-                                <p class="card-text">
-
+                                <p class="text-muted mb-3">
                                     {{ listing.description }}
-
                                 </p>
 
                             {% endif %}
@@ -135,13 +137,10 @@ Find {{ item.name }}
                                     'marketplace.view_listing',
                                     listing_id=listing.id
                                 ) }}"
-                                class="btn btn-primary w-100"
+                                class="btn btn-primary w-100 mt-auto"
                             >
-
-                                <i class="bi bi-eye"></i>
-
+                                <i class="bi bi-eye me-1"></i>
                                 View Listing
-
                             </a>
 
                         </div>
@@ -159,7 +158,9 @@ Find {{ item.name }}
 
         <!-- No Results -->
 
-        <div class="alert alert-info">
+        <div class="alert alert-info border-0 shadow-sm">
+
+            <i class="bi bi-info-circle me-2"></i>
 
             No available listings found for this item.
 
@@ -179,11 +180,8 @@ Find {{ item.name }}
             ) }}"
             class="btn btn-secondary"
         >
-
-            <i class="bi bi-arrow-left"></i>
-
+            <i class="bi bi-arrow-left me-1"></i>
             Back to Missing Items
-
         </a>
 
     </div>
