@@ -266,6 +266,12 @@ Manage Users - CollectiX
                                                         required
                                                     ></textarea>
 
+                                                    {% if request.args.get("ban_error") and request.args.get("error_user_id")|int == user.id %}
+                                                        <div class="alert alert-danger mt-2 mb-0" role="alert">
+                                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                                            {{ request.args.get("ban_error") }}
+                                                        </div>
+                                                    {% endif %}
 
                                                     <div class="text-end mt-3">
 
@@ -347,6 +353,21 @@ Manage Users - CollectiX
 
 </div>
 
+{% endif %}
+
+{% if request.args.get("ban_error") and request.args.get("error_user_id") %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById(
+            "banUser{{ request.args.get('error_user_id') }}"
+        );
+
+        if (modal) {
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        }
+    });
+</script>
 {% endif %}
 
 {% endblock %}
