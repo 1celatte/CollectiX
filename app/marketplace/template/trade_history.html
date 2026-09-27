@@ -19,15 +19,21 @@ Trade History
                 <div class="card-body p-4 p-md-5">
                     <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-4">
                         <div>
-                            <p class="text-muted small text-uppercase fw-semibold mb-1">Trade Request</p>
-                            <h2 class="h4 fw-bold mb-0">
-                                From
-                                {% if detail.trade.sender_id == current_user.id %}
-                                    <span class="text-primary">{{ detail.receiver.name }}</span>
-                                {% else %}
-                                    <span class="text-primary">{{ detail.sender.name }}</span>
-                                {% endif %}
-                            </h2>
+                            {% if detail.trade.sender_id == current_user.id %}
+                                <p class="text-muted small text-uppercase fw-semibold mb-1">
+                                    Trade Request Sent
+                                </p>
+                                <h2 class="h4 fw-bold mb-0">
+                                    To <span class="text-primary">{{ detail.receiver.name }}</span>
+                                </h2>
+                            {% else %}
+                                <p class="text-muted small text-uppercase fw-semibold mb-1">
+                                    Trade Request Received
+                                </p>
+                                <h2 class="h4 fw-bold mb-0">
+                                    From <span class="text-primary">{{ detail.sender.name }}</span>
+                                </h2>
+                            {% endif %}
                         </div>
 
                         {% if detail.trade.status == "completed" %}
@@ -71,7 +77,7 @@ Trade History
                                     </div>
                                 {% else %}
                                     <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted p-3" style="height: 220px;">
-                                        No image was uploaded for the offered item.
+                                        No image available
                                     </div>
                                 {% endif %}
                             </div>

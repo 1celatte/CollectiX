@@ -357,7 +357,7 @@ def payment_qr_settings():
     original_filename = secure_filename(qr_file.filename)
     qr_filename = f"{uuid4().hex}_{original_filename}"
 
-    #Create the folder for seller payment QR images if needed.
+    #Create the folder for seller payment QR images.
     upload_folder = os.path.join(
         marketplace_bp.root_path,
         "static",
@@ -574,6 +574,14 @@ def edit_listing(listing_id):
     item = Item.query.filter_by(
         id=listing.item_id
     ).first_or_404()
+
+    def show_form_error(message):
+        return render_template(
+            "edit_listing.html",
+            listing=listing,
+            item=item,
+            error=message
+        )
     
     if request.method == "GET":
         return render_template(
@@ -896,11 +904,11 @@ def accept_trade_request(trade_id):
     #Only accept a Trade Request while its listing is still available.
     listing = Listing.query.filter_by(
         id=trade.listing_id,
-        user_id=current_user.id,
-        status="available"
+        user_id=current_user.id
     ).first()
 
-    if not listing:
+    #A pending Trade request may reserve the listing before it is accepted.
+    if not listing or listing.status not in ["available", "pending"]:
         return "This Trade listing is no longer available."
 
     #Check that the sender still owns the item they offered.
