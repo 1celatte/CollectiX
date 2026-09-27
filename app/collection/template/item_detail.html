@@ -10,51 +10,60 @@
 
     <!-- Item Header -->
     <div class="mb-4">
-
-        <h1 class="fw-bold">
+        <h1 class="fw-bold mb-2">
             {{ item.name }}
         </h1>
 
-        <p class="text-muted">
+        <p class="text-muted mb-0">
             In Collection:
             <strong>{{ collection.name }}</strong>
         </p>
-
     </div>
 
 
     <!-- Item Details Card -->
-    <div class="card shadow-sm">
+    <div class="card border-0 shadow-sm overflow-hidden">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <div class="row g-4">
 
                 <!-- Item Image -->
-                <div class="col-md-5 text-center">
+                <div class="col-md-5">
 
                     {% if item.image %}
 
-                        <img
-                            src="{{ url_for(
-                                'collection.static',
-                                filename='uploads/' + item.image
-                            ) }}"
-                            class="img-fluid rounded"
-                            alt="{{ item.name }}"
-                            style="
-                                max-height: 400px;
-                                object-fit: contain;
-                            "
-                        >
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center p-3"
+                             style="height: 400px;">
+
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                class="img-fluid rounded"
+                                alt="{{ item.name }}"
+                                style="
+                                    max-height: 100%;
+                                    max-width: 100%;
+                                    object-fit: contain;
+                                "
+                            >
+
+                        </div>
 
                     {% else %}
 
                         <div
                             class="bg-light rounded d-flex align-items-center justify-content-center text-muted"
-                            style="height: 300px;"
+                            style="height: 400px;"
                         >
-                            No Image
+                            <div class="text-center">
+                                <div class="fs-2 mb-2">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <div>No Image</div>
+                            </div>
                         </div>
 
                     {% endif %}
@@ -73,19 +82,19 @@
                     <!-- Description -->
                     <div class="mb-4">
 
-                        <h3 class="h6 fw-bold">
+                        <div class="small text-muted mb-1">
                             Description
-                        </h3>
+                        </div>
 
                         {% if item.description %}
 
-                            <p class="text-muted">
+                            <p class="card-text mb-0">
                                 {{ item.description }}
                             </p>
 
                         {% else %}
 
-                            <p class="text-muted">
+                            <p class="text-muted mb-0">
                                 No description provided.
                             </p>
 
@@ -97,11 +106,11 @@
                     <!-- Collection -->
                     <div class="mb-4">
 
-                        <h3 class="h6 fw-bold">
+                        <div class="small text-muted mb-1">
                             Collection
-                        </h3>
+                        </div>
 
-                        <p>
+                        <p class="mb-0">
                             {{ collection.name }}
                         </p>
 
@@ -111,13 +120,14 @@
                     <!-- Tag -->
                     <div class="mb-4">
 
-                        <h3 class="h6 fw-bold">
+                        <div class="small text-muted mb-1">
                             Tag
-                        </h3>
+                        </div>
 
                         {% if collection.tag %}
 
                             <span class="badge bg-primary">
+                                <i class="bi bi-tag me-1"></i>
                                 {{ collection.tag.name }}
                             </span>
 
@@ -135,11 +145,12 @@
                     <!-- Status -->
                     <div class="mb-4">
 
-                        <h3 class="h6 fw-bold">
+                        <div class="small text-muted mb-1">
                             Status
-                        </h3>
+                        </div>
 
                         <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>
                             Approved
                         </span>
 
@@ -162,9 +173,10 @@
                 'collection.view_collection',
                 collection_id=collection.id
             ) }}"
-            class="btn btn-secondary"
+            class="btn btn-outline-secondary"
         >
-            ← Back to Collection
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Collection
         </a>
 
     </div>

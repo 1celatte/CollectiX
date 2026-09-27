@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container py-4">
 
     <!-- ===================================================== -->
     <!-- FLASH MESSAGES -->
@@ -18,7 +18,11 @@
 
             {% for category, message in messages %}
 
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <div
+                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    <i class="bi bi-info-circle me-2"></i>
                     {{ message }}
 
                     <button
@@ -27,6 +31,7 @@
                         data-bs-dismiss="alert"
                         aria-label="Close"
                     ></button>
+
                 </div>
 
             {% endfor %}
@@ -40,9 +45,9 @@
     <!-- COLLECTION INFORMATION -->
     <!-- ===================================================== -->
 
-    <div class="card shadow-sm mb-4">
+    <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <div class="row align-items-center g-4">
 
@@ -58,7 +63,7 @@
                                 filename='uploads/' + collection.image
                             ) }}"
                             alt="{{ collection.name }}"
-                            class="img-fluid rounded"
+                            class="img-fluid rounded bg-light"
                             style="
                                 width: 100%;
                                 max-width: 300px;
@@ -77,7 +82,17 @@
                                 height: 250px;
                             "
                         >
-                            No Image
+                            <div class="text-center">
+
+                                <div class="fs-2 mb-2">
+                                    <i class="bi bi-image"></i>
+                                </div>
+
+                                <div>
+                                    No Image
+                                </div>
+
+                            </div>
                         </div>
 
                     {% endif %}
@@ -93,19 +108,25 @@
                         {{ collection.name }}
                     </h1>
 
+
+                    <!-- Tag -->
+
                     <div class="mb-3">
 
-                        <strong>Tag:</strong>
+                        <div class="small text-muted mb-1">
+                            Tag
+                        </div>
 
                         {% if collection.tag %}
 
-                            <span class="badge bg-primary ms-1">
+                            <span class="badge bg-primary">
+                                <i class="bi bi-tag me-1"></i>
                                 {{ collection.tag.name }}
                             </span>
 
                         {% else %}
 
-                            <span class="badge bg-secondary ms-1">
+                            <span class="badge bg-secondary">
                                 Not assigned
                             </span>
 
@@ -114,13 +135,17 @@
                     </div>
 
 
+                    <!-- Description -->
+
                     {% if collection.description %}
 
                         <div>
 
-                            <strong>Description:</strong>
+                            <div class="small text-muted mb-1">
+                                Description
+                            </div>
 
-                            <p class="text-muted mt-2 mb-0">
+                            <p class="text-muted mb-0">
                                 {{ collection.description }}
                             </p>
 
@@ -141,9 +166,9 @@
     <!-- ADD COLLECTION TO MY COLLECTION -->
     <!-- ===================================================== -->
 
-    <div class="card shadow-sm mb-4">
+    <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <h2 class="h4 fw-bold mb-3">
                 My Collection
@@ -156,7 +181,8 @@
                     class="btn btn-secondary"
                     disabled
                 >
-                    ✓ Already in My Collection
+                    <i class="bi bi-check-circle me-1"></i>
+                    Already in My Collection
                 </button>
 
                 <p class="text-muted mt-2 mb-0">
@@ -177,7 +203,8 @@
                         type="submit"
                         class="btn btn-primary"
                     >
-                        + Add to My Collection
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add to My Collection
                     </button>
 
                 </form>
@@ -195,11 +222,21 @@
 
     <div class="mb-4">
 
+        <!-- Section Header -->
+
         <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <h2 class="fw-bold mb-0">
-                Items in this Collection
-            </h2>
+            <div>
+
+                <h2 class="fw-bold mb-1">
+                    Items in this Collection
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Browse the approved items in this collection.
+                </p>
+
+            </div>
 
         </div>
 
@@ -212,7 +249,7 @@
 
                     <div class="col-md-6 col-lg-4">
 
-                        <div class="card h-100 shadow-sm">
+                        <div class="card h-100 border-0 shadow-sm overflow-hidden">
 
                             <!-- Item Image -->
 
@@ -224,7 +261,7 @@
                                         filename='uploads/' + item.image
                                     ) }}"
                                     alt="{{ item.name }}"
-                                    class="card-img-top"
+                                    class="card-img-top bg-light"
                                     style="
                                         height: 220px;
                                         object-fit: contain;
@@ -237,7 +274,17 @@
                                     class="bg-light d-flex align-items-center justify-content-center text-muted"
                                     style="height: 220px;"
                                 >
-                                    No Image
+                                    <div class="text-center">
+
+                                        <div class="fs-2 mb-2">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+
+                                        <div>
+                                            No Image
+                                        </div>
+
+                                    </div>
                                 </div>
 
                             {% endif %}
@@ -247,20 +294,20 @@
 
                             <div class="card-body d-flex flex-column">
 
-                                <h3 class="h5 fw-bold card-title">
+                                <h3 class="h5 fw-bold card-title mb-2">
                                     {{ item.name }}
                                 </h3>
 
 
                                 {% if item.description %}
 
-                                    <p class="card-text text-muted">
+                                    <p class="card-text text-muted mb-0">
                                         {{ item.description }}
                                     </p>
 
                                 {% else %}
 
-                                    <p class="card-text text-muted">
+                                    <p class="card-text text-muted mb-0">
                                         No description provided.
                                     </p>
 
@@ -279,6 +326,7 @@
                                         ) }}"
                                         class="btn btn-outline-primary w-100"
                                     >
+                                        <i class="bi bi-eye me-1"></i>
                                         View Item
                                     </a>
 
@@ -296,8 +344,14 @@
 
         {% else %}
 
-            <div class="alert alert-light border">
+            <!-- No Items -->
+
+            <div class="alert alert-light border shadow-sm">
+
+                <i class="bi bi-info-circle me-2"></i>
+
                 No approved items in this collection yet.
+
             </div>
 
         {% endif %}
@@ -316,7 +370,8 @@
                 ) }}"
                 class="btn btn-success"
             >
-                + Add Item
+                <i class="bi bi-plus-lg me-1"></i>
+                Add Item
             </a>
 
         </div>
@@ -334,9 +389,10 @@
             href="{{ url_for(
                 'collection.list_collections'
             ) }}"
-            class="btn btn-secondary"
+            class="btn btn-outline-secondary"
         >
-            ← Back to Public Collections
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Public Collections
         </a>
 
     </div>
