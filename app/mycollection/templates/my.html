@@ -6,7 +6,7 @@ My Collections
 
 {% block content %}
 
-<div class="container">
+<div class="container py-4">
 
     <!-- ===================================================== -->
     <!-- FLASH MESSAGES -->
@@ -22,6 +22,7 @@ My Collections
                     class="alert alert-{{ category }} alert-dismissible fade show"
                     role="alert"
                 >
+                    <i class="bi bi-info-circle me-2"></i>
                     {{ message }}
 
                     <button
@@ -39,18 +40,24 @@ My Collections
 
     {% endwith %}
 
-<div class="container">
 
-    <!-- Page Header + Sort -->
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER + SORT -->
+    <!-- ===================================================== -->
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h1 class="fw-bold mb-0">
-            My Collections
-        </h1>
+        <div>
+            <h1 class="fw-bold mb-1">
+                My Collections
+            </h1>
+
+            <p class="text-muted mb-0">
+                Track your collection progress and manage your collections.
+            </p>
+        </div>
 
         <!-- Sort Collections -->
-
         <form method="GET">
 
             <select
@@ -87,6 +94,10 @@ My Collections
     </div>
 
 
+    <!-- ===================================================== -->
+    <!-- COLLECTIONS -->
+    <!-- ===================================================== -->
+
     {% if collections %}
 
         <div class="row g-4">
@@ -97,56 +108,76 @@ My Collections
 
                 <div class="col-12 col-md-6 col-lg-4">
 
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 border-0 shadow-sm overflow-hidden">
 
-                        <!-- Collection Image -->
+                        <!-- ================================================= -->
+                        <!-- COLLECTION IMAGE -->
+                        <!-- ================================================= -->
 
-                        {% if collection.image %}
+                        <div class="p-3">
 
-                            <img
-                                src="{{ url_for(
-                                    'collection.static',
-                                    filename='uploads/' + collection.image
-                                ) }}"
-                                alt="{{ collection.name }}"
-                                class="card-img-top"
-                                style="
-                                    height: 220px;
-                                    object-fit: contain;
-                                    background-color: #f8f9fa;
-                                "
-                            >
+                            {% if collection.image %}
 
-                        {% else %}
+                                <img
+                                    src="{{ url_for(
+                                        'collection.static',
+                                        filename='uploads/' + collection.image
+                                    ) }}"
+                                    alt="{{ collection.name }}"
+                                    class="card-img-top rounded bg-light"
+                                    style="
+                                        height: 220px;
+                                        object-fit: contain;
+                                    "
+                                >
 
-                            <div
-                                class="d-flex align-items-center justify-content-center bg-light text-muted"
-                                style="height: 220px;"
-                            >
-                                No Image
-                            </div>
+                            {% else %}
 
-                        {% endif %}
+                                <div
+                                    class="rounded bg-light d-flex align-items-center justify-content-center text-muted"
+                                    style="height: 220px;"
+                                >
+                                    <div class="text-center">
+
+                                        <div class="fs-2 mb-2">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+
+                                        <div>
+                                            No Image
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            {% endif %}
+
+                        </div>
 
 
-                        <!-- Collection Information -->
+                        <!-- ================================================= -->
+                        <!-- COLLECTION INFORMATION -->
+                        <!-- ================================================= -->
 
-                        <div class="card-body">
+                        <div class="card-body pt-1">
 
-                            <h5 class="card-title fw-bold">
+                            <!-- Collection Name -->
+                            <h2 class="h4 fw-bold mb-3">
                                 {{ collection.name }}
-                            </h5>
+                            </h2>
 
 
                             <!-- Tag -->
+                            <div class="mb-3">
 
-                            <p class="mb-2">
-
-                                <strong>Tag:</strong>
+                                <div class="small text-muted mb-1">
+                                    Tag
+                                </div>
 
                                 {% if collection.tag %}
 
                                     <span class="badge bg-primary">
+                                        <i class="bi bi-tag me-1"></i>
                                         {{ collection.tag.name }}
                                     </span>
 
@@ -158,101 +189,114 @@ My Collections
 
                                 {% endif %}
 
-                            </p>
+                            </div>
 
 
                             <!-- Description -->
+                            <div class="mb-3">
 
-                            <p class="card-text text-muted">
-                                {{ collection.description }}
-                            </p>
-
-
-                            <hr>
-
-
-                            <!-- Collection Progress -->
-
-                            <h6 class="fw-bold mb-3">
-                                Collection Progress
-                            </h6>
-
-
-                            <div class="row text-center mb-3">
-
-                                <div class="col">
-
-                                    <div class="fw-bold">
-                                        {{ data.total_items }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Total
-                                    </small>
-
+                                <div class="small text-muted mb-1">
+                                    Description
                                 </div>
 
-
-                                <div class="col">
-
-                                    <div class="fw-bold text-success">
-                                        {{ data.owned_items }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Owned
-                                    </small>
-
-                                </div>
-
-
-                                <div class="col">
-
-                                    <div class="fw-bold text-danger">
-                                        {{ data.missing_items }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Missing
-                                    </small>
-
-                                </div>
+                                <p class="card-text mb-0">
+                                    {% if collection.description %}
+                                        {{ collection.description }}
+                                    {% else %}
+                                        <span class="text-muted">
+                                            No description provided.
+                                        </span>
+                                    {% endif %}
+                                </p>
 
                             </div>
 
 
-                            <!-- Progress Percentage -->
+                            <!-- ================================================= -->
+                            <!-- COLLECTION PROGRESS -->
+                            <!-- ================================================= -->
 
-                            <div class="d-flex justify-content-between mb-1">
+                            <div class="pt-2">
 
-                                <small class="fw-bold">
-                                    Progress
-                                </small>
-
-                                <small class="fw-bold">
-                                    {{ data.progress }}%
-                                </small>
-
-                            </div>
+                                <h3 class="h6 fw-bold mb-3">
+                                    Collection Progress
+                                </h3>
 
 
-                            <!-- Bootstrap Progress Bar -->
+                                <!-- Total / Owned / Missing -->
+                                <div class="row text-center mb-3">
 
-                            <div
-                                class="progress"
-                                role="progressbar"
-                                aria-label="Collection progress"
-                                aria-valuenow="{{ data.progress }}"
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                                style="height: 20px;"
-                            >
+                                    <div class="col">
 
+                                        <div class="fw-bold">
+                                            {{ data.total_items }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Total
+                                        </small>
+
+                                    </div>
+
+
+                                    <div class="col">
+
+                                        <div class="fw-bold text-success">
+                                            {{ data.owned_items }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Owned
+                                        </small>
+
+                                    </div>
+
+
+                                    <div class="col">
+
+                                        <div class="fw-bold text-danger">
+                                            {{ data.missing_items }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Missing
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Progress Percentage -->
+                                <div class="d-flex justify-content-between mb-1">
+
+                                    <small class="fw-bold">
+                                        Progress
+                                    </small>
+
+                                    <small class="fw-bold">
+                                        {{ data.progress }}%
+                                    </small>
+
+                                </div>
+
+
+                                <!-- Bootstrap Progress Bar -->
                                 <div
-                                    class="progress-bar bg-success"
-                                    style="width: {{ data.progress }}%;"
+                                    class="progress"
+                                    role="progressbar"
+                                    aria-label="Collection progress"
+                                    aria-valuenow="{{ data.progress }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    style="height: 10px;"
                                 >
-                                    {{ data.progress }}%
+
+                                    <div
+                                        class="progress-bar bg-success"
+                                        style="width: {{ data.progress }}%;"
+                                    ></div>
+
                                 </div>
 
                             </div>
@@ -260,9 +304,11 @@ My Collections
                         </div>
 
 
-                        <!-- Card Footer -->
+                        <!-- ================================================= -->
+                        <!-- CARD FOOTER -->
+                        <!-- ================================================= -->
 
-                        <div class="card-footer bg-white border-0">
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
 
                             <a
                                 href="{{ url_for(
@@ -271,7 +317,7 @@ My Collections
                                 ) }}"
                                 class="btn btn-primary w-100"
                             >
-                                <i class="bi bi-collection"></i>
+                                <i class="bi bi-collection me-1"></i>
                                 View Collection Details
                             </a>
 
@@ -287,11 +333,27 @@ My Collections
 
     {% else %}
 
-        <div class="alert alert-info">
+        <!-- ================================================= -->
+        <!-- EMPTY STATE -->
+        <!-- ================================================= -->
 
-            <i class="bi bi-info-circle"></i>
+        <div class="card border-0 shadow-sm">
 
-            You have not added any collections yet.
+            <div class="card-body text-center py-5">
+
+                <div class="display-5 text-muted mb-3">
+                    <i class="bi bi-collection"></i>
+                </div>
+
+                <h3 class="fw-bold">
+                    No collections yet
+                </h3>
+
+                <p class="text-muted mb-0">
+                    You have not added any collections yet.
+                </p>
+
+            </div>
 
         </div>
 
