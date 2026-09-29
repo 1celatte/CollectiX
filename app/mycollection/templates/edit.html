@@ -147,7 +147,7 @@ Edit {{ collection.name }}
         {% endfor %}
 
 
-        <!-- Save Button -->
+        <!-- Save and Cancel Buttons -->
 
         <div class="mt-4">
 
@@ -157,6 +157,16 @@ Edit {{ collection.name }}
             >
                 Save Changes & Exit
             </button>
+
+            <a
+                href="{{ url_for(
+                    'my_collection.view_my_collection',
+                    collection_id=collection.id
+                ) }}"
+                class="btn btn-secondary ms-2"
+            >
+                Cancel
+            </a>
 
         </div>
 
