@@ -220,9 +220,23 @@ Browse & Search - CollectiX
     <div
         class="col-md-6 col-lg-4"
     >
-        <div
-            class="card h-100 border-0 shadow-sm overflow-hidden"
-        >
+
+        {% if result.type == 'collection' %}
+            <div
+                class="card h-100 border-0 shadow-sm overflow-hidden"
+                style="border-top: 5px solid var(--bs-primary) !important;"
+            >
+        {% elif result.type == 'item' %}
+            <div
+                class="card h-100 border-0 shadow-sm overflow-hidden"
+                style="border-top: 5px solid #20c997 !important;"
+            >
+        {% else %}
+            <div
+                class="card h-100 border-0 shadow-sm overflow-hidden"
+                style="border-top: 5px solid var(--bs-warning) !important;"
+            >
+        {% endif %}
 
             <!--Show the image for this search result-->
             {% if result.image %}
@@ -347,7 +361,7 @@ Browse & Search - CollectiX
                 <!--Open the marketplace listing details-->
                 <a
                     href="{{ url_for('marketplace.view_listing', listing_id=result.id) }}"
-                    class="btn btn-primary"
+                    class="btn btn-primary mt-auto"
                 >
                     View Details
                 </a>
