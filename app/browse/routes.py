@@ -17,6 +17,8 @@ def browse_page():
     tag = request.args.get("tag", "").strip()
     sort = request.args.get("sort", "newest").strip()
     
+    #if the user is redirected from the create collection page, show a message to check if the collection exists
+    
     from_create = request.args.get("from_create", "").strip()
     
     if from_create == "true":

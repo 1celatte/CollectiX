@@ -38,7 +38,7 @@ def marketplace_home():
     
 #====================================================================================================================================
 
-# FIND A MISSING ITEM IN THE MARKETPLACE(let user find the item they want to buy in the marketplace)
+# FIND A MISSING ITEM IN THE MARKETPLACE(let user find the item they want to buy or trade from the marketplace)
 
 #=======================================================================================================================================
 
