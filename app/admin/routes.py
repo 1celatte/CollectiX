@@ -463,6 +463,18 @@ def ban_user(user_id):
     ).first()
 
     if active_transaction:
+
+        source = request.form.get("source")
+
+        if source == "details":
+            return redirect(
+                url_for(
+                    "admin.user_details",
+                    user_id=user.id,
+                    ban_error="Cannot ban user while they have an active transaction."
+                )
+            )
+
         return redirect(
             url_for(
                 "admin.users",
@@ -486,6 +498,16 @@ def ban_user(user_id):
 
     db.session.commit()
 
+    source = request.form.get("source")
+
+    if source == "details":
+        return redirect(
+            url_for(
+                "admin.user_details",
+                user_id=user.id
+            )
+        )
+
     return redirect(url_for("admin.users"))
 
 
@@ -503,5 +525,15 @@ def unban_user(user_id):
     user.is_banned = False
 
     db.session.commit()
+
+    source = request.form.get("source")
+
+    if source == "details":
+        return redirect(
+            url_for(
+                "admin.user_details",
+                user_id=user.id
+            )
+        )
 
     return redirect(url_for("admin.banned_users"))

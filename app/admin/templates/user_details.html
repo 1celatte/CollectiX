@@ -885,6 +885,12 @@ User Details - CollectiX
                     ) }}"
                 >
 
+                    <input
+                        type="hidden"
+                        name="source"
+                        value="details"
+                    >
+
                     <label
                         for="ban_reason"
                         class="form-label fw-semibold"
@@ -901,6 +907,12 @@ User Details - CollectiX
                         required
                     ></textarea>
 
+                    {% if request.args.get("ban_error") %}
+                        <div class="alert alert-danger mt-2 mb-0" role="alert">
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            {{ request.args.get("ban_error") }}
+                        </div>
+                    {% endif %}
 
                     <div class="modal-footer px-0 pb-0">
 
@@ -1009,6 +1021,12 @@ User Details - CollectiX
                     ) }}"
                 >
 
+                    <input
+                        type="hidden"
+                        name="source"
+                        value="details"
+                    >
+
                     <button
                         type="submit"
                         class="btn btn-success"
@@ -1027,6 +1045,19 @@ User Details - CollectiX
 
 </div>
 
+{% endif %}
+
+{% if request.args.get("ban_error") %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("banUserModal");
+
+        if (modal) {
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        }
+    });
+</script>
 {% endif %}
 
 {% endblock %}

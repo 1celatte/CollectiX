@@ -130,37 +130,13 @@ Home - CollectiX
         justify-content: center;
     }
 
-    .hero-icon-circle {
-        width: 95px;
-        height: 95px;
-        border-radius: 28px;
-        background: rgba(255, 255, 255, 0.14);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 22px;
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        max-height: 310px;
+        object-fit: cover;
+        border-radius: 18px;
     }
-
-    .hero-icon-circle i {
-        font-size: 46px;
-        color: white;
-    }
-
-    .hero-visual h3 {
-        font-size: 23px;
-        font-weight: 700;
-        margin-bottom: 9px;
-    }
-
-    .hero-visual p {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.72);
-        max-width: 280px;
-        line-height: 1.6;
-        margin-bottom: 0;
-    }
-
 
     /* =========================
        SECTION TITLE
@@ -517,20 +493,11 @@ Home - CollectiX
 
                 <div class="hero-visual">
 
-                    <div class="hero-icon-circle">
-
-                        <i class="bi bi-box-seam"></i>
-
-                    </div>
-
-                    <h3>
-                        Collect. Organize. Trade.
-                    </h3>
-
-                    <p>
-                        Discover collections, manage your items
-                        and connect with other collectors.
-                    </p>
+                    <img
+                        src="{{ url_for('static', filename='images/collectix-home.png') }}"
+                        alt="CollectiX"
+                        class="hero-image"
+                    >
 
                 </div>
 
