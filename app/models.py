@@ -467,10 +467,20 @@ class Trade(db.Model):
         nullable=False
     )
 
+    sender = db.relationship(
+        "User",
+        foreign_keys=[sender_id]
+    )
+
     receiver_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
         nullable=False
+    )
+
+    receiver = db.relationship(
+        "User",
+        foreign_keys=[receiver_id]
     )
 
     listing_id = db.Column(
@@ -485,10 +495,20 @@ class Trade(db.Model):
         nullable=False
     )
 
+    offered_item = db.relationship(
+        "Item",
+        foreign_keys=[offered_item_id]
+    )
+
     requested_item_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
         nullable=False
+    )
+
+    requested_item = db.relationship(
+        "Item",
+        foreign_keys=[requested_item_id]
     )
 
     offered_condition = db.Column(
