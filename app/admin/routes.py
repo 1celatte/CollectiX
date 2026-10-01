@@ -2,23 +2,37 @@ from flask import render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 import os
 from werkzeug.utils import secure_filename
+from app.utils import normalize_text
 
 from . import admin
-from app.models import Collection,Item, Submission, User, Tag
+from app.models import Collection,Item, Submission, User, Tag, OwnedItem, Listing, Transaction, Trade
 from app.extensions import db
 
 @admin.route("/admin")
 @login_required
-def dashboard():
+def admin_home():
 
     if current_user.role != "admin":
         return "Access denied.", 403 
 
-    pending_count = Submission.query.filter_by(status="pending").count()
+    return redirect(url_for("admin.users"))
 
-    return render_template(
-        "dashboard.html",
-       pending_count=pending_count
+
+@admin.context_processor
+def inject_admin_counts():
+
+    if current_user.is_authenticated and current_user.role == "admin":
+
+        pending_count = Submission.query.filter_by(
+            status="pending"
+        ).count()
+
+    else:
+
+        pending_count = 0
+
+    return dict(
+        pending_count=pending_count
     )
 
 
@@ -246,9 +260,20 @@ def submissions():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    submissions = Submission.query.filter_by(status="pending").all()
+    submission_type = request.args.get("type")
 
-    return render_template("submissions.html", submissions=submissions)
+    query = Submission.query.filter_by(status="pending")
+
+    if submission_type in ["new_collection", "new_item"]:
+        query = query.filter_by(type=submission_type)
+
+    submissions = query.all()
+
+    return render_template(
+        "submissions.html", 
+        submissions=submissions,
+        submission_type=submission_type
+        )
 
 
 @admin.route("/admin/submissions/<int:submission_id>/approve", methods=["POST"])
@@ -261,8 +286,29 @@ def approve_submission(submission_id):
     submission = Submission.query.get_or_404(submission_id)
 
     if submission.type == "new_collection":
+
+        tag_id = submission.tag_id
+
+        if submission.new_tag:
+
+            new_tag = Tag(
+                name=submission.new_tag,
+                normalized_name=normalize_text(
+                    submission.new_tag
+                )
+            )
+
+            db.session.add(new_tag)
+            db.session.flush()
+
+            tag_id = new_tag.id
+
         collection = Collection(
             name=submission.name,
+            normalized_name=normalize_text(
+                submission.name
+            ),
+            tag_id=tag_id,
             description=submission.description,
             image=submission.image,
             status="approved",
@@ -271,14 +317,19 @@ def approve_submission(submission_id):
 
         db.session.add(collection)
 
+        db.session.flush()
+
+        submission.collection_id = collection.id
+       
     elif submission.type == "new_item":
         item = Item(
-        collection_id=submission.collection_id,
-        name=submission.name,
-        description=submission.description,
-        image=submission.image,
-        status="approved",
-        created_by=submission.user_id
+            collection_id=submission.collection_id,
+            name=submission.name,
+            normalized_name=normalize_text(submission.name),
+            description=submission.description,
+            image=submission.image,
+            status="approved",
+            created_by=submission.user_id
         )
 
         db.session.add(item)
@@ -315,14 +366,77 @@ def users():
     if current_user.role != "admin":
         return "Access denied.", 403
 
-    users = User.query.all()
+    users = User.query.filter_by(is_banned=False).all()
 
     return render_template("users.html", users=users)
 
 
-@admin.route("/admin/users/<int:user_id>/remove", methods=["POST"])
+@admin.route("/admin/users/<int:user_id>")
 @login_required
-def remove_user(user_id):
+def user_details(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    submissions = Submission.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Submission.created_at.desc()
+    ).all()
+
+    owned_items = OwnedItem.query.filter_by(
+        user_id=user.id
+    ).all()
+
+    listings = Listing.query.filter_by(
+        user_id=user.id
+    ).order_by(
+        Listing.created_at.desc()
+    ).all()
+
+    transactions = Transaction.query.filter(
+        (Transaction.buyer_id == user.id) |
+        (Transaction.seller_id == user.id)
+    ).order_by(
+        Transaction.created_at.desc()
+    ).all()
+
+    trades = Trade.query.filter(
+        (Trade.sender_id == user.id) |
+        (Trade.receiver_id == user.id)
+    ).order_by(
+        Trade.created_at.desc()
+    ).all()
+
+    return render_template(
+        "user_details.html",
+        user=user,
+        submissions=submissions,
+        owned_items=owned_items,
+        listings=listings,
+        transactions=transactions,
+        trades=trades
+    )
+
+
+@admin.route("/admin/users/banned")
+@login_required
+def banned_users():
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    users = User.query.filter_by(is_banned=True).all()
+
+    return render_template(
+        "banned_users.html",
+        users=users
+    )
+
+
+@admin.route("/admin/users/<int:user_id>/ban", methods=["POST"])
+@login_required
+def ban_user(user_id):
 
     if current_user.role != "admin":
         return "Access denied.", 403
@@ -330,9 +444,96 @@ def remove_user(user_id):
     user = User.query.get_or_404(user_id)
 
     if user.role == "admin":
-        return "Cannot delete admin user.", 403
+        return "Cannot ban admin user.", 403
 
-    db.session.delete(user)
+    ban_reason = request.form.get("ban_reason", "").strip()
+
+    if not ban_reason:
+        return "Ban reason is required.", 400
+
+    active_transaction = Transaction.query.filter(
+        (
+            (Transaction.buyer_id == user.id) |
+            (Transaction.seller_id == user.id)
+        ),
+        ~Transaction.status.in_([
+            "completed",
+            "cancelled"
+        ])
+    ).first()
+
+    if active_transaction:
+
+        source = request.form.get("source")
+
+        if source == "details":
+            return redirect(
+                url_for(
+                    "admin.user_details",
+                    user_id=user.id,
+                    ban_error="Cannot ban user while they have an active transaction."
+                )
+            )
+
+        return redirect(
+            url_for(
+                "admin.users",
+                ban_error="Cannot ban user while they have an active transaction.",
+                error_user_id=user.id
+            )
+        )
+
+    user.is_banned = True
+    user.ban_reason = ban_reason
+
+    pending_submissions = Submission.query.filter_by(
+        user_id=user.id,
+        status="pending"
+    ).all()
+
+    for submission in pending_submissions:
+
+        submission.status = "rejected"
+        submission.reviewed_by = current_user.id
+
     db.session.commit()
 
+    source = request.form.get("source")
+
+    if source == "details":
+        return redirect(
+            url_for(
+                "admin.user_details",
+                user_id=user.id
+            )
+        )
+
     return redirect(url_for("admin.users"))
+
+
+@admin.route("/admin/users/<int:user_id>/unban", methods=["POST"])
+@login_required
+def unban_user(user_id):
+    if current_user.role != "admin":
+        return "Access denied.", 403
+
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        return "Cannot unban admin user.", 403
+
+    user.is_banned = False
+
+    db.session.commit()
+
+    source = request.form.get("source")
+
+    if source == "details":
+        return redirect(
+            url_for(
+                "admin.user_details",
+                user_id=user.id
+            )
+        )
+
+    return redirect(url_for("admin.banned_users"))

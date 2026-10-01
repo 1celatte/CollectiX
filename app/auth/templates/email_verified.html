@@ -1,57 +1,179 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Email Verified - CollectiX</title>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding-top: 100px;
-    }
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-    .verified-box {
-        max-width: 500px;
-        margin: auto;
-    }
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
 
-    h2 {
-        margin-bottom: 20px;
-    }
+    <style>
 
-    p {
-        margin-bottom: 15px;
-    }
+        body {
+            min-height: 100vh;
 
-    strong {
-        font-weight: bold;
-    }
-</style>
+            background-color: #ebf9ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .verified-card {
+            width: 100%;
+            max-width: 480px;
+
+            background-color: #ffffff;
+
+            border: 1px solid #dee2e6;
+
+            border-radius: 14px;
+
+            padding: 40px 35px;
+
+            text-align: center;
+
+            box-shadow:
+                0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .verified-icon {
+            width: 60px;
+            height: 60px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 50%;
+
+            background-color: #e8f6ef;
+
+            color: #198754;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+        }
+
+        .verified-card h2 {
+            font-size: 27px;
+
+            font-weight: 700;
+
+            color: #212529;
+
+            margin-bottom: 14px;
+        }
+
+        .verified-card p {
+            color: #6c757d;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 12px;
+        }
+
+        .verified-card strong {
+            color: #212529;
+        }
+
+        .login-btn {
+            display: inline-block;
+
+            margin-top: 14px;
+
+            padding: 10px 22px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+        @media (max-width: 576px) {
+
+            .verified-card {
+                padding: 32px 25px;
+            }
+
+            .verified-card h2 {
+                font-size: 24px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
 
-<div class="verified-box">
+    <div class="verified-card">
 
-    <h2>Email Verified Successfully! ✅</h2>
 
-    <p>
-        Your email address
-        <strong>{{ email }}</strong>
-        has been successfully verified.
-    </p>
+        <!-- Success Icon -->
 
-    <p>
-        Your CollectiX account is now ready to use.
-    </p>
+        <div class="verified-icon">
 
-</div>
+            <i class="bi bi-check-lg"></i>
+
+        </div>
+
+
+        <!-- Header -->
+
+        <h2>
+            Email Verified Successfully!
+        </h2>
+
+
+        <!-- Message -->
+
+        <p>
+            Your email address
+            <strong>{{ email }}</strong>
+            has been successfully verified.
+        </p>
+
+        <p>
+            Your CollectiX account is now ready to use.
+        </p>
+
+
+        <!-- Return Message --> 
+        <p class="return-text"> 
+            You can now return to the page where you started. 
+        </p>
+
+    </div>
 
 </body>
 
 </html>
+

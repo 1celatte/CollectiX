@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ item.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Item Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold mb-2">
+            {{ item.name }}
+        </h1>
+
+        <p class="text-muted mb-0">
+            In Collection:
+            <strong>{{ collection.name }}</strong>
+        </p>
+    </div>
+
+
+    <!-- Item Details Card -->
+    <div
+        class="card shadow-sm overflow-hidden"
+        style="
+            border: 1px solid #d1e7dd;
+            border-top: 4px solid #198754;
+            border-radius: 0.75rem;
+        "
+    >
+
+        <div class="card-body p-4">
+
+            <div class="row g-4">
+
+                <!-- Item Image -->
+                <div class="col-md-5">
+
+                    {% if item.image %}
+
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center p-3"
+                             style="height: 400px;">
+
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                class="img-fluid rounded"
+                                alt="{{ item.name }}"
+                                style="
+                                    max-height: 100%;
+                                    max-width: 100%;
+                                    object-fit: contain;
+                                "
+                            >
+
+                        </div>
+
+                    {% else %}
+
+                        <div
+                            class="bg-light rounded d-flex align-items-center justify-content-center text-muted"
+                            style="height: 400px;"
+                        >
+                            <div class="text-center">
+                                <div class="fs-2 mb-2">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <div>No Image</div>
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Item Information -->
+                <div class="col-md-7">
+
+                    <h2 class="h4 fw-bold mb-4">
+                        Item Information
+                    </h2>
+
+
+                    <!-- Description -->
+                    <div class="mb-4">
+
+                        <div class="small text-muted mb-1">
+                            Description
+                        </div>
+
+                        {% if item.description %}
+
+                            <p class="card-text mb-0">
+                                {{ item.description }}
+                            </p>
+
+                        {% else %}
+
+                            <p class="text-muted mb-0">
+                                No description provided.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Collection -->
+                    <div class="mb-4">
+
+                        <div class="small text-muted mb-1">
+                            Collection
+                        </div>
+
+                        <p class="mb-0">
+                            {{ collection.name }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- Tag -->
+                    <div class="mb-4">
+
+                        <div class="small text-muted mb-1">
+                            Tag
+                        </div>
+
+                        {% if collection.tag %}
+
+                            <span class="badge bg-primary">
+                                <i class="bi bi-tag me-1"></i>
+                                {{ collection.tag.name }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Not assigned
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="mb-4">
+
+                        <div class="small text-muted mb-1">
+                            Status
+                        </div>
+
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Approved
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Back Button -->
+    <div class="mt-4">
+
+        <a
+            href="{{ url_for(
+                'collection.view_collection',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Collection
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

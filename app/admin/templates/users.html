@@ -1,233 +1,378 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "admin_base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Manage Users - CollectiX
+{% endblock %}
 
-    <title>Manage Users - CollectiX</title>
-</head>
+{% block content %}
 
-<body>
+<!-- =========================
+     PAGE HEADER
+========================= -->
 
-<h1>Manage Users</h1>
+<div class="mb-4">
 
-<table>
+    <h1 class="fw-bold mb-1">
+        Manage Users
+    </h1>
 
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+    <p class="text-secondary mb-0">
+        View and manage registered users in CollectiX.
+    </p>
 
-    <tbody>
+</div>
 
-        {% for user in users %}
 
-        <tr>
+{% if users %}
 
-            <td>{{ user.id }}</td>
+<!-- =========================
+     USERS TABLE
+========================= -->
 
-            <td>{{ user.name }}</td>
+<div class="card border-0 shadow-sm">
 
-            <td>{{ user.email }}</td>
+    <div class="card-body p-0">
 
-            <td>{{ user.role }}</td>
+        <div class="table-responsive">
 
-            <td>
+            <table class="table table-hover align-middle mb-0">
 
-                {% if user.role != "admin" %}
+                <thead class="table-light">
 
-                <button
-                    type="button"
-                    class="remove-btn"
-                    popovertarget="deleteUser{{ user.id }}"
-                >
-                    Delete
-                </button>
+                    <tr>
 
-                <div
-                    id="deleteUser{{ user.id }}"
-                    popover
-                    class="delete-popup"
-                >
+                        <th class="px-4">
+                            ID
+                        </th>
 
-                    <div class="delete-box">
+                        <th>
+                            Name
+                        </th>
 
-                        <p>
-                            Are you sure you want to delete this user?
-                        </p>
+                        <th>
+                            Profile Picture
+                        </th>
 
-                        <form
-                            action="{{ url_for(
-                                'admin.remove_user',
-                                user_id=user.id
-                            ) }}"
-                            method="POST"
-                        >
+                        <th>
+                            Email
+                        </th>
 
-                            <button
-                                type="submit"
-                                class="delete-confirm"
-                            >
-                                Yes
-                            </button>
+                        <th>
+                            Role
+                        </th>
 
-                            <button
-                                type="button"
-                                class="cancel-btn"
-                                popovertarget="deleteUser{{ user.id }}"
-                                popovertargetaction="hide"
-                            >
-                                Cancel
-                            </button>
+                        <th class="text-center">
+                            Action
+                        </th>
 
-                        </form>
+                    </tr>
 
-                    </div>
+                </thead>
 
-                </div>
 
-                {% else %}
+                <tbody>
 
-                    -
+                    {% for user in users %}
 
-                {% endif %}
+                    <tr>
 
-            </td>
+                        <!-- ID -->
 
-        </tr>
+                        <td class="px-4">
+                            {{ user.id }}
+                        </td>
 
-        {% endfor %}
 
-    </tbody>
+                        <!-- Name -->
 
-</table>
+                        <td>
+                            <strong>
+                                {{ user.name }}
+                            </strong>
+                        </td>
 
-<br>
 
-<a
-    href="{{ url_for('admin.dashboard') }}"
-    class="back-btn"
->
-    Back to Dashboard
-</a>
+                        <!-- Profile Picture -->
 
+                        <td>
 
-<style>
+                            {% if user.profile_picture and user.profile_picture != "default_avatar.jpg" %}
 
-    body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-    }
+                                <img
+                                    src="{{ url_for(
+                                        'auth.static',
+                                        filename=user.profile_picture
+                                    ) }}"
+                                    alt="{{ user.name }}"
+                                    class="rounded-circle border"
+                                    style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    "
+                                >
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
+                            {% else %}
 
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: left;
-        vertical-align: middle;
-    }
+                                <img
+                                    src="{{ url_for(
+                                        'auth.static',
+                                        filename='images/default_avatar.jpg'
+                                    ) }}"
+                                    alt="Default Profile Picture"
+                                    class="rounded-circle border"
+                                    style="
+                                        width: 60px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                    "
+                                >
 
-    th {
-        background-color: #f2f2f2;
-    }
+                            {% endif %}
 
+                        </td>
 
-    /* Delete button */
 
-    .remove-btn {
-        display: inline-block;
-        padding: 6px 12px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
+                        <!-- Email -->
 
-    .remove-btn:hover {
-        background-color: #bb2d3b;
-    }
+                        <td>
+                            {{ user.email }}
+                        </td>
 
 
-    /* Popup */
+                        <!-- Role -->
 
-    .delete-popup {
-        padding: 0;
-        border: none;
-        background: transparent;
-    }
+                        <td>
 
+                            {% if user.role == "admin" %}
 
-    /* Popup box */
+                                <span class="badge text-bg-primary">
+                                    Admin
+                                </span>
 
-    .delete-box {
-        background-color: white;
-        padding: 25px;
-        border-radius: 8px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
+                            {% else %}
 
+                                <span class="badge text-bg-secondary">
+                                    User
+                                </span>
 
-    /* Yes button */
+                            {% endif %}
 
-    .delete-confirm {
-        padding: 6px 15px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
+                        </td>
 
 
-    /* Cancel button */
+                        <!-- Action -->
 
-    .cancel-btn {
-        padding: 6px 15px;
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
+                        <td class="text-center">
 
-    .cancel-btn:hover {
-        background-color: #5c636a;
-    }
+                            {% if user.role != "admin" %}
 
 
-    /* Back button */
+                                <!-- View Details -->
 
-    .back-btn {
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-    }
+                                <a
+                                    href="{{ url_for(
+                                        'admin.user_details',
+                                        user_id=user.id
+                                    ) }}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    <i class="bi bi-person-lines-fill me-1"></i>
+                                    View Details
+                                </a>
 
-    .back-btn:hover {
-        background-color: #5c636a;
-    }
 
-</style>
+                                <!-- Ban Button -->
 
-</body>
-</html>
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#banUser{{ user.id }}"
+                                >
+                                    <i class="bi bi-person-x me-1"></i>
+                                    Ban
+                                </button>
 
+
+                                <!-- Ban Modal -->
+
+                                <div
+                                    class="modal fade"
+                                    id="banUser{{ user.id }}"
+                                    tabindex="-1"
+                                    aria-labelledby="banUserLabel{{ user.id }}"
+                                    aria-hidden="true"
+                                >
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content">
+
+
+                                            <!-- Modal Header -->
+
+                                            <div class="modal-header">
+
+                                                <h5
+                                                    class="modal-title"
+                                                    id="banUserLabel{{ user.id }}"
+                                                >
+                                                    <i class="bi bi-person-x text-danger me-2"></i>
+                                                    Ban User
+                                                </h5>
+
+                                                <button
+                                                    type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close"
+                                                ></button>
+
+                                            </div>
+
+
+                                            <!-- Modal Body -->
+
+                                            <div class="modal-body text-start">
+
+                                                <p>
+                                                    Are you sure you want to ban
+                                                    <strong>{{ user.name }}</strong>?
+                                                </p>
+
+
+                                                <form
+                                                    action="{{ url_for(
+                                                        'admin.ban_user',
+                                                        user_id=user.id
+                                                    ) }}"
+                                                    method="POST"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="source"
+                                                        value="users"
+                                                    >
+
+                                                    <label
+                                                        for="banReason{{ user.id }}"
+                                                        class="form-label fw-semibold"
+                                                    >
+                                                        Ban Reason
+                                                    </label>
+
+                                                    <textarea
+                                                        id="banReason{{ user.id }}"
+                                                        name="ban_reason"
+                                                        class="form-control"
+                                                        rows="4"
+                                                        placeholder="Enter the reason for banning this user..."
+                                                        required
+                                                    ></textarea>
+
+                                                    {% if request.args.get("ban_error") and request.args.get("error_user_id")|int == user.id %}
+                                                        <div class="alert alert-danger mt-2 mb-0" role="alert">
+                                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                                            {{ request.args.get("ban_error") }}
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div class="text-end mt-3">
+
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-secondary"
+                                                            data-bs-dismiss="modal"
+                                                        >
+                                                            Cancel
+                                                        </button>
+
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-danger"
+                                                        >
+                                                            <i class="bi bi-person-x me-1"></i>
+                                                            Ban User
+                                                        </button>
+
+                                                    </div>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            {% else %}
+
+                                <span class="text-secondary">
+                                    -
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% else %}
+
+<!-- =========================
+     EMPTY STATE
+========================= -->
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-body text-center py-5">
+
+        <i class="bi bi-people fs-1 text-secondary"></i>
+
+        <h4 class="mt-3">
+            No Users
+        </h4>
+
+        <p class="text-secondary mb-0">
+            There are currently no active users.
+        </p>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% if request.args.get("ban_error") and request.args.get("error_user_id") %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById(
+            "banUser{{ request.args.get('error_user_id') }}"
+        );
+
+        if (modal) {
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        }
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -8,13 +8,15 @@ from app.models import (
     UserCollection,
     OwnedItem,
     Submission,
-    CorrectionRequest,
     Listing,
     Transaction,
-    Trade
+    Trade,
+    PaymentQR
 )
 from werkzeug.security import generate_password_hash
 from app.utils import normalize_text
+import os
+import shutil
 
 
 app = create_app()
@@ -28,10 +30,10 @@ with app.app_context():
     # CLEAR EXISTING DATA
     # =========================
 
+    db.session.query(PaymentQR).delete()
     db.session.query(Trade).delete()
     db.session.query(Transaction).delete()
     db.session.query(Listing).delete()
-    db.session.query(CorrectionRequest).delete()
     db.session.query(Submission).delete()
     db.session.query(OwnedItem).delete()
     db.session.query(UserCollection).delete()
@@ -97,7 +99,49 @@ with app.app_context():
 
     db.session.commit()
 
+    # =========================
+    # PAYMENT QR
+    # =========================
 
+    bob_qr_filename = "bob_payment_qr.png"
+
+    seed_qr_path = os.path.join(
+        app.root_path,
+        "marketplace",
+        "static",
+        "seed_images",
+        bob_qr_filename
+    )
+
+    qr_upload_folder = os.path.join(
+        app.root_path,
+        "marketplace",
+        "static",
+        "uploads",
+        "payment_qrs"
+    )
+
+    os.makedirs(
+        qr_upload_folder,
+        exist_ok=True
+    )
+
+    shutil.copyfile(
+        seed_qr_path,
+        os.path.join(
+            qr_upload_folder,
+            bob_qr_filename
+        )
+    )
+
+    bob_payment_qr = PaymentQR(
+        user_id=bob.id,
+        filename=bob_qr_filename
+    )
+
+    db.session.add(bob_payment_qr)
+    db.session.commit()
+    
     # =========================
     # TAGS
     # =========================
@@ -329,12 +373,22 @@ with app.app_context():
 
         UserCollection(
             user_id=bob.id,
+            collection_id=pokemon.id
+        ),
+
+        UserCollection(
+            user_id=bob.id,
             collection_id=crybaby.id
         ),
 
         UserCollection(
             user_id=charlie.id,
             collection_id=pokemon.id
+        ),
+
+        UserCollection(
+            user_id=charlie.id,
+            collection_id=naruto.id
         )
     ])
 
@@ -371,6 +425,18 @@ with app.app_context():
         ),
 
         OwnedItem(
+            user_id=bob.id,
+            item_id=charizard.id,
+            quantity=1
+        ),
+
+        OwnedItem(
+            user_id=bob.id,
+            item_id=sakura.id,
+            quantity=1
+        ),
+
+        OwnedItem(
             user_id=charlie.id,
             item_id=pikachu.id,
             quantity=1
@@ -379,6 +445,12 @@ with app.app_context():
         OwnedItem(
             user_id=charlie.id,
             item_id=charizard.id,
+            quantity=1
+        ),
+
+        OwnedItem(
+            user_id=charlie.id,
+            item_id=sasuke.id,
             quantity=1
         )
     ])
@@ -428,24 +500,6 @@ with app.app_context():
 
     db.session.commit()
 
-
-    # =========================
-    # TRADE
-    # =========================
-
-    trade = Trade(
-        sender_id=alice.id,
-        receiver_id=bob.id,
-        offered_item_id=pikachu.id,
-        requested_item_id=sasuke.id,
-        status="pending"
-    )
-
-    db.session.add(trade)
-
-    db.session.commit()
-
-
     # =========================
     # SUBMISSION
     # =========================
@@ -464,25 +518,6 @@ with app.app_context():
     )
 
     db.session.add(submission)
-
-    db.session.commit()
-
-
-    # =========================
-    # CORRECTION REQUEST
-    # =========================
-
-    correction = CorrectionRequest(
-        user_id=alice.id,
-        item_id=pikachu.id,
-        type="text",
-        description="The description of this item needs to be corrected.",
-        image=None,
-        status="pending",
-        reviewed_by=None
-    )
-
-    db.session.add(correction)
 
     db.session.commit()
 

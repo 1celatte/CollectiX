@@ -1,190 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "admin_base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Edit Collection - CollectiX
+{% endblock %}
 
-    <title>Edit Collection - CollectiX</title>
-</head>
+{% block content %}
 
-<body>
+<!-- =========================
+     PAGE HEADER
+========================= -->
 
-<h1>Edit Collection</h1>
+<div class="mb-4">
 
-<form method="POST" enctype="multipart/form-data">
+    <h1 class="fw-bold mb-1">
+        Edit Collection
+    </h1>
 
-    <label>Name:</label>
+    <p class="text-secondary mb-0">
+        Make changes to the collection information and image.
+    </p>
 
-    <input
-        type="text"
-        name="name"
-        value="{{ collection.name }}"
-        required
-    >
+</div>
 
-    <br><br>
 
-    <label>Tag:</label>
+<!-- =========================
+     EDIT FORM
+========================= -->
 
-    <select name="tag_id" required>
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
 
-        {% for tag in tags %}
+    <div class="row g-4">
 
-            <option
-                value="{{ tag.id }}"
-                {% if collection.tag_id == tag.id %}
-                    selected
-                {% endif %}
-            >
-                {{ tag.name }}
-            </option>
 
-        {% endfor %}
+        <!-- =========================
+             COLLECTION INFORMATION
+        ========================= -->
 
-    </select>
+        <div class="col-lg-7">
 
-    <br><br>
+            <div class="card border-0 shadow-sm h-100">
 
-    <label>Current Image:</label>
+                <div class="card-header bg-white py-3">
 
-    <br><br>
+                    <h5 class="fw-bold mb-1">
+                        Collection Information
+                    </h5>
 
-    <div class="image-box">
+                    <small class="text-secondary">
+                        Update the details of this collection.
+                    </small>
 
-        {% if collection.image %}
+                </div>
 
-            <img
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + collection.image
-                ) }}"
-                alt="{{ collection.name }}"
-            >
 
-        {% else %}
+                <div class="card-body">
 
-            <span>No Image</span>
 
-        {% endif %}
+                    <!-- Name -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="name"
+                            class="form-label fw-semibold"
+                        >
+                            Collection Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ collection.name }}"
+                            class="form-control"
+                            required
+                        >
+
+                        <div class="form-text">
+                            Enter the name of the collection.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Tag -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="tag_id"
+                            class="form-label fw-semibold"
+                        >
+                            Tag
+                        </label>
+
+                        <select
+                            id="tag_id"
+                            name="tag_id"
+                            class="form-select"
+                            required
+                        >
+
+                            {% for tag in tags %}
+
+                                <option
+                                    value="{{ tag.id }}"
+                                    {% if collection.tag_id == tag.id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ tag.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="form-text">
+                            Select a category tag for this collection.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="mb-2">
+
+                        <label
+                            for="description"
+                            class="form-label fw-semibold"
+                        >
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="8"
+                            class="form-control"
+                            placeholder="Enter collection description..."
+                        >{{ collection.description }}</textarea>
+
+                        <div class="form-text">
+                            Update the description of the collection.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             COLLECTION IMAGE
+        ========================= -->
+
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-1">
+                        Collection Image
+                    </h5>
+
+                    <small class="text-secondary">
+                        Manage the image for this collection.
+                    </small>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <!-- Current Image -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+                            Current Image
+                        </label>
+
+
+                        <div
+                            class="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden"
+                            style="height: 280px;"
+                        >
+
+                            {% if collection.image %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'collection.static',
+                                        filename='uploads/' + collection.image
+                                    ) }}"
+                                    alt="{{ collection.name }}"
+                                    class="img-fluid"
+                                    style="
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: contain;
+                                    "
+                                >
+
+                            {% else %}
+
+                                <div class="text-center text-secondary">
+
+                                    <i class="bi bi-image fs-1 d-block mb-2"></i>
+
+                                    <div>
+                                        No Image
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        {% if collection.image %}
+
+                            <div class="form-check mt-3">
+
+                                <input
+                                    type="checkbox"
+                                    id="remove_image"
+                                    name="remove_image"
+                                    value="1"
+                                    class="form-check-input"
+                                >
+
+                                <label
+                                    for="remove_image"
+                                    class="form-check-label"
+                                >
+                                    Remove current image
+                                </label>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Change Image -->
+
+                    <div>
+
+                        <label
+                            for="image"
+                            class="form-label fw-semibold"
+                        >
+                            Change Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept="image/*"
+                            class="form-control"
+                        >
+
+                        <div class="form-text">
+                            Select a new image to replace the current one.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    {% if collection.image %}
 
-        <br>
+    <!-- =========================
+         ACTION BUTTONS
+    ========================= -->
 
-        <label>
-            <input
-                type="checkbox"
-                name="remove_image"
-                value="1"
-            >
-            Remove Image
-        </label>
+    <div class="card border-0 shadow-sm mt-4">
 
-    {% endif %}
+        <div class="card-body">
 
-    <br><br>
+            <div class="d-flex justify-content-between align-items-center">
 
-    <label>Change Image:</label>
+                <a
+                    href="{{ url_for('admin.collections') }}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back to Collections
+                </a>
 
-    <input
-        type="file"
-        name="image"
-        accept="image/*"
-    >
 
-    <br><br>
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-check-lg me-1"></i>
+                    Save Changes
+                </button>
 
-    <label>Description:</label>
+            </div>
 
-    <br>
+        </div>
 
-    <textarea
-        name="description"
-        rows="5"
-        cols="50"
-    >{{ collection.description }}</textarea>
-
-    <br><br>
-
-    <button type="submit" class="save-btn">
-        Save Changes
-    </button>
+    </div>
 
 </form>
 
-<br>
-
-<a href="{{ url_for('admin.collections') }}" class="back-btn">
-    ← Back
-</a>
-
-<style>
-
-    body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-    }
-
-    input[type="text"],
-    select,
-    textarea {
-        padding: 6px;
-        font-size: 14px;
-    }
-
-    .image-box {
-        width: 150px;
-        height: 150px;
-        border: 1px solid #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        background-color: #f8f8f8;
-    }
-
-    .image-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .image-box span {
-        color: #888;
-        font-size: 14px;
-    }
-
-    .save-btn {
-        padding: 8px 15px;
-        background-color: #198754;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .save-btn:hover {
-        background-color: #157347;
-    }
-
-    .back-btn {
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-    }
-
-    .back-btn:hover {
-        background-color: #5c636a;
-    }
-
-</style>
-
-</body>
-</html>
-
+{% endblock %}

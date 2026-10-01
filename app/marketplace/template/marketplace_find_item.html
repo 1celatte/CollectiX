@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}
+Find {{ item.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+
+        <h1 class="display-6 fw-bold mb-2">
+            Find Item
+        </h1>
+
+        <p class="text-muted mb-0">
+            Marketplace listings for
+            <strong>{{ item.name }}</strong>
+            from
+            <strong>{{ collection.name }}</strong>
+        </p>
+
+    </div>
+
+
+    <!-- Marketplace Listings -->
+    {% if listings %}
+
+        <div class="row g-4">
+
+            {% for listing in listings %}
+
+                <div class="col-12 col-md-6 col-lg-4">
+
+                    {% if listing.listing_type == "sell" %}
+                        <div
+                            class="card h-100 shadow-sm overflow-hidden"
+                            style="
+                                border: 1px solid #cfe2ff;
+                                border-top: 4px solid #0d6efd;
+                                border-radius: 0.75rem;
+                            "
+                        >
+                    {% else %}
+                        <div
+                            class="card h-100 shadow-sm overflow-hidden"
+                            style="
+                                border: 1px solid #ffecb5;
+                                border-top: 4px solid #ffc107;
+                                border-radius: 0.75rem;
+                            "
+                        >
+                    {% endif %}
+
+                        <!-- Listing Image -->
+                        {% if listing.image %}
+
+                            <img
+                                src="{{ url_for(
+                                    'marketplace.static',
+                                    filename='uploads/listings/' + listing.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                class="card-img-top bg-white"
+                                style="height: 220px; object-fit: contain;"
+                            >
+
+                        {% else %}
+
+                            <div
+                                class="bg-white d-flex align-items-center justify-content-center text-muted"
+                                style="height: 220px;"
+                            >
+                                <div class="text-center">
+
+                                    <div class="fs-2 mb-1">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+
+                                    No image available
+
+                                </div>
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Listing Information -->
+                        <div class="card-body d-flex flex-column">
+
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+
+                                <h2 class="h4 mb-0">
+                                    {{ item.name }}
+                                </h2>
+
+                                {% if listing.listing_type == "sell" %}
+
+                                    <span class="badge text-bg-primary">
+                                        For Sale
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge text-bg-warning">
+                                        For Trade
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if listing.price is not none %}
+
+                                <p class="mb-2">
+                                    <strong>Price:</strong>
+                                    RM {{ "%.2f"|format(listing.price) }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if listing.condition %}
+
+                                <p class="mb-2">
+                                    <strong>Condition:</strong>
+                                    {{ listing.condition }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if listing.description %}
+
+                                <p class="text-muted mb-3">
+                                    {{ listing.description }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <!-- View Listing -->
+                            <a
+                                href="{{ url_for(
+                                    'marketplace.view_listing',
+                                    listing_id=listing.id
+                                ) }}"
+                                class="btn btn-primary w-100 mt-auto"
+                            >
+                                <i class="bi bi-eye me-1"></i>
+                                View Listing
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- No Results -->
+        <div class="alert alert-info border-0 shadow-sm">
+
+            <i class="bi bi-info-circle me-2"></i>
+
+            No available listings found for this item.
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- Back Button -->
+    <div class="mt-4">
+
+        <a
+            href="{{ url_for(
+                'my_collection.view_missing_items',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Missing Items
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

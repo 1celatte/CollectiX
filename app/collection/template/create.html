@@ -6,181 +6,606 @@ Create New Collection
 
 {% block content %}
 
-<h1>Create New Collection</h1>
+<style>
 
-<p>
-    Create a new collectible collection.
-    Your collection will be reviewed by an admin before
-    appearing publicly.
-</p>
+    .create-section {
+        padding: 45px 0;
+    }
 
-<form
-    method="POST"
-    enctype="multipart/form-data"
->
+    /* =========================
+       MAIN CARD
+    ========================= */
 
-    <!-- Collection Name -->
+    .create-card {
+        position: relative;
+        overflow: hidden;
 
-    <div>
+        border-radius: 26px;
 
-        <label for="name">
-            Collection Name:
-        </label>
+        background-color: #ffffff;
 
-        <br>
+        border: 1px solid #d5eaf4;
 
-        <input
-            type="text"
-            id="name"
-            name="name"
-            required
-        >
+        box-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.08);
+    }
 
-    </div>
 
-    <br>
+    /* =========================
+       PAGE HEADER
+    ========================= */
 
-    <!-- Tag -->
+    .create-header {
+        position: relative;
+        overflow: hidden;
 
-    <div>
+        padding: 35px 40px;
 
-        <label for="tag_id">
-            Tag:
-        </label>
+        background: linear-gradient(
+            145deg,
+            #102a43,
+            #0d6efd
+        );
 
-        <br>
+        color: white;
+    }
 
-        <select
-            id="tag_id"
-            name="tag_id"
-            required
-            onchange="toggleNewTagField()"
-        >
+    .create-header::before {
+        content: "";
 
-            <option value="">
-                -- Select a tag --
-            </option>
+        position: absolute;
 
-            {% for tag in tags %}
+        width: 200px;
+        height: 200px;
 
-                <option value="{{ tag.id }}">
-                    {{ tag.name }}
-                </option>
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.08);
+
+        top: -90px;
+        right: -50px;
+    }
+
+    .create-header::after {
+        content: "";
+
+        position: absolute;
+
+        width: 150px;
+        height: 150px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.06);
+
+        bottom: -80px;
+        left: -50px;
+    }
+
+    .create-header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .create-icon {
+        width: 58px;
+        height: 58px;
+
+        border-radius: 17px;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 18px;
+    }
+
+    .create-icon i {
+        font-size: 27px;
+        color: white;
+    }
+
+    .create-header h1 {
+        font-size: 30px;
+        font-weight: 750;
+
+        line-height: 1.2;
+
+        margin-bottom: 10px;
+    }
+
+    .create-header p {
+        font-size: 14px;
+
+        color: rgba(255, 255, 255, 0.78);
+
+        line-height: 1.7;
+
+        max-width: 650px;
+
+        margin-bottom: 0;
+    }
+
+
+    /* =========================
+       FORM SIDE
+    ========================= */
+
+    .create-form-side {
+        background-color: #f5fbfe;
+
+        padding: 40px;
+
+        border-top: 1px solid #d5eaf4;
+    }
+
+    .create-form-content {
+        width: 100%;
+        max-width: 800px;
+
+        margin: auto;
+    }
+
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .create-form-label {
+        color: #374151;
+
+        font-size: 14px;
+
+        margin-bottom: 8px;
+    }
+
+    .create-form-control,
+    .create-form-select {
+        background-color: #ffffff;
+
+        border: 1px solid #cfe3ec;
+
+        border-radius: 10px;
+
+        padding: 11px 13px;
+
+        font-size: 14px;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .create-form-control:focus,
+    .create-form-select:focus {
+        border-color: #0d6efd;
+
+        box-shadow:
+            0 0 0 3px rgba(13, 110, 253, 0.10);
+    }
+
+    .create-form-control::placeholder {
+        color: #adb5bd;
+    }
+
+    .create-form-text {
+        color: #6c757d;
+
+        font-size: 13px;
+
+        margin-top: 7px;
+    }
+
+
+    /* =========================
+       NEW TAG FIELD
+    ========================= */
+
+    .new-tag-box {
+        background-color: #ffffff;
+
+        border: 1px solid #cfe3ec;
+
+        border-radius: 12px;
+
+        padding: 18px;
+
+        margin-top: -5px;
+    }
+
+
+    /* =========================
+       SUBMIT BUTTON
+    ========================= */
+
+    .create-btn {
+        border: none;
+
+        border-radius: 10px;
+
+        padding: 11px 20px;
+
+        font-weight: 600;
+
+        background: linear-gradient(
+            135deg,
+            #0d6efd,
+            #087ea4
+        );
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .create-btn:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 7px 16px rgba(13, 110, 253, 0.22);
+    }
+
+
+    /* =========================
+       BACK BUTTON
+    ========================= */
+
+    .back-btn {
+        border-radius: 10px;
+
+        padding: 10px 16px;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 991px) {
+
+        .create-header {
+            padding: 35px;
+        }
+
+        .create-form-side {
+            padding: 35px;
+        }
+
+    }
+
+    @media (max-width: 576px) {
+
+        .create-section {
+            padding: 25px 0;
+        }
+
+        .create-card {
+            border-radius: 20px;
+        }
+
+        .create-header {
+            padding: 30px 25px;
+        }
+
+        .create-form-side {
+            padding: 30px 25px;
+        }
+
+        .create-header h1 {
+            font-size: 27px;
+        }
+
+    }
+
+</style>
+
+
+<div class="container create-section">
+
+    <!-- ===================================================== -->
+    <!-- FLASH MESSAGES -->
+    <!-- ===================================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div
+                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    <i class="bi bi-info-circle me-2"></i>
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
 
             {% endfor %}
 
-            <option value="other">
-                Other 
-            </option>
+        {% endif %}
 
-        </select>
+    {% endwith %}
+
+
+    <!-- ===================================================== -->
+    <!-- CREATE COLLECTION CARD -->
+    <!-- ===================================================== -->
+
+    <div class="create-card">
+
+        <!-- ================================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ================================================= -->
+
+        <div class="create-header">
+
+            <div class="create-header-content">
+
+                <div class="create-icon">
+                    <i class="bi bi-collection"></i>
+                </div>
+
+                <h1>
+                    Create New Collection
+                </h1>
+
+                <p>
+                    Create a new collectible collection.
+                    Your collection will be reviewed by an admin before
+                    appearing publicly.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FORM -->
+        <!-- ================================================= -->
+
+        <div class="create-form-side">
+
+            <div class="create-form-content">
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+                    <!-- Collection Name -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="name"
+                            class="form-label create-form-label fw-semibold"
+                        >
+                            Collection Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control create-form-control"
+                            placeholder="Enter collection name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Tag -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="tag_id"
+                            class="form-label create-form-label fw-semibold"
+                        >
+                            Tag
+                        </label>
+
+                        <select
+                            id="tag_id"
+                            name="tag_id"
+                            class="form-select create-form-select"
+                            required
+                            onchange="toggleNewTagField()"
+                        >
+
+                            <option value="">
+                                -- Select a tag --
+                            </option>
+
+                            {% for tag in tags %}
+
+                                <option value="{{ tag.id }}">
+                                    {{ tag.name }}
+                                </option>
+
+                            {% endfor %}
+
+                            <option value="other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- New Tag: shown only for Other -->
+
+                    <div
+                        id="new-tag-field"
+                        class="mb-4 new-tag-box"
+                        style="display: none;"
+                    >
+
+                        <label
+                            for="new_tag"
+                            class="form-label create-form-label fw-semibold"
+                        >
+                            New Tag Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="new_tag"
+                            name="new_tag"
+                            class="form-control create-form-control"
+                            maxlength="80"
+                            placeholder="e.g. KPOP MERCHANDISE"
+                        >
+
+                        <div class="create-form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Your new tag will require admin approval.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="description"
+                            class="form-label create-form-label fw-semibold"
+                        >
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="form-control create-form-control"
+                            rows="5"
+                            placeholder="Describe your collection"
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- Collection Image -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="image"
+                            class="form-label create-form-label fw-semibold"
+                        >
+                            Collection Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            class="form-control create-form-control"
+                            accept="image/*"
+                        >
+
+                        <div class="create-form-text">
+                            <i class="bi bi-image me-1"></i>
+                            Upload an image representing your collection.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Submit -->
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary create-btn"
+                    >
+                        <i class="bi bi-plus-lg me-2"></i>
+                        Create Collection
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <br>
 
-    <!-- New Tag: shown only for Other -->
+    <!-- ===================================================== -->
+    <!-- BACK TO COLLECTIONS -->
+    <!-- ===================================================== -->
 
-    <div
-        id="new-tag-field"
-        style="display: none;"
-    >
+    <div class="mt-4">
 
-        <label for="new_tag">
-            New Tag Name:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            id="new_tag"
-            name="new_tag"
-            maxlength="80"
-            placeholder="e.g. KPOP MERCHANDISE"
+        <a
+            href="{{ url_for('collection.list_collections') }}"
+            class="btn btn-outline-secondary back-btn"
         >
-
-        <p>
-            Your new tag will require admin approval.
-        </p>
-
-    </div>
-
-    <!-- Description -->
-
-    <div>
-
-        <label for="description">
-            Description:
-        </label>
-
-        <br>
-
-        <textarea
-            id="description"
-            name="description"
-            rows="5"
-            cols="40"
-        ></textarea>
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Collections
+        </a>
 
     </div>
 
-    <br>
 
-    <!-- Collection Image -->
+    <!-- ===================================================== -->
+    <!-- NEW TAG JAVASCRIPT -->
+    <!-- ===================================================== -->
 
-    <div>
+    <script>
 
-        <label for="image">
-            Collection Image:
-        </label>
+        function toggleNewTagField() {
 
-        <br>
+            const tagSelect =
+                document.getElementById("tag_id");
 
-        <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-        >
+            const newTagField =
+                document.getElementById("new-tag-field");
 
-    </div>
+            const newTagInput =
+                document.getElementById("new_tag");
 
-    <br>
 
-    <!-- Submit -->
+            const selectedOther =
+                tagSelect.value === "other";
 
-    <button type="submit">
-        Create Collection
-    </button>
 
-</form>
+            newTagField.style.display =
+                selectedOther ? "block" : "none";
 
-<br>
+            newTagInput.required =
+                selectedOther;
 
-<!-- Back to Collections -->
 
-<a href="{{ url_for('collection.list_collections') }}">
-    <button type="button">
-        ← Back to Collections
-    </button>
-</a>
+            if (!selectedOther) {
 
-<script>
-    function toggleNewTagField() {
-        const tagSelect = document.getElementById("tag_id");
-        const newTagField = document.getElementById("new-tag-field");
-        const newTagInput = document.getElementById("new_tag");
+                newTagInput.value = "";
 
-        const selectedOther = tagSelect.value === "other";
+            }
 
-        newTagField.style.display = selectedOther ? "block" : "none";
-        newTagInput.required = selectedOther;
-
-        if (!selectedOther) {
-            newTagInput.value = "";
         }
-    }
-</script>
+
+    </script>
+
+</div>
 
 {% endblock %}

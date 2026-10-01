@@ -1,39 +1,724 @@
 {% extends "base.html" %}
 
-<!--Page Title-->
 {% block title %}
 Home - CollectiX
 {% endblock %}
 
 {% block content %}
 
-<!--Main welcome area of the homepage-->
-<div class="text-center py-5">
+<style>
 
-    <!--Main heading-->
-    <h1 class="display-4 fw-bold">
-        Welcome to CollectiX
-    </h1>
+    /* =========================
+       GENERAL
+    ========================= */
 
-    <!--Short introduction-->
-    <p class="lead">
-        Illustrated collection system, items buy/sell and exchange platform
-    </p>
+    .home-section {
+        padding: 35px 0;
+    }
 
-    <!--Browse collections button-->
-    <a href="{{ url_for('collection.list_collections') }}" class="btn btn-primary me-2">
-        Browse Collections
-    </a>
 
-    <!--Marketplace button-->
-    <a href="{{ url_for('marketplace.marketplace_home') }}" class="btn btn-outline-primary">
-        View Marketplace
-    </a>
+    /* =========================
+       HERO
+    ========================= */
 
-    <!--Profile action button-->
-    <a href="{{ url_for('auth.profile') }}" class="btn btn-primary">
-        View Profile
-    </a>
+    .hero-card {
+        position: relative;
+        overflow: hidden;
+
+        background: linear-gradient(
+            135deg,
+            #102a43,
+            #0d6efd
+        );
+
+        border-radius: 28px;
+        padding: 60px;
+        color: white;
+
+        box-shadow:
+            0 15px 40px rgba(13, 110, 253, 0.20);
+    }
+
+    .hero-card::before {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        top: -120px;
+        right: -70px;
+    }
+
+    .hero-card::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 50%;
+        bottom: -90px;
+        left: 42%;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        color: white;
+        border-radius: 30px;
+        padding: 8px 15px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .hero-title {
+        font-size: 54px;
+        font-weight: 750;
+        line-height: 1.1;
+        margin-bottom: 20px;
+    }
+
+    .hero-title span {
+        color: #8ed8ff;
+    }
+
+    .hero-text {
+        font-size: 17px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 580px;
+        margin-bottom: 30px;
+    }
+
+    .hero-buttons .btn {
+        border-radius: 10px;
+        padding: 10px 18px;
+    }
+
+    .hero-buttons .btn-light {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       HERO VISUAL
+    ========================= */
+
+    .hero-visual {
+        position: relative;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(8px);
+        border-radius: 24px;
+        padding: 42px 30px;
+        text-align: center;
+        min-height: 310px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        max-height: 310px;
+        object-fit: cover;
+        border-radius: 18px;
+    }
+
+    /* =========================
+       SECTION TITLE
+    ========================= */
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 42px;
+    }
+
+    .section-label {
+        display: inline-block;
+        background: rgba(13, 110, 253, 0.08);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.12);
+        border-radius: 30px;
+        padding: 7px 15px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        margin-bottom: 12px;
+    }
+
+    .section-title {
+        font-size: 34px;
+        font-weight: 750;
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .section-description {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+
+    /* =========================
+       FEATURE CARDS
+    ========================= */
+
+    .feature-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        border-radius: 24px;
+        padding: 32px;
+        color: white;
+        border: none;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 18px 35px rgba(0, 0, 0, 0.13);
+    }
+
+
+    /* Decorative circles */
+
+    .feature-card::before {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.10);
+        right: -65px;
+        top: -55px;
+    }
+
+    .feature-card::after {
+        content: "";
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.07);
+        right: 30px;
+        bottom: -55px;
+    }
+
+
+    /* Individual colours */
+
+    .collection-card {
+        background: linear-gradient(
+            145deg,
+            #087ea4,
+            #0d6efd
+        );
+    }
+
+    .marketplace-card {
+        background: linear-gradient(
+            145deg,
+            #11795b,
+            #20a674
+        );
+    }
+
+    .mycollection-card {
+        background: linear-gradient(
+            145deg,
+            #6842b7,
+            #8b5cf6
+        );
+    }
+
+
+    /* Card content */
+
+    .feature-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .feature-number {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        opacity: 0.75;
+        margin-bottom: 20px;
+    }
+
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 29px;
+        margin-bottom: 23px;
+    }
+
+    .feature-card h4 {
+        font-size: 23px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .feature-card p {
+        color: rgba(255, 255, 255, 0.80);
+        line-height: 1.65;
+        margin-bottom: 28px;
+        max-width: 300px;
+    }
+
+    .feature-link {
+        margin-top: auto;
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.14);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 10px;
+        padding: 9px 16px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .feature-link:hover {
+        background: rgba(255, 255, 255, 0.22);
+        color: white;
+    }
+
+    .feature-link i {
+        margin-left: 7px;
+    }
+
+
+    /* =========================
+       CTA
+    ========================= */
+
+    .cta-card {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+            135deg,
+            #111827,
+            #1e3a5f
+        );
+        border-radius: 24px;
+        padding: 52px 30px;
+        text-align: center;
+        color: white;
+        box-shadow:
+            0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .cta-card::before {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(14, 165, 233, 0.12);
+        top: -100px;
+        left: -60px;
+    }
+
+    .cta-card::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(139, 92, 246, 0.10);
+        right: -50px;
+        bottom: -80px;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-icon {
+        width: 65px;
+        height: 65px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 18px;
+    }
+
+    .cta-card h2 {
+        font-size: 31px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .cta-card p {
+        color: rgba(255, 255, 255, 0.72);
+        margin-bottom: 25px;
+    }
+
+    .cta-card .btn {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 768px) {
+
+        .hero-card {
+            padding: 35px 25px;
+        }
+
+        .hero-title {
+            font-size: 39px;
+        }
+
+        .hero-text {
+            font-size: 16px;
+        }
+
+        .hero-visual {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 28px;
+        }
+
+        .feature-card {
+            min-height: 320px;
+        }
+
+    }
+
+</style>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<div class="container home-section">
+
+    <div class="hero-card">
+
+        <div class="row align-items-center">
+
+            <!-- Left -->
+            <div class="col-lg-7">
+
+                <div class="hero-content">
+
+                    <span class="hero-badge">
+                        <i class="bi bi-stars"></i>
+                        Your Collection Platform
+                    </span>
+
+                    <h1 class="hero-title">
+                        Welcome to <span>CollectiX</span>
+                    </h1>
+
+                    <p class="hero-text">
+                        Collect, organize, buy, sell and exchange
+                        your favourite items — all in one place.
+                    </p>
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="{{ url_for('collection.list_collections') }}"
+                            class="btn btn-light me-2 mb-2"
+                        >
+                            <i class="bi bi-collection me-2"></i>
+                            Browse Collections
+                        </a>
+
+                        <a
+                            href="{{ url_for('marketplace.marketplace_home') }}"
+                            class="btn btn-outline-light mb-2"
+                        >
+                            <i class="bi bi-shop me-2"></i>
+                            View Marketplace
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Right -->
+            <div class="col-lg-5">
+
+                <div class="hero-visual">
+
+                    <img
+                        src="{{ url_for('static', filename='images/collectix-home.png') }}"
+                        alt="CollectiX"
+                        class="hero-image"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
+
+<!-- =========================
+     FEATURES
+========================= -->
+
+<div class="container home-section">
+
+    <div class="section-header">
+
+        <span class="section-label">
+            EXPLORE COLLECTIX
+        </span>
+
+        <h2 class="section-title">
+            How CollectiX works ?
+        </h2>
+
+        <p class="section-description">
+            Everything you need to collect, discover and trade.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+
+        <!-- Collections -->
+
+        <div class="col-md-4">
+
+            <div class="feature-card collection-card">
+
+                <div class="feature-content">
+
+                    <div class="feature-number">
+                        01 / COLLECTIONS
+                    </div>
+
+                    <div class="feature-icon">
+                        <i class="bi bi-collection"></i>
+                    </div>
+
+                    <h4>
+                        Collections
+                    </h4>
+
+                    <p>
+                        Discover different collections and
+                        keep track of the collectible items
+                        you own.
+                    </p>
+
+                    <a
+                        href="{{ url_for('collection.list_collections') }}"
+                        class="feature-link"
+                    >
+                        Explore Collections
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Marketplace -->
+
+        <div class="col-md-4">
+
+            <div class="feature-card marketplace-card">
+
+                <div class="feature-content">
+
+                    <div class="feature-number">
+                        02 / MARKETPLACE
+                    </div>
+
+                    <div class="feature-icon">
+                        <i class="bi bi-shop"></i>
+                    </div>
+
+                    <h4>
+                        Marketplace
+                    </h4>
+
+                    <p>
+                        Buy, sell and exchange collectible
+                        items with other collectors.
+                    </p>
+
+                    <a
+                        href="{{ url_for('marketplace.marketplace_home') }}"
+                        class="feature-link"
+                    >
+                        Visit Marketplace
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- My Collection -->
+
+        <div class="col-md-4">
+
+            <div class="feature-card mycollection-card">
+
+                <div class="feature-content">
+
+                    <div class="feature-number">
+                        03 / MY COLLECTION
+                    </div>
+
+                    <div class="feature-icon">
+                        <i class="bi bi-person-heart"></i>
+                    </div>
+
+                    <h4>
+                        My Collection
+                    </h4>
+
+                    <p>
+                        Manage your personal collections
+                        and keep track of the items you own.
+                    </p>
+
+                    {% if current_user.is_authenticated %}
+
+                        <a
+                            href="{{ url_for('my_collection.list_my_collections') }}"
+                            class="feature-link"
+                        >
+                            My Collection
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                    {% else %}
+
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="feature-link"
+                        >
+                            Login to Start
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CTA
+========================= -->
+
+<div class="container home-section">
+
+    <div class="cta-card">
+
+        <div class="cta-content">
+
+            <div class="cta-icon">
+                <i class="bi bi-stars"></i>
+            </div>
+
+            <h2>
+                Let’s Get Started
+            </h2>
+
+            <p>
+                Create your account and start building
+                your collection with CollectiX.
+            </p>
+
+            <a
+                href="{{ url_for('auth.register') }}"
+                class="btn btn-light me-2"
+            >
+                <i class="bi bi-person-plus me-2"></i>
+                Register
+            </a>
+
+            <a
+                href="{{ url_for('auth.login') }}"
+                class="btn btn-outline-light"
+            >
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 {% endblock %}

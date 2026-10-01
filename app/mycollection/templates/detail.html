@@ -6,160 +6,420 @@
 
 {% block content %}
 
-<h1>
-    {{ collection.name }}
-</h1>
+<div class="container">
 
-{% if collection.image %}
+    <!-- Flash Messages -->
 
-    <img
-        src="{{ url_for(
-            'collection.static',
-            filename='uploads/' + collection.image
-        ) }}"
-        alt="{{ collection.name }}"
-        width="200"
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div
+                    class="alert alert-{{ category }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- Collection Header -->
+    <div
+        class="card shadow-sm mb-4"
+        style="
+            border: 1px solid #e2d9f3;
+            border-top: 4px solid #6f42c1;
+            border-radius: 0.75rem;
+        "
     >
+        <div class="card-body">
 
-{% endif %}
+            <h1 class="card-title fw-bold mb-3">
+                {{ collection.name }}
+            </h1>
 
-<p>
-    <strong>Tag:</strong>
+            {% if collection.image %}
+                <img
+                    src="{{ url_for(
+                        'collection.static',
+                        filename='uploads/' + collection.image
+                    ) }}"
+                    alt="{{ collection.name }}"
+                    class="img-fluid rounded mb-3"
+                    style="
+                        max-width: 300px;
+                        height: 250px;
+                        object-fit: contain;
+                        background-color: #f8f9fa;
+                    "
+                >
+            {% endif %}
 
-    {% if collection.tag %}
-        {{ collection.tag.name }}
-    {% else %}
-        Not assigned
-    {% endif %}
-</p>
+            <p class="mb-2">
+                <strong>Tag:</strong>
+                {% if collection.tag %}
+                    <span class="badge bg-primary">
+                        {{ collection.tag.name }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary">
+                        Not assigned
+                    </span>
+                {% endif %}
+            </p>
 
-<p>
-    <strong>Description:</strong>
-    {{ collection.description }}
-</p>
+            <p class="mb-0">
+                <strong>Description:</strong>
+                {{ collection.description }}
+            </p>
 
-<hr>
 
-<h2>
-    Items in This Collection
-</h2>
+            <!-- Collection Progress -->
+            <hr>
 
-{% if items %}
+            <h5 class="fw-bold mb-3">
+                Collection Progress
+            </h5>
 
-    {% for item in items %}
+            <div class="row text-center mb-3">
 
-        <hr>
+                <!-- Total Items -->
+                <div class="col">
+                    <div class="fw-bold">
+                        {{ total_items }}
+                    </div>
+                    <small class="text-muted">
+                        Total
+                    </small>
+                </div>
 
-        <h3>
-            {{ item.name }}
-        </h3>
+                <!-- Owned Items -->
+                <div class="col">
+                    <div class="fw-bold text-success">
+                        {{ owned_count }}
+                    </div>
+                    <small class="text-muted">
+                        Owned
+                    </small>
+                </div>
 
-        {% if item.image %}
+                <!-- Missing Items -->
+                <div class="col">
+                    <div class="fw-bold text-danger">
+                        {{ missing_items }}
+                    </div>
+                    <small class="text-muted">
+                        Missing
+                    </small>
+                </div>
 
-            <img
-                src="{{ url_for(
-                    'collection.static',
-                    filename='uploads/' + item.image
-                ) }}"
-                alt="{{ item.name }}"
-                width="150"
-            >
-         {% else %}
+            </div>
 
+
+            <!-- Progress Percentage -->
+            <div class="d-flex justify-content-between mb-1">
+                <small class="fw-bold">
+                    Progress
+                </small>
+                <small class="fw-bold">
+                    {{ progress }}%
+                </small>
+            </div>
+
+
+            <!-- Bootstrap Progress Bar -->
             <div
-                style="
-                    width: 150px;
-                    height: 150px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #eee;
-                "
+                class="progress"
+                role="progressbar"
+                aria-label="Collection progress"
+                aria-valuenow="{{ progress }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="height: 20px;"
             >
-                No Image
-            </div>    
+                <div
+                    class="progress-bar bg-success"
+                    style="width: {{ progress }}%;"
+                >
+                    {{ progress }}%
+                </div>
+            </div>
 
-        {% endif %}
+        </div>
+    </div>
 
-        <p>
-            {{ item.description }}
-        </p>
 
-        <!-- Check whether current user owns this item -->
+    <!-- Items -->
+    <h2 class="fw-bold mb-3">
+        Items in This Collection
+    </h2>
 
-        {% set owned = owned_items
-            |selectattr("item_id", "equalto", item.id)
-            |list
-            |first
-        %}
+    {% if items %}
+        <div class="row g-4">
 
-        {% if owned %}
+            {% for item in items %}
 
-            <p>
-                <strong>Status:</strong>
-                Owned
-            </p>
+                {% set owned = owned_items
+                    |selectattr("item_id", "equalto", item.id)
+                    |list
+                    |first
+                %}
 
-            <p>
-                <strong>Quantity:</strong>
-                {{ owned.quantity }}
-            </p>
+                <div class="col-12 col-md-6 col-lg-4">
 
+                    {% if owned %}
+                        <div
+                            class="card h-100 shadow-sm"
+                            style="
+                                border: 1px solid #d1e7dd;
+                                border-top: 4px solid #198754;
+                                border-radius: 0.75rem;
+                            "
+                        >
+                    {% else %}
+                        <div
+                            class="card h-100 shadow-sm"
+                            style="
+                                border: 1px solid #dee2e6;
+                                border-top: 4px solid #6c757d;
+                                border-radius: 0.75rem;
+                            "
+                        >
+                    {% endif %}
+
+                        {% if item.image %}
+                            <img
+                                src="{{ url_for(
+                                    'collection.static',
+                                    filename='uploads/' + item.image
+                                ) }}"
+                                alt="{{ item.name }}"
+                                class="card-img-top"
+                                style="
+                                    height: 220px;
+                                    object-fit: contain;
+                                    background-color: #f8f9fa;
+                                "
+                            >
+                        {% else %}
+                            <div
+                                class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                style="height: 220px;"
+                            >
+                                No Image
+                            </div>
+                        {% endif %}
+
+
+                        <div class="card-body">
+
+                            <h5 class="card-title fw-bold">
+                                {{ item.name }}
+                            </h5>
+
+                            <p class="card-text">
+                                {{ item.description }}
+                            </p>
+
+
+                            <!-- Owned or Unowned Status -->
+                            {% if owned %}
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+                                    <span class="badge bg-success">
+                                        Owned
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <strong>Quantity:</strong>
+                                    {{ owned.quantity }}
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+                                    <span class="badge bg-secondary">
+                                        Unowned
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <strong>Quantity:</strong>
+                                    0
+                                </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No approved items are available in this collection yet.
+        </div>
+    {% endif %}
+
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap gap-2 mt-4">
+
+        <!-- Find Missing Items Button -->
+        {% if missing_items > 0 %}
+            <a
+                href="{{ url_for(
+                    'my_collection.view_missing_items',
+                    collection_id=collection.id
+                ) }}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-search"></i>
+                Find Missing Items
+            </a>
         {% else %}
-
-            <p>
-                <strong>Status:</strong>
-                Unowned
-            </p>
-
-            <p>
-                <strong>Quantity:</strong>
-                0
-            </p>
-
+            <button
+                type="button"
+                class="btn btn-secondary"
+                disabled
+            >
+                <i class="bi bi-check-circle"></i>
+                No Missing Items
+            </button>
         {% endif %}
 
-    {% endfor %}
 
-{% else %}
+        <!-- Edit My Collection -->
+        <a
+            href="{{ url_for(
+                'my_collection.edit_my_collection',
+                collection_id=collection.id
+            ) }}"
+            class="btn btn-primary"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit My Collection
+        </a>
 
-    <p>
-        No approved items are available in this collection yet.
-    </p>
 
-{% endif %}
+        <!-- Remove Button -->
+        <button
+            type="button"
+            class="btn btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#removeCollectionModal"
+        >
+            <i class="bi bi-trash"></i>
+            Remove From My Collection
+        </button>
 
-<br>
-<a href="{{ url_for(
-    'my_collection.edit_my_collection',
-    collection_id=collection.id
-) }}">
-    <button type="button">Edit My Collection</button>
-</a>
 
-<br>
-<br>
-<form
-    method="POST"
-    action="{{ url_for(
-        'my_collection.remove_from_my_collection',
-        collection_id=collection.id
-    ) }}"
->
-    <button type="submit">
-        Remove Collection from My Collection
-    </button>
-</form>
-<br>
-<br>
-<a
-    href="{{ url_for(
-        'my_collection.list_my_collections'
-    ) }}"
->
-    <button type="button">
-        ← Back to My Collections
-    </button>
-</a>
+        <!-- Back Button -->
+        <a
+            href="{{ url_for(
+                'my_collection.list_my_collections'
+            ) }}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Back to My Collections
+        </a>
+
+    </div>
+
+
+    <!-- Remove Confirmation Modal -->
+    <div
+        class="modal fade"
+        id="removeCollectionModal"
+        tabindex="-1"
+        aria-labelledby="removeCollectionModalLabel"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="removeCollectionModalLabel"
+                    >
+                        Remove From My Collection
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p class="mb-0">
+                        Are you sure you want to remove
+                        <strong>{{ collection.name }}</strong>
+                        from My Collection?
+                    </p>
+
+                </div>
+
+                <div class="modal-footer">
+                    
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'my_collection.remove_from_my_collection',
+                            collection_id=collection.id
+                        ) }}"
+                    >
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                        >
+                            <i class="bi bi-trash"></i>
+                            Yes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

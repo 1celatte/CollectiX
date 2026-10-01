@@ -1,17 +1,31 @@
-from flask import render_template, request
+from flask import render_template, request,flash
 from app.browse import browse_bp
 from app.models import Collection, Item, Listing, Tag
 from datetime import datetime
 from app.utils import normalize_text
 
-#Browse all public collections
+
+#======================================================================
+# BROWSE ALL PUBLIC COLLECTIONS     
+#======================================================================
 @browse_bp.route("/")
 def browse_page():
+    
     #Read user's search and filter choices
     show = request.args.get("show", "all").strip()
     query = request.args.get("q", "").strip()
     tag = request.args.get("tag", "").strip()
     sort = request.args.get("sort", "newest").strip()
+    
+    #if the user is redirected from the create collection page, show a message to check if the collection exists
+    
+    from_create = request.args.get("from_create", "").strip()
+    
+    if from_create == "true":
+        flash(
+            "Use Browse & Search to check if the collection exists.",
+            "info"
+        )
     
     results = []
     
@@ -59,6 +73,7 @@ def browse_page():
                 "category": tag_record.name,
                 "description": collection.description,
                 "image": collection.image,
+                "image_source": "collection",
                 "collection_name": collection.name,
                 "price": None,
                 "created_at": collection.created_at,
@@ -99,6 +114,7 @@ def browse_page():
                 "category": tag_record.name,
                 "description": item.description,
                 "image": item.image,
+                "image_source": "collection",
                 "collection_name": collection.name,
                 "price": None,
                 "created_at": item.created_at,
@@ -143,9 +159,11 @@ def browse_page():
                 "name": item.name,
                 "category": tag_record.name,
                 "description": listing.description or item.description,
-                "image": item.image,
+                "image": listing.image or item.image,
+                "image_source": "marketplace" if listing.image else "collection",
                 "collection_name": collection.name,
                 "price": listing.price,
+                "listing_type": listing.listing_type,
                 "created_at": listing.created_at,
             })
 
@@ -189,52 +207,9 @@ def browse_page():
         tags=tags
     )
     
-#Display available marketplace listings
-@browse_bp.route("/marketplace")
-def browse_marketplace():
-    #Get selected sorting option
-    sort = request.args.get(
-        "sort",
-        "newest"
-    )
-      
-        
-    #Start with available listings
-    listings_query = Listing.query.join(
-        Item,
-        Listing.item_id == Item.id
-    ).add_entity(
-        Item
-    ).filter(
-        Listing.status == "available"
-    )
+    
 
-    #Sort marketplace listings
-    if sort == "oldest":
-        listings_query = listings_query.order_by(
-            Listing.created_at.asc()
-        )
-    elif sort == "name":
-        listings_query = listings_query.order_by(
-            Item.name.asc()
-        )
-    elif sort == "lowest":
-        listings_query = listings_query.order_by(
-            Listing.price.asc().nulls_last()
-        )
-    elif sort == "highest":
-        listings_query = listings_query.order_by(
-            Listing.price.desc().nulls_last()
-        )
-    else:
-        listings_query = listings_query.order_by(
-            Listing.created_at.desc()
-        )
 
-    listings = listings_query.all()
-        
-    return render_template(
-        "marketplace.html",
-        listings=listings,
-        sort=sort
-    )
+
+
+
