@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, app, render_template, redirect, request, url_for
 from app.extensions import db, login_manager,mail
 import flask_migrate
 from config import Config
@@ -89,4 +89,8 @@ def create_app():
     def home():
         return render_template("main/index.html")
 
+
+    from app.gmail_oauth import gmail_oauth
+    app.register_blueprint(gmail_oauth)
+    
     return app
