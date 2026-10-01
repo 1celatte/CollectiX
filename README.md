@@ -46,42 +46,59 @@ A simplified structure is:
 CollectiX/
 ├── app/
 │   ├── admin/
+│   │   ├── templates/
 │   │   ├── __init__.py
-│   │   ├── routes.py
-│   │   └── templates/
+│   │   └── routes.py
 │   ├── auth/
+│   │   ├── static/
+│   │   │   ├── images/
+│   │   │   │   └── default_avatar.jpg
+│   │   │   └── uploads/avatars/       # uploaded avatars
+│   │   ├── templates/
 │   │   ├── __init__.py
-│   │   ├── routes.py
-│   │   └── templates/
+│   │   └── routes.py
 │   ├── browse/
+│   │   ├── template/                  
 │   │   ├── __init__.py
-│   │   ├── routes.py
-│   │   └── templates/
+│   │   └── routes.py
 │   ├── collection/
+│   │   ├── static/uploads/            # uploaded collection and item images
+│   │   ├── template/                  
 │   │   ├── __init__.py
-│   │   ├── feature.py
-│   │   └── templates/
-│   ├── my_collection/
+│   │   └── feature.py
+│   ├── marketplace/
+│   │   ├── static/
+│   │   │   └── seed_images/
+│   │   ├── template/                  
 │   │   ├── __init__.py
-│   │   ├── feature.py
-│   │   └── templates/
+│   │   └── routes.py
+│   ├── mycollection/
+│   │   ├── templates/
+│   │   ├── __init__.py
+│   │   └── feature.py
 │   ├── static/
-│   │   └── uploads/
+│   │   └── images/
+│   │       └── collectix-home.png
 │   ├── templates/
 │   ├── __init__.py
 │   ├── extensions.py
 │   ├── models.py
 │   └── utils.py
 ├── instance/
-│   └── collectix.db
+│   └── collectix.db                  # created at runtime; not tracked in main
 ├── migrations/
-├── .env
+│   ├── versions/
+│   ├── README
+│   ├── alembic.ini
+│   ├── env.py
+│   └── script.py.mako
+├── .env                              # local/server settings; not tracked
 ├── .gitignore
+├── README.md
 ├── config.py
 ├── requirements.txt
 ├── run.py
-├── seed.py
-└── README.md
+└── seed.py                           # development data; don't run on production
 ```
 
 The actual project structure may contain additional files and templates used by individual features.
