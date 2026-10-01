@@ -1,6 +1,5 @@
 import unicodedata
-
-from flask_mail import Message
+from app.email_service import Message
 from flask_login import current_user
 from app.extensions import mail
 from app.models import User

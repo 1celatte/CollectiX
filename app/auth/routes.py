@@ -4,7 +4,7 @@ import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
-from flask_mail import Message
+from app.email_service import Message
 import os
 
 from . import auth
@@ -28,20 +28,6 @@ def validate_password(password):
 @auth.route("/test-auth")
 def test_auth():
     return "Auth Blueprint is working!"
-
-@auth.route("/test-email")
-def test_email():
-    msg = Message(  #建立email
-        subject="CollectiX Email Test",
-        sender=mail.username,
-        recipients=["cngchifei@gmail.com"]
-    )
-
-    msg.body = "This is a test email from CollectiX."
-
-    mail.send(msg) #发出去
-
-    return "Test email sent!"
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
