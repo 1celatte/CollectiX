@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
 from datetime import datetime, timedelta
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -282,6 +282,14 @@ def login():
                 email=email
             )
 
+        # User is banned
+        if user.is_banned:
+            return render_template(
+                "login.html",
+                login_error=f"Your account has been banned. Reason: {user.ban_reason}",
+                email=email
+            )
+
         login_user(user)
 
         if user.role == "admin":
@@ -388,6 +396,8 @@ def change_password():
     current_user.password = generate_password_hash(new_password)
 
     db.session.commit()
+
+    flash("Password changed successfully.", "success")
 
     return redirect(url_for("auth.profile"))
 
