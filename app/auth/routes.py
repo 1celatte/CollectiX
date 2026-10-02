@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for,flash
 from datetime import datetime, timedelta
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -374,6 +374,9 @@ def change_password():
     current_user.password = generate_password_hash(new_password)
 
     db.session.commit()
+    
+    flash("Password changed successfully.", "success")
+
 
     return redirect(url_for("auth.profile"))
 
