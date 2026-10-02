@@ -527,7 +527,7 @@ User Details - CollectiX
 
 
 <!-- =========================
-     ITEMS FOR SALE
+     LISTINGS
 ========================= -->
 
 <div class="card shadow-sm border-0 mb-4">
@@ -538,24 +538,17 @@ User Details - CollectiX
 
             <i class="bi bi-tag me-2 text-secondary"></i>
 
-            Items for Sale
+            Listings
 
         </h5>
 
-
-        {% set sale_listings = listings
-            | selectattr("listing_type", "equalto", "sell")
-            | list
-        %}
-
-        <span class="badge text-bg-secondary">
-            {{ sale_listings|length }}
+        <span class="badge text-bg-secondary"> 
+            {{ listings|length }} 
         </span>
 
     </div>
 
-
-    {% if sale_listings %}
+    {% if listings %}
 
         <div class="table-responsive">
 
@@ -567,6 +560,10 @@ User Details - CollectiX
 
                         <th class="px-4">
                             Item
+                        </th>
+
+                        <th> 
+                            Type 
                         </th>
 
                         <th>
@@ -592,21 +589,67 @@ User Details - CollectiX
 
                 <tbody>
 
-                    {% for listing in sale_listings %}
+                    {% for listing in listings %}
 
                     <tr>
+
+                        <!-- Item -->
 
                         <td class="px-4 fw-semibold">
                             {{ listing.item.name }}
                         </td>
 
-                        <td class="fw-semibold text-success">
-                            RM {{ "%.2f"|format(listing.price) }}
+                        <!-- Type -->
+                        
+                        <td>
+                            
+                            {% if listing.listing_type == "sell" %} 
+                            
+                                <span class="badge text-bg-primary"> 
+                                    Sell 
+                                </span> 
+                                
+                            {% elif listing.listing_type == "trade" %} 
+                            
+                                <span class="badge text-bg-warning"> 
+                                    Trade 
+                                </span> 
+                                
+                            {% else %} 
+                            
+                                <span class="badge text-bg-secondary"> 
+                                    {{ listing.listing_type }} 
+                                </span> 
+                                
+                            {% endif %} 
+                        
                         </td>
+
+                        <!-- Price -->
+
+                        <td class="fw-semibold"> 
+                            
+                            {% if listing.listing_type == "sell" %}
+
+                                <span class="text-success">
+                                    RM {{ "%.2f"|format(listing.price) }}
+                                </span>
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Condition -->
 
                         <td>
                             {{ listing.condition }}
                         </td>
+
+                        <!-- Status -->
 
                         <td>
 
@@ -622,6 +665,12 @@ User Details - CollectiX
                                     Sold
                                 </span>
 
+                            {% elif listing.status == "traded" %} 
+                            
+                                <span class="badge text-bg-secondary"> 
+                                    Traded 
+                                </span>
+
                             {% else %}
 
                                 <span class="badge text-bg-warning">
@@ -631,6 +680,8 @@ User Details - CollectiX
                             {% endif %}
 
                         </td>
+
+                        <!-- Listed At -->
 
                         <td>
                             {{ listing.created_at }}
@@ -652,7 +703,7 @@ User Details - CollectiX
 
             <i class="bi bi-tag fs-2 d-block mb-2"></i>
 
-            No items for sale.
+            No listings.
 
         </div>
 
@@ -819,6 +870,208 @@ User Details - CollectiX
             <i class="bi bi-receipt fs-2 d-block mb-2"></i>
 
             No transaction history.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================
+     TRADE HISTORY
+========================= -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+
+        <h5 class="mb-0 fw-semibold">
+
+            <i class="bi bi-arrow-left-right me-2 text-secondary"></i>
+
+            Trade History
+
+        </h5>
+
+        <span class="badge text-bg-secondary">
+            {{ trades|length }}
+        </span>
+
+    </div>
+
+
+    {% if trades %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th class="px-4">
+                            Role
+                        </th>
+
+                        <th>
+                            Other User
+                        </th>
+
+                        <th>
+                            Offered Item
+                        </th>
+
+                        <th>
+                            Requested Item
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for trade in trades %}
+
+                    <tr>
+
+                        <!-- Role -->
+
+                        <td class="px-4">
+
+                            {% if trade.sender_id == user.id %}
+
+                                <span class="badge text-bg-primary">
+                                    Sender
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-secondary">
+                                    Receiver
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Other User -->
+
+                        <td>
+
+                            {% if trade.sender_id == user.id %}
+
+                                {{ trade.receiver.name }}
+
+                            {% else %}
+
+                                {{ trade.sender.name }}
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Offered Item -->
+
+                        <td>
+
+                            {% if trade.offered_item %}
+                                {{ trade.offered_item.name }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Requested Item -->
+
+                        <td>
+
+                            {% if trade.requested_item %}
+                                {{ trade.requested_item.name }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if trade.status == "accepted" %}
+
+                                <span class="badge text-bg-success">
+                                    Accepted
+                                </span>
+
+                            {% elif trade.status == "rejected" %}
+
+                                <span class="badge text-bg-danger">
+                                    Rejected
+                                </span>
+
+                            {% elif trade.status == "cancelled" %}
+
+                                <span class="badge text-bg-danger">
+                                    Cancelled
+                                </span>
+
+                            {% elif trade.status == "completed" %}
+
+                                <span class="badge text-bg-success">
+                                    Completed
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-warning">
+                                    {{ trade.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Date -->
+
+                        <td>
+                            {{ trade.created_at }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="text-center text-secondary py-5">
+
+            <i class="bi bi-arrow-left-right fs-2 d-block mb-2"></i>
+
+            No trade history.
 
         </div>
 
